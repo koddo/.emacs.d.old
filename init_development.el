@@ -76,13 +76,13 @@
 ;; https://github.com/swannodette/clojure-snippets
 ;;; ??? hippie-expand
 ;; -------------------------------------------------------------------
-(require 'rvm)
-(rvm-use-default)
+;; (require 'rvm)
+;; (rvm-use-default)
 ;; -------------------------------------------------------------------
-(load "~/.elisp/haskell-mode/haskell-site-file")
-(add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)   ; hslint on the command line only likes this indentation mode
-(add-to-list 'completion-ignored-extensions ".hi")
+;; (load "~/.elisp/haskell-mode/haskell-site-file")
+;; (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
+;; (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)   ; hslint on the command line only likes this indentation mode
+;; (add-to-list 'completion-ignored-extensions ".hi")
 ;; -------------------------------------------------------------------
 ;; for coursera programming languages
 ;; (autoload 'sml-mode "sml-mode" "Major mode for editing SML." t)
@@ -117,43 +117,43 @@
 ;; $ sudo ports install ctags
 ;; $ cd /opt/local/bin/
 ;; $ sudo ln -s ctags etags
-(require 'etags-select)
-(require 'etags-update)
-(etags-update-mode 1)
-(setq tags-revert-without-query t)
-(diminish 'etags-update-mode)
-(setq etu/append-file-action
-      (lambda (filename-to-save)
-        (when
-            (and (projectile-project-p) (file-exists-p (projectile-expand-root ".TAGS")))
-            ;; (and ym-project-name
-            ;;      ym-proj-tags-file
-            ;;      (string-prefix-p ym-project-basedir filename-to-save)
-            ;;      (some (lambda (elt) (not (null elt)))    ; has known extenstion
-            ;;            (mapcar
-            ;;             (lambda (w) (string-match (wildcard-to-regexp w) filename-to-save))
-            ;;             ym-proj-src-patterns))
-            ;;      )
-          'add)))
+;; (require 'etags-select)
+;; (require 'etags-update)
+;; (etags-update-mode 1)
+;; (setq tags-revert-without-query t)
+;; (diminish 'etags-update-mode)
+;; (setq etu/append-file-action
+;;       (lambda (filename-to-save)
+;;         (when
+;;             (and (projectile-project-p) (file-exists-p (projectile-expand-root ".TAGS")))
+;;             ;; (and ym-project-name
+;;             ;;      ym-proj-tags-file
+;;             ;;      (string-prefix-p ym-project-basedir filename-to-save)
+;;             ;;      (some (lambda (elt) (not (null elt)))    ; has known extenstion
+;;             ;;            (mapcar
+;;             ;;             (lambda (w) (string-match (wildcard-to-regexp w) filename-to-save))
+;;             ;;             ym-proj-src-patterns))
+;;             ;;      )
+;;           'add)))
 
-;; (if (and (boundp 'projectile-mode) projectile-mode)
-;;     (message "projectile-mode is on")
-;;   (message "projectile-mode is off"))
+;; ;; (if (and (boundp 'projectile-mode) projectile-mode)
+;; ;;     (message "projectile-mode is on")
+;; ;;   (message "projectile-mode is off"))
 
-(defun ym-ido-find-tag ()
-  "Find a tag using ido"
-  (interactive)
-  (tags-completion-table)
-  (let (tag-names)
-    (mapatoms (lambda (x)
-                (push (prin1-to-string x t) tag-names))
-              tags-completion-table)
-    (etags-select-find (ido-completing-read "Tag: " tag-names))))
-(defun ym-find-tag-at-point ()
-  (interactive)
-  (if (find-tag-default)
-      (etags-select-find-tag-at-point)
-    (ym-ido-find-tag)))
+;; (defun ym-ido-find-tag ()
+;;   "Find a tag using ido"
+;;   (interactive)
+;;   (tags-completion-table)
+;;   (let (tag-names)
+;;     (mapatoms (lambda (x)
+;;                 (push (prin1-to-string x t) tag-names))
+;;               tags-completion-table)
+;;     (etags-select-find (ido-completing-read "Tag: " tag-names))))
+;; (defun ym-find-tag-at-point ()
+;;   (interactive)
+;;   (if (find-tag-default)
+;;       (etags-select-find-tag-at-point)
+;;     (ym-ido-find-tag)))
 ;; -------------------------------------------------------------------
 (setq erlang-root-dir "~/.kerl_erlang/r16b01")
 (add-to-list 'exec-path (concat erlang-root-dir "/bin"))
