@@ -179,7 +179,7 @@
       (setq output (concat ".../" output)))
     output))
 ;; -------------------------------------------------------------------
-(require 'tree-mode)
-(require 'dirtree)   ; alternative to dired
-(require 'windata)
+;; (require 'tree-mode)
+;; (require 'dirtree)   ; alternative to dired
+;; (require 'windata)
 ;; -------------------------------------------------------------------
