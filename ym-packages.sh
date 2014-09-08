@@ -23,7 +23,7 @@ function usage() {
 
 
 function log_entry() {    # extract from 'Squashed ... content from commit 75e85d0'
-    echo "$PKGNAME -- $PKGGIT -- $PKGREF -- $(echo `git log --grep Squashed --oneline | grep $PKGNAME | head -n 1 | awk '{print $NF}'`)"
+    echo "$PKGNAME $PKGGIT $PKGREF -- $(echo `git log --grep Squashed --oneline | grep $PKGNAME | head -n 1 | awk '{print $NF}'`)"
 }
 if [[ $PKGCMD == "add" ]]; then
     git remote add $PKGNAME $PKGGIT && \
