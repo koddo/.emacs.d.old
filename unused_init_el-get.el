@@ -16,6 +16,7 @@
 	ledger-mode
         ))
 
+;; TODO: monitor changes on security and upgrade this script if needed
 (setq el-get-allow-insecure nil)
 
 (el-get 'sync ym-el-get-packages)

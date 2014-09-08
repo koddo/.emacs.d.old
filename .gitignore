@@ -8,5 +8,8 @@
 tramp
 .org-id-locations
 
-preinit_this_machine.el
+/preinit_this_machine.el
+/org-clock-save.el
+/projectile-bookmarks.eld
+
 
