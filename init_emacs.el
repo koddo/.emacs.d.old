@@ -43,6 +43,7 @@
 ;; -------------------------------------------------------------------
 (require       'saveplace)   ; When you visit a file, point goes to the last place where it was when you previously visited the same file.
 (setq-default   save-place t)
+(setq save-place-file "~/.emacs.d/.emacs-places")
 ;; -------------------------------------------------------------------
 (require   'uniquify)  ; buffer names are uniquified with parts of directory name, for ex.: name|folder
 (setq       uniquify-buffer-name-style 'reverse)

@@ -11,5 +11,5 @@ tramp
 /preinit_this_machine.el
 /org-clock-save.el
 /projectile-bookmarks.eld
-
+/.emacs-places
 
