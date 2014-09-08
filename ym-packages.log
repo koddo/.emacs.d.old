@@ -12,3 +12,4 @@ added ack-and-a-half https://github.com/jhelwig/ack-and-a-half master -- bdbbc8e
 added projectile https://github.com/bbatsov/projectile master -- 4a3b56a
 added s https://github.com/magnars/s.el master -- fec417a
 added dash https://github.com/magnars/dash.el master -- b1e585d
+added pkg-info https://github.com/lunaryorn/pkg-info.el master -- 475cdeb
