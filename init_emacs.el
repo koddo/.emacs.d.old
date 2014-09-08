@@ -1,6 +1,6 @@
 (server-start)
-(require 'maxframe)
-(add-hook 'window-setup-hook 'maximize-frame t)
+;(require 'maxframe)
+;(add-hook 'window-setup-hook 'maximize-frame t)
 
 ;; -------------------------------------------------------------------
 (setq user-full-name "Alex Scherbanov")

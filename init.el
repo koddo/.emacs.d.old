@@ -6,6 +6,7 @@
                    (not (equal f ".."))
                    (not (equal f ".")))
           (add-to-list 'load-path name)))))
+(ym-add-everything-to-load-path-in "~/.emacs.d/ym-packages")
 (add-to-list 'load-path "~/.emacs.d/ym-packages/org-mode/contrib/lisp")
 (add-to-list 'load-path "~/.emacs.d/ym-packages/org-mode/lisp")
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
