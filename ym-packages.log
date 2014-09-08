@@ -15,3 +15,4 @@ added dash https://github.com/magnars/dash.el master -- b1e585d
 added pkg-info https://github.com/lunaryorn/pkg-info.el master -- 475cdeb
 added epl https://github.com/cask/epl master -- 63c78c0
 added maxframe https://github.com/rmm5t/maxframe.el master -- baa9885
+added exec-path-from-shell https://github.com/purcell/exec-path-from-shell master -- 8748769
