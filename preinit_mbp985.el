@@ -17,7 +17,8 @@
 (defun open-file-with-os (filename)   ; TODO: why?
   (shell-command (concat "open '" filename "'")))
 
-
+(require 'exec-path-from-shell)   ; TODO: move to init.el after checking it on linux
+(exec-path-from-shell-initialize)   ; exec-path-from-shell-variables
 
 
 
