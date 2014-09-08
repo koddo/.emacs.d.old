@@ -1,0 +1,12 @@
+# see https://github.com/github/gitignore/blob/master/Global/Emacs.gitignore
+
+*.elc
+/elpa/
+/el-get/
+
+/auto-save-list/
+tramp
+.org-id-locations
+
+preinit_this_machine.el
+
