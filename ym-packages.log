@@ -5,3 +5,4 @@ added macrostep https://github.com/joddie/macrostep master -- 51d5b6a
 added dired-plus https://github.com/emacsmirror/dired-plus master -- 75e85d0
 added dired-details https://github.com/emacsmirror/dired-details master -- 1cca7d2
 added color-theme-buffer-local https://github.com/vic/color-theme-buffer-local master -- b4444be
+added smex https://github.com/nonsequitur/smex master -- f1f8543
