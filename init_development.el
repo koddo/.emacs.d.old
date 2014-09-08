@@ -155,71 +155,71 @@
 ;;       (etags-select-find-tag-at-point)
 ;;     (ym-ido-find-tag)))
 ;; -------------------------------------------------------------------
-(setq erlang-root-dir "~/.kerl_erlang/r16b01")
-(add-to-list 'exec-path (concat erlang-root-dir "/bin"))
-(add-to-list 'load-path
-             (car (file-expand-wildcards (concat erlang-root-dir "/lib/tools-*/emacs"))))
-(require 'erlang-start)
-(add-to-list 'load-path "~/.elisp/distel/elisp")
-(require 'distel)
-(distel-setup)
-(add-hook 'erlang-mode-hook
-          (lambda ()
-            (setq inferior-erlang-machine-options '("-sname" "emacs"))   ; default node name
-            ;; (setq erlang-compile-extra-opts '(debug_info))
-            ))
-(require 'erlang-flymake)
-(erlang-flymake-only-on-save)
-;; maybe http://blog.erlware.org/2012/05/15/getting-flymake-and-rebar-to-play-nice/
-(defun m/erl-recompile-and-reload ()
-  (interactive)
-  (let
-      ((current-prefix-arg '(4)))
-    (call-interactively 'erlang-compile))
-  (erl-reload-module (erl-target-node) (erlang-get-module))
-  (message "===== %S" (list (erl-target-node) (erlang-get-module))))
-(defun m/erl-shell-on-node ()
-  (interactive)
-  (erl-choose-nodename)
-  (progn
-    (erlang-shell-display)
-    (end-of-buffer)
-    (insert (kbd "C-g"))
-    (erlang-RET-command)
-    (insert (kbd "h"))
-    (erlang-RET-command)
-    (insert (kbd "j"))
-    (erlang-RET-command)
-    (let* ((node (symbol-name (erl-target-node)))
-           (found
-            (save-excursion
-              (search-backward-regexp "^ --> j\n")
-              (numberp (ignore-errors (search-forward node))))
-            ))
-      (flet ((get-job-number ()
-                             (save-excursion
-                               (search-backward node)
-                               (let ((line (substring-no-properties (buffer-substring (point-at-bol) (point-at-eol)))))
-                                 (string-match "^[[:space:]]*\\([[:digit:]]+\\)+" line)
-                                 (match-string-no-properties 1 line))))
-             (connect-to-job ()
-                             (let ((nn (get-job-number)))
-                               (insert (concat "c " nn))
-                               (erlang-RET-command)
-                               (erlang-RET-command)
-                               )))
-        (if (not found)
-            (progn (insert (concat "r " node))
-                   (erlang-RET-command)
-                   (insert "j")
-                   (erlang-RET-command)
-                   (connect-to-job))
-          (connect-to-job)
-          )))))
-(defun m/erl-connect-to-node ()
-  (interactive)
-  (erl-choose-nodename)
-  (erl-ping (erl-target-node)))
+;; (setq erlang-root-dir "~/.kerl_erlang/r16b01")
+;; (add-to-list 'exec-path (concat erlang-root-dir "/bin"))
+;; (add-to-list 'load-path
+;;              (car (file-expand-wildcards (concat erlang-root-dir "/lib/tools-*/emacs"))))
+;; (require 'erlang-start)
+;; (add-to-list 'load-path "~/.elisp/distel/elisp")
+;; (require 'distel)
+;; (distel-setup)
+;; (add-hook 'erlang-mode-hook
+;;           (lambda ()
+;;             (setq inferior-erlang-machine-options '("-sname" "emacs"))   ; default node name
+;;             ;; (setq erlang-compile-extra-opts '(debug_info))
+;;             ))
+;; (require 'erlang-flymake)
+;; (erlang-flymake-only-on-save)
+;; ;; maybe http://blog.erlware.org/2012/05/15/getting-flymake-and-rebar-to-play-nice/
+;; (defun m/erl-recompile-and-reload ()
+;;   (interactive)
+;;   (let
+;;       ((current-prefix-arg '(4)))
+;;     (call-interactively 'erlang-compile))
+;;   (erl-reload-module (erl-target-node) (erlang-get-module))
+;;   (message "===== %S" (list (erl-target-node) (erlang-get-module))))
+;; (defun m/erl-shell-on-node ()
+;;   (interactive)
+;;   (erl-choose-nodename)
+;;   (progn
+;;     (erlang-shell-display)
+;;     (end-of-buffer)
+;;     (insert (kbd "C-g"))
+;;     (erlang-RET-command)
+;;     (insert (kbd "h"))
+;;     (erlang-RET-command)
+;;     (insert (kbd "j"))
+;;     (erlang-RET-command)
+;;     (let* ((node (symbol-name (erl-target-node)))
+;;            (found
+;;             (save-excursion
+;;               (search-backward-regexp "^ --> j\n")
+;;               (numberp (ignore-errors (search-forward node))))
+;;             ))
+;;       (flet ((get-job-number ()
+;;                              (save-excursion
+;;                                (search-backward node)
+;;                                (let ((line (substring-no-properties (buffer-substring (point-at-bol) (point-at-eol)))))
+;;                                  (string-match "^[[:space:]]*\\([[:digit:]]+\\)+" line)
+;;                                  (match-string-no-properties 1 line))))
+;;              (connect-to-job ()
+;;                              (let ((nn (get-job-number)))
+;;                                (insert (concat "c " nn))
+;;                                (erlang-RET-command)
+;;                                (erlang-RET-command)
+;;                                )))
+;;         (if (not found)
+;;             (progn (insert (concat "r " node))
+;;                    (erlang-RET-command)
+;;                    (insert "j")
+;;                    (erlang-RET-command)
+;;                    (connect-to-job))
+;;           (connect-to-job)
+;;           )))))
+;; (defun m/erl-connect-to-node ()
+;;   (interactive)
+;;   (erl-choose-nodename)
+;;   (erl-ping (erl-target-node)))
 ;; -------------------------------------------------------------------
 (setq save-abbrevs nil)   ; stop asking whether to save newly added abbrev when quitting emacs
 ;; (setq-default abbrev-mode t)   ; turn on abbrev mode globally
@@ -240,7 +240,8 @@
 ;; (add-hook 'python-mode-hook 'projectile-on)
 ;; (add-hook 'prog-mode-hook 'projectile-on) --- ???
 (projectile-global-mode)
-(setq ack-and-a-half-executable "ack-5.12")
+; TODO: what about flx-ido -- highly recommended by projectile?
+; (setq ack-and-a-half-executable "ack-5.12")
 ;; -------------------------------------------------------------------
 
 
