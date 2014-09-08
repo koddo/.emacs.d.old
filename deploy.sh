@@ -2,6 +2,9 @@
 
 cd "$(dirname "$0")"
 
+cat > ym-packages/org-mode/local.mk << EOF
+EMACS = /Applications/MacPorts/Emacs.app/Contents/MacOS/Emacs
+EOF
 cd ym-packages/org-mode && make
 
 echo
