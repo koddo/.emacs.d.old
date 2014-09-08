@@ -1,5 +1,11 @@
-(add-to-list 'default-frame-alist
-             '(font . "-apple-Monaco-medium-normal-normal-*-10-*-*-*-m-0-iso10646-1"))
+;; (add-to-list 'default-frame-alist
+;;              '(font . "-apple-Monaco-medium-normal-normal-*-10-*-*-*-m-0-iso10646-1"))
+;;              ;; '(font . "-misc-ubuntu mono-medium-r-normal--0-0-0-0-m-0-iso10646-1"))
+(progn
+  (set-face-attribute 'default nil :family "Monaco" :height 100)
+  (set-fontset-font t 'cyrillic "Monaco")
+  )
+(setq mac-allow-anti-aliasing t)
 (setq mac-command-modifier 'control
       mac-option-modifier 'meta
       mac-control-modifier 'super)
@@ -13,6 +19,9 @@
 
 (defun open-file-with-os (filename)
   (shell-command (concat "open '" filename "'")))
+
+
+
 
 
 
