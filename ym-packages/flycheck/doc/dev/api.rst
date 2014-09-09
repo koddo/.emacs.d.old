@@ -152,9 +152,6 @@ syntax check.
 .. function:: flycheck-has-errors-p
    :auto:
 
-.. function:: flycheck-has-max-errors-p
-   :auto:
-
 .. _builtin-error-parsers:
 
 Builtin error parsers
