@@ -8,7 +8,7 @@
 /tramp
 /.org-id-locations
 
-/preinit_this_machine.el
+/init__preinit_this_machine.el
 /org-clock-save.el
 /projectile-bookmarks.eld
 /.emacs-places
