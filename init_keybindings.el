@@ -199,8 +199,6 @@
 (ym-define-key (kbd "S-<f5>") (lambda () (interactive) (ym-org-clock-summary 7)))
 (ym-define-key (kbd "M-<f5>") 'ym-org-problems-count-view)
 (ym-define-key (kbd "<f6>") 'ym-org-contacts-view)
-(ym-define-key (kbd "<f11>") (lambda () (interactive) (ym-clock-in-and-notify t)))
-(ym-define-key (kbd "<f12>") (lambda () (interactive) (ym-clock-out-and-notify)))
 (ym-define-key (kbd "C-<left>")     'winner-undo)
 (ym-define-key (kbd "C-<right>")    'winner-redo)
 (ym-define-key (kbd "M-x") 'smex)
@@ -413,7 +411,7 @@
       (ignore-errors (org-agenda-clock-out))
       (if old-current
           old-current
-        "------------------------")
+        "")
       )))
 (defun ym-clock-show-current ()
   (interactive)
