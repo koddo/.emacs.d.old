@@ -3,8 +3,7 @@
 
 # keybindings
 in bettertouchtool for osx
-| keybinding | exec command |
-| --- | --- |
+
 | C-S-F11 | osascript ~/.emacs.d/org-clock.applescript clock_in |
 | C-S-M-F11 | osascript ~/.emacs.d/org-clock.applescript clock_in_default |
 | C-S-F12 | osascript ~/.emacs.d/org-clock.applescript clock_out |
