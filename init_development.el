@@ -232,16 +232,18 @@
 (add-to-list 'auto-mode-alist '("\\.html?$" . web-mode))
 ;; -------------------------------------------------------------------
 (require 'projectile)
-;; $ sudo port install p5-app-ack
+(require 'ack-and-a-half)
+(require 'dash)
+(require 's)
+(require 'epl)
+(projectile-global-mode)
+                                        ; TODO: what about flx-ido -- highly recommended by projectile?
 ;; (add-hook 'js-mode-hook 'projectile-on)
 ;; (add-hook 'css-mode-hook 'projectile-on)
 ;; (add-hook 'web-mode-hook 'projectile-on)
 ;; (add-hook 'emacs-lisp-mode-hook 'projectile-on)
 ;; (add-hook 'python-mode-hook 'projectile-on)
 ;; (add-hook 'prog-mode-hook 'projectile-on) --- ???
-(projectile-global-mode)
-; TODO: what about flx-ido -- highly recommended by projectile?
-; (setq ack-and-a-half-executable "ack-5.12")
 ;; -------------------------------------------------------------------
 
 
