@@ -16,6 +16,7 @@ TODO: same thing in linux
 
 # ym-packages.sh
 TODO: use elpa when it supports ssl or signed packages, it now doesn't
+
 Anyway it's convenient to have everything in the same repo for fast deployment.
 
 I use stock git subtrees without support of .gittrees file, in some forks it contains info on paths, repos, and refspecs.
