@@ -35,3 +35,7 @@ I wrote a trivial script which also logs info on subtrees:
 ./ym-packages.sh add org-mode git://orgmode.org/org-mode.git maint
 ```
 
+# to-do
+
+TODO: in org-clock.applescript find a better way to get full path of emacsclient --- in osx it's in Emacs.app, not one installed systemwide
+

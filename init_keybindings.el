@@ -203,6 +203,7 @@
 (ym-define-key (kbd "C-<right>")    'winner-redo)
 (ym-define-key (kbd "M-x") 'smex)
 (ym-define-key (kbd "C-`") 'other-frame)
+(ym-define-key (kbd "C-c '") 'narrow-or-widen-dwim)
 ;; (ym-define-key (kbd "<left>") (lambda () (interactive) (ignore-errors (windmove-left))))
 ;; (ym-define-key (kbd "<right>") (lambda () (interactive) (ignore-errors (windmove-right))))
 ;; (ym-define-key (kbd "<up>") (lambda () (interactive) (ignore-errors (windmove-up))))
@@ -413,6 +414,14 @@
           old-current
         "")
       )))
+;; (defun ym-org-clock-in-ask-effort ()
+;;   "Ask for an effort estimate when clocking in."
+;;   (unless (org-entry-get (point) "Effort")
+;;     (org-set-effort))
+;;   (when (string= (org-get-effort) "0:00")
+;;     (org-delete-property "Effort")))
+;; ;; (add-hook 'org-clock-in-prepare-hook 'ym-org-clock-in-ask-effort)
+;; (define-key org-mode-map (kbd "M-I") 'ym-org-clock-in-ask-effort)
 (defun ym-clock-show-current ()
   (interactive)
   (delete-other-windows)
@@ -420,6 +429,7 @@
   (show-entry)
   (search-forward ":END:")
   (forward-line -1))
+;; -------------------------------------------------------------------
 (defun ym-org-agenda-hide-line-temporarily (&optional do-not-leave-blank)
   (interactive)
   (overlay-put
@@ -608,8 +618,32 @@ there's a region, all lines that region covers will be duplicated."
     (isearch-yank-string selection)))  
 (defun ym-search-selection-or-isearch-forward  () (interactive) (if mark-active (ym-search-selection-or-isearch t)   (isearch-forward)))
 (defun ym-search-selection-or-isearch-backward () (interactive) (if mark-active (ym-search-selection-or-isearch nil) (isearch-backward)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun narrow-or-widen-dwim (p)   ; http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html
+  "If the buffer is narrowed, it widens. Otherwise, it narrows intelligently.
+Intelligently means: region, org-src-block, org-subtree, or defun,
+whichever applies first.
+Narrowing to org-src-block actually calls `org-edit-src-code'.
+
+With prefix P, don't widen, just narrow even if buffer is already
+narrowed."
+  (interactive "P")
+  (declare (interactive-only))
+  (cond ((and (buffer-narrowed-p) (not p)) (widen))
+        ((region-active-p)
+         (narrow-to-region (region-beginning) (region-end)))
+        ((derived-mode-p 'org-mode)
+         ;; `org-edit-src-code' is not a real narrowing command.
+         ;; Remove this first conditional if you don't want it.
+         (cond ((org-in-src-block-p)
+                (org-edit-src-code)
+                (delete-other-windows))
+               ((org-at-block-p)
+                (org-narrow-to-block))
+               (t (org-narrow-to-subtree))))
+        (t (narrow-to-defun))))
 
 
 
@@ -622,12 +656,4 @@ there's a region, all lines that region covers will be duplicated."
 
 
 
-;; (defun ym-org-clock-in-ask-effort ()
-;;   "Ask for an effort estimate when clocking in."
-;;   (unless (org-entry-get (point) "Effort")
-;;     (org-set-effort))
-;;   (when (string= (org-get-effort) "0:00")
-;;     (org-delete-property "Effort")))
-;; ;; (add-hook 'org-clock-in-prepare-hook 'ym-org-clock-in-ask-effort)
-;; (define-key org-mode-map (kbd "M-I") 'ym-org-clock-in-ask-effort)
 
