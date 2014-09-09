@@ -11,8 +11,8 @@
 (add-to-list 'load-path "~/.emacs.d/ym-packages/org-mode/lisp")
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 
-(load-file "~/.emacs.d/preinit_this_machine.el")
-(setq custom-file "~/.emacs.d/custom.el")
+(load-file "~/.emacs.d/init__preinit_this_machine.el")
+(setq custom-file "~/.emacs.d/init_custom.el")
 (load custom-file 'noerror)
 
 
