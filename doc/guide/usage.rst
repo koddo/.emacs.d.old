@@ -280,12 +280,16 @@ following algorithm:
 1. If the configuration file variable contains a path a directory
    separator, expand the path against the buffer's default directory and
    use the resulting path as configuration file.
-2. If the buffer has a file name, search the buffer's directory and any
+2. If Projectile_ is available and the current buffer is part of a project
+   project, search the configuration file in the root directory of the project.
+3. If the buffer has a file name, search the buffer's directory and any
    ancestors thereof for the configuration file.
-3. Eventually attempt to locate the configuration file in the user's home
+4. Eventually attempt to locate the configuration file in the user's home
    directory.
 
 If any of these steps succeeds, the subsequent steps are not executed.
+
+.. _Projectile: https://github.com/bbatsov/projectile
 
 .. _error-reporting:
 
@@ -311,12 +315,12 @@ Errors and warnings from a syntax checker are
 
       The default faces provided by GNU Emacs are ill-suited to highlight errors
       because these are relatively pale and do not specify a background color or
-      underline.  Hence highlights are easy to overlook and even **invisible**
+      underline.  Hence highlights are easily overlook and even **invisible**
       for white space.
 
-   For best error highlighting customize these faces, or choose a color theme
-   that has reasonable Flycheck faces.  The popular Solarized_ and Zenburn_
-   themes are known to have good Flycheck faces.
+   For best error highlighting customize these faces, or choose a color
+   theme that has reasonable Flycheck faces.  For instance, the Solarized_ and
+   Zenburn_ themes are known to have good Flycheck faces.
 
 .. option:: flycheck-highlighting-mode
    :auto:
@@ -353,21 +357,9 @@ The error is displayed via :option:`flycheck-display-errors-function`:
 .. option:: flycheck-display-errors-function
    :auto:
 
-   .. seealso::
-
-      The `flycheck-pos-tip`_ extension provides a display function to show
-      errors at point in a graphical popup.
-
-      .. _flycheck-pos-tip: https://github.com/flycheck/flycheck-pos-tip
-
 The default function displays the error messages in the echo area:
 
 .. function:: flycheck-display-error-messages
-   :auto:
-
-Alternatively, the following error display functions are available:
-
-.. function:: flycheck-display-error-messages-unless-error-list
    :auto:
 
 You can also work with the error messages at point, and copy them into the kill
@@ -518,10 +510,3 @@ Change :option:`flycheck-mode-line` to customize the mode line reporting:
 
 .. option:: flycheck-mode-line
    :auto:
-
-.. seealso::
-
-   The flycheck-color-mode-line_ extension changes the background colour of the
-   mode line according to the result of the last syntax check.
-
-.. _flycheck-color-mode-line: https://github.com/flycheck/flycheck-color-mode-line

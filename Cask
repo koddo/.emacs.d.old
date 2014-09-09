@@ -13,6 +13,7 @@
 
  ;; Make optional dependencies available for development
  (depends-on "google-this")             ; Search for messages
+ (depends-on "projectile")              ; Projectile integration
 
  ;; Various modes for use in the unit tests
  (depends-on "adoc-mode")
@@ -39,4 +40,5 @@
  (depends-on "scala-mode2")
  (depends-on "scss-mode")
  (depends-on "slim-mode")
+ (depends-on "web-mode")
  (depends-on "yaml-mode"))

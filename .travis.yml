@@ -3,7 +3,6 @@ env:
   - EMACS=emacs24
   - EMACS=emacs-snapshot
 before_install:
-  # Provision the test environment, and setup a proper PATH
   - sudo add-apt-repository -y ppa:rquillo/ansible
   - sudo apt-get update -y -q
   - sudo apt-get install -y ansible
@@ -13,7 +12,6 @@ install:
   # Install our packages
   - make EMACS=$EMACS deps
 script:
-  # Byte-compile the file, and error on warnings
-  - make EMACS=$EMACS EMACSFLAGS="--eval '(setq byte-compile-error-on-warn t)'" compile
-  # Run the unit tests
+  # Run unit tests.
+  - make EMACS=$EMACS compile
   - make EMACS=$EMACS test
