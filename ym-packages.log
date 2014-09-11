@@ -18,3 +18,4 @@ added maxframe https://github.com/rmm5t/maxframe.el master -- baa9885
 added exec-path-from-shell https://github.com/purcell/exec-path-from-shell master -- 8748769
 added flycheck https://github.com/flycheck/flycheck master -- 2ee1cd4
 pulled flycheck https://github.com/flycheck/flycheck 4a08b21605f756eacca35385ba3af120761270b8 -- 2ee1cd4..4a08b21
+added expand-region https://github.com/magnars/expand-region.el master -- 12df090
