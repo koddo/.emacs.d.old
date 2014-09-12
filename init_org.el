@@ -166,7 +166,16 @@
 (setq ym-org-agenda-planning-header-non-scheduled "Non-scheduled tasks:")
 (setq ym-org-agenda-planning-header-stuck-projects "Stuck projects:")
 (setq org-agenda-custom-commands
-      '(("1" "Daily schedule"
+      '(("0" "Only working to quickly switch between them"
+         (
+          (todo ""
+                ((org-agenda-overriding-header ym-org-agenda-planning-header-now)
+                 (org-agenda-skip-function '(org-agenda-skip-entry-if 'nottodo '("WORKING")))))
+          (todo ""
+                ((org-agenda-overriding-header ym-org-agenda-planning-header-paused)
+                 (org-agenda-skip-function '(org-agenda-skip-entry-if 'nottodo '("PAUSED" "WAITING")))))
+          ))
+        ("1" "Daily schedule"
          ((agenda "" ((org-agenda-span 1)
                       (org-agenda-show-log t)))
           (todo ""
@@ -220,6 +229,38 @@
 ;; (add-to-list 'org-export-latex-packages-alist '("" "amsmath" t))
 ;; (add-to-list 'org-export-latex-packages-alist '("" "bm" t))   ; bold math: $\bm \alpha$
 ;; -------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

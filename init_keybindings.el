@@ -183,6 +183,7 @@
 ;; (ym-define-key (kbd "M-/") ')
 (ym-define-key (kbd "M-,") 'pop-tag-mark)
 (ym-define-key (kbd "<f1>") 'ym-org-day-view)
+(ym-define-key (kbd "C-<f1>") 'ym-org-working)
 (ym-define-key (kbd "S-<f1>") 'ym-org-week-view)
 (ym-define-key (kbd "M-<f1>") 'ym-org-todo-view)
 (ym-define-key (kbd "S-M-<f1>") 'ym-org-todo-match-tags-view)
@@ -279,19 +280,24 @@
   (org-agenda nil "1") ; see org-agenda-custom-commands
   (ym-org-day-view-aux-go-to-now-header)
   (delete-other-windows))
+(defun ym-org-working ()
+  (interactive)
+  (org-agenda nil "0") ; see org-agenda-custom-commands
+  (forward-line)
+  (delete-other-windows))
 (defun ym-org-week-view ()
   (interactive)
   (org-agenda nil "2") ; see org-agenda-custom-commands
   (end-of-buffer)
   (search-backward org-agenda-current-time-string nil t)
-  (next-line)
+  (forward-line)
   (beginning-of-line)
   (delete-other-windows))
 (defun ym-org-todo-view ()
   (interactive)
   (org-agenda nil "3") ; see org-agenda-custom-commands
   (search-forward-regexp (concat "^" ym-org-agenda-planning-header-non-scheduled "$"))
-  (next-line)
+  (forward-line)
   (beginning-of-line)
   (delete-other-windows))
 (defun ym-org-todo-match-tags-view ()
@@ -394,7 +400,7 @@
   (view-mode 1))
 (defun ym-org-clocktable--aux--today-string-plus-days (days)
   (format-time-string "<%Y-%m-%d %a>" (time-add (current-time) (days-to-time days))))
-(defun ym-clock-in-and-notify (&optional emacs-is-active)    ; for growl
+(defun ym-clock-in-and-notify (&optional emacs-is-active)    ; for growl or notification center
   (interactive)
   (with-current-buffer (window-buffer (selected-window))   ; these functions are invoked by emacsclient
     (unless (and emacs-is-active (eq major-mode 'org-agenda-mode) (ignore-errors (org-agenda-clock-in)))
@@ -644,10 +650,6 @@ narrowed."
                 (org-narrow-to-block))
                (t (org-narrow-to-subtree))))
         (t (narrow-to-defun))))
-
-
-
-
 
 
 
