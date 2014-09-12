@@ -20,3 +20,4 @@ added flycheck https://github.com/flycheck/flycheck master -- 2ee1cd4
 pulled flycheck https://github.com/flycheck/flycheck 4a08b21605f756eacca35385ba3af120761270b8 -- 2ee1cd4..4a08b21
 added expand-region https://github.com/magnars/expand-region.el master -- 12df090
 added emacs-quickrun https://github.com/syohex/emacs-quickrun master -- 18b93d8
+added ibuffer-vc https://github.com/purcell/ibuffer-vc master -- ef61ad6
