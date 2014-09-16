@@ -75,6 +75,7 @@
 ;; -------------------------------------------------------------------
 (setq org-enforce-todo-dependencies t)
 (setq org-enforce-todo-checkbox-dependencies nil)
+;; (setq org-agenda-dim-blocked-tasks 'invisible)
 (setq org-agenda-dim-blocked-tasks t)
 (setq org-agenda-todo-list-sublevels t)
 ;; -------------------------------------------------------------------
@@ -228,6 +229,9 @@
 ;; (add-to-list 'org-export-latex-packages-alist '("russian" "babel" t))
 ;; (add-to-list 'org-export-latex-packages-alist '("" "amsmath" t))
 ;; (add-to-list 'org-export-latex-packages-alist '("" "bm" t))   ; bold math: $\bm \alpha$
+;; -------------------------------------------------------------------
+(add-hook 'org-clock-in-hook (lambda () (call-process "/usr/bin/osascript" nil 0 nil "-e" (concat "tell application \"org-clock-statusbar\" to clock in \"" org-clock-current-task "\""))))
+(add-hook 'org-clock-out-hook (lambda () (call-process "/usr/bin/osascript" nil 0 nil "-e" "tell application \"org-clock-statusbar\" to clock out")))
 ;; -------------------------------------------------------------------
 
 
