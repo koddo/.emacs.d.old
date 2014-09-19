@@ -38,6 +38,7 @@ I wrote a trivial script which also logs info on subtrees:
 If you want to get specific commit, then add master and then pull refspec.
 
 
+
 # to-do
 
 TODO: in org-clock.applescript find a better way to get full path of emacsclient --- in osx it's in Emacs.app, not one installed systemwide

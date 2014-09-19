@@ -41,17 +41,19 @@
 (setq ym-org-birthdays-file "~/workspace/.org.birthdays.org")
 (setq ym-org-journal-file "~/workspace/.org.journal.org.gpg")
 (setq ym-ledger-file "~/workspace/.org.finances.ledger.gpg")
-(setq org-agenda-files (list ym-org-agenda-file org-directory))
+(setq ym-work-file "~/workspace/Work.org.gpg")
+(setq org-agenda-files (list ym-org-agenda-file ym-work-file org-directory))
 (setq ym-org-clock-buffer-name "*Org Clock Summary*")
 (setq ym-org-contacts-view-buffer-name "*Org Contacts*")
 (setq ym-org-problems-count-view-buffer-name "*Org Problems Count*")
 (setq org-latex-preview-ltxpng-directory ".ltxpng/")
 (setq org-archive-location ".org.archive.org.gpg::")
 ;; -------------------------------------------------------------------
-(setq org-refile-targets '((org-agenda-files . (:tag . "TASKS"))))
+(setq org-refile-targets '((org-agenda-files . (:tag . "PROJECT"))))
 (setq org-refile-use-outline-path nil)
 (setq org-outline-path-complete-in-steps nil)
-(setq org-tags-exclude-from-inheritance '("TASKS"))
+(setq org-tags-exclude-from-inheritance '("PROJECT" "TASKS"))   ; TODO: remove TASKS from list
+(setq org-reverse-note-order t)
 ;; -------------------------------------------------------------------
 (setq org-agenda-tags-column -110)
 (setq org-complete-tags-always-offer-all-agenda-tags t)
@@ -75,11 +77,10 @@
 ;; -------------------------------------------------------------------
 (setq org-enforce-todo-dependencies t)
 (setq org-enforce-todo-checkbox-dependencies nil)
-;; (setq org-agenda-dim-blocked-tasks 'invisible)
-(setq org-agenda-dim-blocked-tasks t)
+(setq org-agenda-dim-blocked-tasks 'invisible)   ; was t
 (setq org-agenda-todo-list-sublevels t)
 ;; -------------------------------------------------------------------
-(setq ym-org-todo-keywords-working '("WORKING(w!)" "WAITING(W!)" "PAUSED(p!)"))
+(setq ym-org-todo-keywords-working '("WORKING(w!)" "WAITING(W!)" "PAUSED(p!)"))   ; STATES
 (setq ym-org-todo-keywords-undone `("REGULARLY(R!)" "NEXT(n!)" "TODO(t!)" ,@ym-org-todo-keywords-working))
 (setq ym-org-todo-keywords-done '("DONE(d!)" "CANCELLED(c@)" "REDIRECTED(r@)" "MERGED(m@)"))
 (setq ym-org-todo-state-string-in-log "State:     (")
@@ -114,50 +115,54 @@
 (setq org-columns-default-format "%10Effort(Effort){:} %10CLOCKSUM{:} %80ITEM(Task)")
 (setq org-global-properties '(("Effort_ALL" . "1:00 2:00 3:00 4:00 5:00 6:00 7:00 0:30 0:10 0:00")))
 ;; -------------------------------------------------------------------
+;; "unstuck" tag is for toplevel projects that I don't want to see in stuck projects, example:   * Ruby  :PROJECT:UNSTUCK:
+(setq org-stuck-projects '("PROJECT" ("NEXT" "WORKING" "PAUSED") ("UNSTUCK") nil))   ; STATES   
+
+;; TODO: remove helper functions below
 ;; helper functions for finding stuck projects
 ;; a heading is a project if it is a TODO and has TODO children, but it does not have NEXT
 ;; pasted from http://doc.norang.ca/org-mode.html#Projects
-(setq org-stuck-projects '("" nil nil ""))   ; for custom stuck project definition
-(defun bh/is-project-p ()
-  "Any task with a todo keyword subtask"
-  (save-restriction
-    (widen)
-    (let ((has-subtask)
-          (subtree-end (save-excursion (org-end-of-subtree t)))
-          (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
-      (save-excursion
-        (forward-line 1)
-        (while (and (not has-subtask)
-                    (< (point) subtree-end)
-                    (re-search-forward "^\*+ " subtree-end t))
-          (when (member (org-get-todo-state) org-todo-keywords-1)
-            (setq has-subtask t))))
-      (and is-a-task has-subtask))))
-(defun bh/list-sublevels-for-projects-indented ()
-  "Set org-tags-match-list-sublevels so when restricted to a subtree we list all subtasks.
-  This is normally used by skipping functions where this variable is already local to the agenda."
-  (if (marker-buffer org-agenda-restrict-begin)
-      (setq org-tags-match-list-sublevels 'indented)
-    (setq org-tags-match-list-sublevels nil))
-  nil)
-(defun bh/skip-non-stuck-projects ()   ; used in org-agenda-custom-commands as skip function
-  "Skip trees that are not stuck projects"
-  (bh/list-sublevels-for-projects-indented)
-  (save-restriction
-    (widen)
-    (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-      (if (bh/is-project-p)
-          (let* ((subtree-end (save-excursion (org-end-of-subtree t)))
-                 (has-next ))
-            (save-excursion
-              (forward-line 1)
-              (while (and (not has-next) (< (point) subtree-end) (re-search-forward "^\\*+ \\(NEXT\\|WORKING\\|WAITING\\) " subtree-end t))
-                (unless (member "WAITING" (org-get-tags-at))
-                  (setq has-next t))))
-            (if has-next
-                next-headline
-              nil)) ; a stuck project, has subtasks but no next task
-        next-headline))))
+;; (setq org-stuck-projects '("" nil nil ""))   ; for custom stuck project definition
+;; (defun bh/is-project-p ()
+;;   "Any task with a todo keyword subtask"
+;;   (save-restriction
+;;     (widen)
+;;     (let ((has-subtask)
+;;           (subtree-end (save-excursion (org-end-of-subtree t)))
+;;           (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
+;;       (save-excursion
+;;         (forward-line 1)
+;;         (while (and (not has-subtask)
+;;                     (< (point) subtree-end)
+;;                     (re-search-forward "^\*+ " subtree-end t))
+;;           (when (member (org-get-todo-state) org-todo-keywords-1)
+;;             (setq has-subtask t))))
+;;       (and is-a-task has-subtask))))
+;; (defun bh/list-sublevels-for-projects-indented ()
+;;   "Set org-tags-match-list-sublevels so when restricted to a subtree we list all subtasks.
+;;   This is normally used by skipping functions where this variable is already local to the agenda."
+;;   (if (marker-buffer org-agenda-restrict-begin)
+;;       (setq org-tags-match-list-sublevels 'indented)
+;;     (setq org-tags-match-list-sublevels nil))
+;;   nil)
+;; (defun bh/skip-non-stuck-projects ()   ; used in org-agenda-custom-commands as skip function
+;;   "Skip trees that are not stuck projects"
+;;   (bh/list-sublevels-for-projects-indented)
+;;   (save-restriction
+;;     (widen)
+;;     (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+;;       (if (bh/is-project-p)
+;;           (let* ((subtree-end (save-excursion (org-end-of-subtree t)))
+;;                  (has-next ))
+;;             (save-excursion
+;;               (forward-line 1)
+;;               (while (and (not has-next) (< (point) subtree-end) (re-search-forward "^\\*+ \\(NEXT\\|WORKING\\|WAITING\\) " subtree-end t))
+;;                 (unless (member "WAITING" (org-get-tags-at))
+;;                   (setq has-next t))))
+;;             (if has-next
+;;                 next-headline
+;;               nil)) ; a stuck project, has subtasks but no next task
+;;         next-headline))))
 ;; -------------------------------------------------------------------
 (setq org-agenda-current-time-string "------------------------------- now -------------------------------      ")
 (setq ym-org-agenda-planning-header-now "Now:")
@@ -166,7 +171,7 @@
 (setq ym-org-agenda-planning-header-next-actions "Next actions:")
 (setq ym-org-agenda-planning-header-non-scheduled "Non-scheduled tasks:")
 (setq ym-org-agenda-planning-header-stuck-projects "Stuck projects:")
-(setq org-agenda-custom-commands
+(setq org-agenda-custom-commands   ; STATES
       '(("0" "Only working to quickly switch between them"
          (
           (todo ""
@@ -210,9 +215,11 @@
           (todo ""
                 ((org-agenda-overriding-header ym-org-agenda-planning-header-next-actions)
                  (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp 'nottodo '("NEXT")))))
-          (tags-todo "-CANCELLED/!"
-                     ((org-agenda-overriding-header ym-org-agenda-planning-header-stuck-projects)
-                      (org-agenda-skip-function 'bh/skip-non-stuck-projects)))
+          ;; (tags-todo "-CANCELLED/!"
+          ;;            ((org-agenda-overriding-header ym-org-agenda-planning-header-stuck-projects)
+          ;;             (org-agenda-skip-function 'bh/skip-non-stuck-projects)))
+          (stuck ""
+                 ((org-agenda-overriding-header ym-org-agenda-planning-header-stuck-projects)))
           (todo ""
                 ((org-agenda-overriding-header ym-org-agenda-planning-header-non-scheduled)
                  (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp 'nottodo '("TODO")))))

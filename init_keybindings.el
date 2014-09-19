@@ -182,8 +182,8 @@
 (ym-define-key (kbd "M-.") 'ym-find-tag-at-point)
 ;; (ym-define-key (kbd "M-/") ')
 (ym-define-key (kbd "M-,") 'pop-tag-mark)
-(ym-define-key (kbd "<f1>") 'ym-org-day-view)
-(ym-define-key (kbd "C-<f1>") 'ym-org-working)
+(ym-define-key (kbd "<C-f1>") 'ym-org-day-view)
+(ym-define-key (kbd "<f1>") 'ym-org-working)
 (ym-define-key (kbd "S-<f1>") 'ym-org-week-view)
 (ym-define-key (kbd "M-<f1>") 'ym-org-todo-view)
 (ym-define-key (kbd "S-M-<f1>") 'ym-org-todo-match-tags-view)
@@ -264,7 +264,7 @@
 (defun ym-org-insert-inline-task ()
   (interactive)
   (insert "
-*************** TODO 
+*************** TODO                                                 :inline:
                 :LOGBOOK:
                 - Added ")
   (org-insert-time-stamp nil t t)
@@ -273,7 +273,9 @@
 *************** END
 ")
   (forward-line -5)
-  (end-of-line))
+  (beginning-of-line)
+  (forward-char 21)
+  )
 ;; -------------------------------------------------------------------
 (defun ym-org-day-view ()
   (interactive)

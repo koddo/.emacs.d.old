@@ -68,10 +68,20 @@
        (setq autopair-skip-whitespace 'chomp))   ; ) ) => )) when closing
 ;; -------------------------------------------------------------------
 (require 'yasnippet)
-(setq yas/snippet-dirs '("~/.emacs.d/snippets"))   ; only use my snippets, skip default snippets dir
+(setq yas/snippet-dirs '("~/.emacs.d/yasnippet"))   ; only use my snippets, skip default snippets dir
+(setq yas-new-snippet-default "# -*- mode: snippet -*-\n# name: $1\n# key: ${2:${1:$(yas--key-from-desc yas-text)}}\n# --\n$0")
 (yas/global-mode 1)
-(setq yas/indent-line 'fixed)
-(setq yas/wrap-around-region nil)
+(add-hook 'snippet-mode-hook
+          (lambda ()
+            (setq require-final-newline nil)
+            (add-hook 'after-save-hook 'yas-recompile-all 'append 'make-it-local)
+            (add-hook 'after-save-hook 'yas-reload-all 'append 'make-it-local)))
+(auto-insert-mode 1)
+(setq auto-insert-query nil)
+(defun ym-auto-insert-action () (yas-expand-snippet (yas--template-content (yas--get-template-by-uuid major-mode "ymyasnippetautoinsertmodetemplate")) (point-min) (point-max)))
+(define-auto-insert 'sh-mode 'ym-auto-insert-action)   ; when adding new modes, put file 'ymyasnippetautoinsertmodetemplate' to yasnippet/mode/ dir
+;; (setq yas/indent-line 'fixed)
+;; (setq yas/wrap-around-region nil)
 ;; clojure (ns ...) auto fill: http://inclojurewetrust.blogspot.ru/2011/04/fed-up-of-typing-ns-declarations.html
 ;; https://github.com/swannodette/clojure-snippets
 ;;; ??? hippie-expand
@@ -251,7 +261,12 @@
 ;; (global-set-key (kbd "C-=") 'er/expand-region)     ; TODO: keybinding
 ;; -------------------------------------------------------------------
 (require 'quickrun)
+;; (quickrun-add-command "shellscript"
+;;                       '((:command . (lambda () sh-shell))
+;;                         (:description . "Run Shellscript file")))
 ;; -------------------------------------------------------------------
+
+
 
 
 

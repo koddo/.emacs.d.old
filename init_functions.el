@@ -90,25 +90,10 @@
   (org-tags-view nil (concat "/" (mapconcat (lambda (str) (car (split-string str "("))) ym-org-todo-keywords-done "|")))
   (delete-other-windows)
   )
-;; -------------------------------------------------------------------
 (defun m/toggle-habits ()
   (interactive)
   (setq org-habit-show-habits (not org-habit-show-habits))
   (ym-org-day-view)
   )
+;; -------------------------------------------------------------------
 
-
-
-
-
-
-
-;; (setq ym-proj-name nil)
-;; (setq ym-proj-tags-file nil)
-;; (setq ym-proj-basedir nil)
-;; (setq ym-proj-src-patterns nil)
-
-;; (defun m/proj-load ()
-;;   (interactive)
-;;   (visit)
-;;   )

@@ -87,8 +87,8 @@
 (setq delete-by-moving-to-trash t)
 (set-face-attribute 'diredp-symlink nil :foreground "Blue")   ; trash-directory is set in preinit.this_machine.el
 ;; -------------------------------------------------------------------
-(require 'epa-file)   ; gnupg, gpg, pgp
-(setq epa-file-inhibit-auto-save nil)
+(require 'epa-file)   ; gnupg, gpg
+(setq epa-file-inhibit-auto-save t)   ; it's on by default, but for sure
 ;; -------------------------------------------------------------------
 (require 'ido)   ; InteractivelyDoThings -- input completion without having to hit TAB
 (setq ido-ignore-buffers '("\\` " "\\.muse\\'" "\\*Ibuffer\\*" "\\*Ido Completions\\*"))
