@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: ymyasnippetautoinsertmodetemplate
+# key: ymyasnippetautoinsertmodetemplate
+# --
+#!/usr/bin/env bash
+
+$0
+

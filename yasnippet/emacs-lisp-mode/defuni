@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: defuni
+# key: defuni
+# --
+(defun ${1:name} (${2:args})
+       (interactive)
+       $0
+       )
