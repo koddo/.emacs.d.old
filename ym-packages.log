@@ -22,3 +22,4 @@ added expand-region https://github.com/magnars/expand-region.el master -- 12df09
 added emacs-quickrun https://github.com/syohex/emacs-quickrun master -- 18b93d8
 added ibuffer-vc https://github.com/purcell/ibuffer-vc master -- ef61ad6
 added ace-jump-mode https://github.com/winterTTr/ace-jump-mode master -- 8351e2d
+pulled org-mode git://orgmode.org/org-mode.git maint -- 4b9146c..1b17e8c
