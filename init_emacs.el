@@ -197,3 +197,5 @@
 ;; (require 'dirtree)   ; alternative to dired
 ;; (require 'windata)
 ;; -------------------------------------------------------------------
+(require 'ace-jump-mode)
+

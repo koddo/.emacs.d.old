@@ -15,9 +15,12 @@
 (setq org-habit-graph-column 55)
 (setq org-habit-preceding-days 28)
 (setq org-habit-following-days 7)
-(setq ym-timer-show-habits
-      (run-at-time "00:00am" (* 60 60 24)
-                   (lambda () (setq org-habit-show-habits t))))
+(setq ym-timer-list-to-show-habits   ; (dolist (x ym-timer-list-to-show-habits) (cancel-timer x))
+      (list
+       (run-at-time "07:00pm" (* 60 60 24)
+                   (lambda () (setq org-habit-show-habits t)))
+       (run-at-time "07:00am" (* 60 60 24)
+                   (lambda () (setq org-habit-show-habits t)))))
 ;; -------------------------------------------------------------------
 (setq org-startup-with-inline-images t)
 (setq org-cycle-separator-lines 0)
