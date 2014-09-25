@@ -121,6 +121,7 @@
 ;; "unstuck" tag is for toplevel projects that I don't want to see in stuck projects, example:   * Ruby  :PROJECT:UNSTUCK:
 (setq org-stuck-projects '("PROJECT" ("NEXT" "WORKING" "PAUSED") ("UNSTUCK") nil))   ; STATES   
 
+
 ;; TODO: remove helper functions below
 ;; helper functions for finding stuck projects
 ;; a heading is a project if it is a TODO and has TODO children, but it does not have NEXT
@@ -243,21 +244,6 @@
 (add-hook 'org-clock-in-hook (lambda () (call-process "/usr/bin/osascript" nil 0 nil "-e" (concat "tell application \"org-clock-statusbar\" to clock in \"" org-clock-current-task "\""))))
 (add-hook 'org-clock-out-hook (lambda () (call-process "/usr/bin/osascript" nil 0 nil "-e" "tell application \"org-clock-statusbar\" to clock out")))
 ;; -------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

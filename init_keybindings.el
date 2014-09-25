@@ -215,6 +215,7 @@
 (define-key dired-mode-map (kbd "<backspace>") (lambda () (interactive) (dired (concat dired-directory ".."))))
 (add-hook 'help-mode-hook (lambda () (define-key help-mode-map "b" 'help-go-back)))
 (add-hook 'help-mode-hook (lambda () (define-key help-mode-map "f" 'help-go-forward)))
+(define-key yas-keymap (kbd "<backspace>") 'ym-yas-skip-and-clear-or-delete-backward-char)
 ;; -------------------------------------------------------------------
 (defadvice ido-init-completion-maps (after ido-init-completion-maps-with-ym-keybindings activate)
   "My keybindings in ido."
@@ -487,9 +488,19 @@
   (next-line)
   (beginning-of-line))
 ;; -------------------------------------------------------------------
-
-
-
+(defun ym-yas-skip-and-clear-or-delete-backward-char (&optional field)
+  (interactive)
+  (let ((field (or field
+                   (and yas--active-field-overlay
+                        (overlay-buffer yas--active-field-overlay)
+                        (overlay-get yas--active-field-overlay 'yas--field)))))
+    (cond ((and field
+                (not (yas--field-modified-p field))
+                (eq (point) (marker-position (yas--field-start field))))
+           (yas--skip-and-clear field)
+           (yas-next-field 1))
+          (t
+           (call-interactively 'delete-backward-char)))))   ; full copy of yas-skip-and-clear-or-delete-char except this line --- I just want to press backspace to clear or delete-backward-char
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -653,11 +664,6 @@ narrowed."
                (t (org-narrow-to-subtree))))
         (t (narrow-to-defun))))
 
-
-
-
-
-
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 

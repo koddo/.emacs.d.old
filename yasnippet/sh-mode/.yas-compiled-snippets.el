@@ -2,8 +2,10 @@
 ;;; Snippet definitions:
 ;;;
 (yas-define-snippets 'sh-mode
-                     '(("if" "if [[ $1 ]]; then\n    $0\nfi\n" "if" nil nil nil nil nil nil)
+                     '(("for" "for ${1:var} in ${2:stuff} ; do\n    $0\ndone" "for" nil nil nil nil nil nil)
+                       ("f" "${1:name} () {\n    ${2:echo \"return string --- var=\\$($1)\"\n    return exit_code}$0\n}" "function" nil nil nil nil nil nil)
+                       ("if" "if [[ $1 ]]; then\n    $0\nfi\n" "if" nil nil nil nil nil nil)
                        ("ymyasnippetautoinsertmodetemplate" "#!/usr/bin/env bash\n\n$0\n\n" "ymyasnippetautoinsertmodetemplate" nil nil nil nil nil nil)))
 
 
-;;; Do not edit! File generated at Fri Sep 19 19:47:31 2014
+;;; Do not edit! File generated at Mon Sep 22 19:57:54 2014
