@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: function
+# key: f
+# --
+${1:name} () {
+    ${2:echo "return string --- var=\$($1)"
+    return exit_code}$0
+}
