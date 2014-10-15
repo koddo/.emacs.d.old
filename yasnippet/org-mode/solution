@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: solution
+# key: solution
+# --
+#+begin_solution
+$0
+#+end_solution

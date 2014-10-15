@@ -204,7 +204,8 @@
 (ym-define-key (kbd "C-<right>")    'winner-redo)
 (ym-define-key (kbd "M-x") 'smex)
 (ym-define-key (kbd "C-`") 'other-frame)
-;; (ym-define-key (kbd "C-c '") 'narrow-or-widen-dwim)
+(global-set-key (kbd "C-c '") #'narrow-or-widen-dwim)
+(org-defkey org-agenda-mode-map "q" 'org-agenda-columns)
 ;; (ym-define-key (kbd "<left>") (lambda () (interactive) (ignore-errors (windmove-left))))
 ;; (ym-define-key (kbd "<right>") (lambda () (interactive) (ignore-errors (windmove-right))))
 ;; (ym-define-key (kbd "<up>") (lambda () (interactive) (ignore-errors (windmove-up))))
@@ -640,7 +641,7 @@ there's a region, all lines that region covers will be duplicated."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun narrow-or-widen-dwim (p)   ; http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html
+(defun narrow-or-widen-dwim (p)
   "If the buffer is narrowed, it widens. Otherwise, it narrows intelligently.
 Intelligently means: region, org-src-block, org-subtree, or defun,
 whichever applies first.
@@ -656,8 +657,7 @@ narrowed."
         ((derived-mode-p 'org-mode)
          ;; `org-edit-src-code' is not a real narrowing command.
          ;; Remove this first conditional if you don't want it.
-         (cond ((org-in-src-block-p)
-                (org-edit-src-code)
+         (cond ((ignore-errors (org-edit-src-code))
                 (delete-other-windows))
                ((org-at-block-p)
                 (org-narrow-to-block))
@@ -665,5 +665,8 @@ narrowed."
         (t (narrow-to-defun))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
 
 

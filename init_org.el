@@ -90,7 +90,7 @@
 (setq org-todo-keywords
       `((sequence ,@ym-org-todo-keywords-undone "|" ,@ym-org-todo-keywords-done)))
 (setq ym-org-todo-keywords-working-regexp
-      (concat "Sched.*\\("
+      (concat "\\("
               (mapconcat (lambda (str) (car (split-string str "("))) ym-org-todo-keywords-working "\\|")
               "\\)"))
 (setq ym-org-todo-keywords-undone-regexp
@@ -116,7 +116,7 @@
 (setq org-clock-modeline-total 'auto)
 (setq org-clock-report-include-clocking-task t)
 (setq org-columns-default-format "%10Effort(Effort){:} %10CLOCKSUM{:} %80ITEM(Task)")
-(setq org-global-properties '(("Effort_ALL" . "1:00 2:00 3:00 4:00 5:00 6:00 7:00 0:30 0:10 0:00")))
+(setq org-global-properties '(("Effort_ALL" . "1:00 2:00 3:00 4:00 5:00 0:50 0:40 0:30 0:20 0:10")))
 ;; -------------------------------------------------------------------
 ;; "unstuck" tag is for toplevel projects that I don't want to see in stuck projects, example:   * Ruby  :PROJECT:UNSTUCK:
 (setq org-stuck-projects '("PROJECT" ("NEXT" "WORKING" "PAUSED") ("UNSTUCK") nil))   ; STATES   
@@ -184,6 +184,10 @@
           (todo ""
                 ((org-agenda-overriding-header ym-org-agenda-planning-header-paused)
                  (org-agenda-skip-function '(org-agenda-skip-entry-if 'nottodo '("PAUSED" "WAITING")))))
+          (tags-todo "+top"
+                     ((org-agenda-overriding-header ym-org-agenda-planning-header-top)
+                      (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp 'nottodo '("NEXT")))
+                      ))
           ))
         ("1" "Daily schedule"
          ((agenda "" ((org-agenda-span 1)
@@ -244,9 +248,6 @@
 (add-hook 'org-clock-in-hook (lambda () (call-process "/usr/bin/osascript" nil 0 nil "-e" (concat "tell application \"org-clock-statusbar\" to clock in \"" org-clock-current-task "\""))))
 (add-hook 'org-clock-out-hook (lambda () (call-process "/usr/bin/osascript" nil 0 nil "-e" "tell application \"org-clock-statusbar\" to clock out")))
 ;; -------------------------------------------------------------------
-
-
-
 
 
 

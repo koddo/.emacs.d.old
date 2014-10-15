@@ -37,7 +37,7 @@
                                ("TODO" . "ForestGreen")
                                ("NEXT" . "ForestGreen")))
 (set-face-foreground 'org-special-keyword "gray70")   ; for :LOGBOOK: drawer
-(setq ym-org-agenda-dim-top-tag-regexp ":top:")
+(setq ym-org-agenda-dim-tag-regexp ":grey:")
 (defface ym-org-agenda-dim-top-tag-face '((t :foreground "grey80")) "")
 (custom-set-faces
  '(org-habit-clear-face                 ((t (:background "grey95"))) t)
@@ -51,7 +51,7 @@
 ;; -------------------------------------------------------------------
 (add-hook 'org-agenda-finalize-hook (lambda ()
                                       (beginning-of-buffer)
-                                      (while (search-forward-regexp ym-org-todo-keywords-working-regexp nil t)
+                                      (while (search-forward-regexp (concat "Sched.*" ym-org-todo-keywords-working-regexp) nil t)
                                         (overlay-put
                                          (make-overlay
                                           (- (line-beginning-position) 1)
@@ -78,8 +78,12 @@
                                       (while (search-forward-regexp ym-org-todo-keywords-done-regexp nil t)
                                         (ym-add-overlay-to-line 'ym-org-agenda-dim-done-face))
                                       (beginning-of-buffer)
-                                      (while (search-forward-regexp ym-org-agenda-dim-top-tag-regexp nil t)
-                                        (ym-add-overlay-to-line 'ym-org-agenda-dim-top-tag-face))
+                                      (while (search-forward-regexp ym-org-agenda-dim-tag-regexp nil t)
+                                        (unless
+                                            (string-match ym-org-todo-keywords-working-regexp (substring-no-properties (thing-at-point 'line)))
+                                          (ym-add-overlay-to-line 'ym-org-agenda-dim-top-tag-face)
+                                          )
+                                        )
                                       (beginning-of-buffer)
                                       (while (search-forward-regexp ym-org-todo-keywords-undone-regexp nil t)
                                         (ym-add-overlay-to-line 'ym-org-agenda-dim-undone-face))
