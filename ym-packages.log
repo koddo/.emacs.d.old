@@ -24,3 +24,4 @@ added ibuffer-vc https://github.com/purcell/ibuffer-vc master -- ef61ad6
 added ace-jump-mode https://github.com/winterTTr/ace-jump-mode master -- 8351e2d
 pulled org-mode git://orgmode.org/org-mode.git maint -- 4b9146c..1b17e8c
 pulled org-mode git://orgmode.org/org-mode.git maint -- 1b17e8c..fdd9b18
+pulled org-mode git://orgmode.org/org-mode.git master -- fdd9b18..c27d86d
