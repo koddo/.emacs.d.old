@@ -814,7 +814,7 @@ This variable can be either set to `buffer' or `subtree'."
 
 (defcustom org-export-show-temporary-export-buffer t
   "Non-nil means show buffer after exporting to temp buffer.
-When Org exports to a file, the buffer visiting that file is ever
+When Org exports to a file, the buffer visiting that file is never
 shown, but remains buried.  However, when exporting to
 a temporary buffer, that buffer is popped up in a second window.
 When this variable is nil, the buffer remains buried also in
@@ -5479,8 +5479,9 @@ to `:default' encoding. If it fails, return S."
 (defmacro org-export-async-start  (fun &rest body)
   "Call function FUN on the results returned by BODY evaluation.
 
-BODY evaluation happens in an asynchronous process, from a buffer
-which is an exact copy of the current one.
+FUN is an anonymous function of one argument.  BODY evaluation
+happens in an asynchronous process, from a buffer which is an
+exact copy of the current one.
 
 Use `org-export-add-to-stack' in FUN in order to register results
 in the stack.
