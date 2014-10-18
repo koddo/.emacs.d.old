@@ -54,6 +54,12 @@
   "This will cache timestamps and titles for files in publishing projects.
 Blocks could hash sha1 values here.")
 
+(defvar org-publish-after-publishing-hook nil
+  "Hook run each time a file is published.
+Every function in this hook will be called with two arguments:
+the name of the original file and the name of the file
+produced.")
+
 (defgroup org-publish nil
   "Options for publishing a set of Org-mode and related files."
   :tag "Org Publishing"
@@ -170,6 +176,7 @@ included.  See the back-end documentation for more information.
   :with-inlinetasks         `org-export-with-inlinetasks'
   :with-latex               `org-export-with-latex'
   :with-priority            `org-export-with-priority'
+  :with-properties          `org-export-with-properties'
   :with-smart-quotes        `org-export-with-smart-quotes'
   :with-special-strings     `org-export-with-special-strings'
   :with-statistics-cookies' `org-export-with-statistics-cookies'
@@ -599,11 +606,12 @@ publishing directory.
 Return output file name."
   (unless (file-directory-p pub-dir)
     (make-directory pub-dir t))
-  (or (equal (expand-file-name (file-name-directory filename))
-	     (file-name-as-directory (expand-file-name pub-dir)))
-      (copy-file filename
-		 (expand-file-name (file-name-nondirectory filename) pub-dir)
-		 t)))
+  (let ((output (expand-file-name (file-name-nondirectory filename) pub-dir)))
+    (or (equal (expand-file-name (file-name-directory filename))
+	       (file-name-as-directory (expand-file-name pub-dir)))
+	(copy-file filename output t))
+    ;; Return file name.
+    output))
 
 
 
@@ -624,8 +632,10 @@ See `org-publish-projects'."
 	 (project-plist (cdr project))
 	 (ftname (expand-file-name filename))
 	 (publishing-function
-	  (or (plist-get project-plist :publishing-function)
-	      (error "No publishing function chosen")))
+	  (let ((fun (plist-get project-plist :publishing-function)))
+	    (cond ((null fun) (error "No publishing function chosen"))
+		  ((listp fun) fun)
+		  (t (list fun)))))
 	 (base-dir
 	  (file-name-as-directory
 	   (expand-file-name
@@ -647,19 +657,14 @@ See `org-publish-projects'."
 	   (concat pub-dir
 		   (and (string-match (regexp-quote base-dir) ftname)
 			(substring ftname (match-end 0))))))
-    (if (listp publishing-function)
-	;; allow chain of publishing functions
-	(mapc (lambda (f)
-		(when (org-publish-needed-p
-		       filename pub-dir f tmp-pub-dir base-dir)
-		  (funcall f project-plist filename tmp-pub-dir)
-		  (org-publish-update-timestamp filename pub-dir f base-dir)))
-	      publishing-function)
-      (when (org-publish-needed-p
-	     filename pub-dir publishing-function tmp-pub-dir base-dir)
-	(funcall publishing-function project-plist filename tmp-pub-dir)
-	(org-publish-update-timestamp
-	 filename pub-dir publishing-function base-dir)))
+    ;; Allow chain of publishing functions.
+    (dolist (f publishing-function)
+      (when (org-publish-needed-p filename pub-dir f tmp-pub-dir base-dir)
+	(let ((output (funcall f project-plist filename tmp-pub-dir)))
+	  (org-publish-update-timestamp filename pub-dir f base-dir)
+	  (run-hook-with-args 'org-publish-after-publishing-hook
+			      filename
+			      output))))
     (unless no-cache (org-publish-write-cache-file))))
 
 (defun org-publish-projects (projects)
@@ -1164,22 +1169,30 @@ the file including them will be republished as well."
 	 (org-inhibit-startup t)
 	 (visiting (find-buffer-visiting filename))
 	 included-files-ctime buf)
-
     (when (equal (file-name-extension filename) "org")
       (setq buf (find-file (expand-file-name filename)))
       (with-current-buffer buf
 	(goto-char (point-min))
-	(while (re-search-forward
-		"^#\\+INCLUDE:[ \t]+\"\\([^\t\n\r\"]*\\)\"[ \t]*.*$" nil t)
-	  (let* ((included-file (expand-file-name (match-string 1))))
-	    (add-to-list 'included-files-ctime
-			 (org-publish-cache-ctime-of-src included-file) t))))
+	(while (re-search-forward "^[ \t]*#\\+INCLUDE:" nil t)
+	  (let* ((element (org-element-at-point))
+		 (included-file
+		  (and (eq (org-element-type element) 'keyword)
+		       (let ((value (org-element-property :value element)))
+			 (and value
+			      (string-match "^\\(\".+?\"\\|\\S-+\\)" value)
+			      (org-remove-double-quotes
+			       (match-string 1 value)))))))
+	    (when included-file
+	      (add-to-list 'included-files-ctime
+			   (org-publish-cache-ctime-of-src
+			    (expand-file-name included-file))
+			   t)))))
       (unless visiting (kill-buffer buf)))
     (if (null pstamp) t
       (let ((ctime (org-publish-cache-ctime-of-src filename)))
 	(or (< pstamp ctime)
 	    (when included-files-ctime
-	      (not (null (delq nil (mapcar (lambda(ct) (< ctime ct))
+	      (not (null (delq nil (mapcar (lambda (ct) (< ctime ct))
 					   included-files-ctime))))))))))
 
 (defun org-publish-cache-set-file-property

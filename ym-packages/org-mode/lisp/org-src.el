@@ -39,7 +39,6 @@
 
 (declare-function org-do-remove-indentation "org" (&optional n))
 (declare-function org-at-table.el-p "org" ())
-(declare-function org-in-src-block-p "org" (&optional inside))
 (declare-function org-in-block-p "org" (names))
 (declare-function org-get-indentation "org" (&optional line))
 (declare-function org-switch-to-buffer-other-window "org" (&rest args))
@@ -119,11 +118,12 @@ These are the regions where each line starts with a colon."
   "If non-nil preserve leading whitespace characters on export.
 If non-nil leading whitespace characters in source code blocks
 are preserved on export, and when switching between the org
-buffer and the language mode edit buffer.  If this variable is nil
-then, after editing with \\[org-edit-src-code], the
-minimum (across-lines) number of leading whitespace characters
-are removed from all lines, and the code block is uniformly
-indented according to the value of `org-edit-src-content-indentation'."
+buffer and the language mode edit buffer.
+
+When this variable is nil, after editing with \\[org-edit-src-code],
+the minimum (across-lines) number of leading whitespace characters
+are removed from all lines, and the code block is uniformly indented
+according to the value of `org-edit-src-content-indentation'."
   :group 'org-edit-structure
   :type 'boolean)
 
@@ -180,7 +180,7 @@ but which mess up the display of a snippet in Org exported files.")
   '(("ocaml" . tuareg) ("elisp" . emacs-lisp) ("ditaa" . artist)
     ("asymptote" . asy) ("dot" . fundamental) ("sqlite" . sql)
     ("calc" . fundamental) ("C" . c) ("cpp" . c++) ("C++" . c++)
-    ("screen" . shell-script))
+    ("screen" . shell-script) ("shell" . sh) ("bash" . sh))
   "Alist mapping languages to their major mode.
 The key is the language name, the value is the string that should
 be inserted as the name of the major mode.  For many languages this is
@@ -554,13 +554,6 @@ the language, a switch telling if the content should be in a single line."
 	 (append
 	  org-edit-src-region-extra
 	  '(
-	    ("<src\\>[^<]*>[ \t]*\n?" "\n?[ \t]*</src>" lang)
-	    ("<literal\\>[^<]*>[ \t]*\n?" "\n?[ \t]*</literal>" style)
-	    ("<example>[ \t]*\n?" "\n?[ \t]*</example>" "fundamental")
-	    ("<lisp>[ \t]*\n?" "\n?[ \t]*</lisp>" "emacs-lisp")
-	    ("<perl>[ \t]*\n?" "\n?[ \t]*</perl>" "perl")
-	    ("<python>[ \t]*\n?" "\n?[ \t]*</python>" "python")
-	    ("<ruby>[ \t]*\n?" "\n?[ \t]*</ruby>" "ruby")
 	    ("^[ \t]*#\\+begin_src\\( \\([^ \t\n]+\\)\\)?.*\n" "\n[ \t]*#\\+end_src" 2)
 	    ("^[ \t]*#\\+begin_example.*\n" "\n[ \t]*#\\+end_example" "fundamental")
 	    ("^[ \t]*#\\+html:" "\n" "html" single-line)
@@ -888,17 +881,6 @@ issued in the language major mode buffer."
   :type 'boolean
   :version "24.1"
   :group 'org-babel)
-
-(defun org-src-native-tab-command-maybe ()
-  "Perform language-specific TAB action.
-Alter code block according to what TAB does in the language major mode."
-  (and org-src-tab-acts-natively
-       (org-in-src-block-p)
-       (not (equal this-command 'org-shifttab))
-       (let ((org-src-strip-leading-and-trailing-blank-lines nil))
-	 (org-babel-do-key-sequence-in-edit-buffer (kbd "TAB")))))
-
-(add-hook 'org-tab-first-hook 'org-src-native-tab-command-maybe)
 
 (defun org-src-font-lock-fontify-block (lang start end)
   "Fontify code block.
