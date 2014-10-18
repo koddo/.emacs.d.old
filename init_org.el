@@ -168,7 +168,7 @@
 ;;               nil)) ; a stuck project, has subtasks but no next task
 ;;         next-headline))))
 ;; -------------------------------------------------------------------
-(setq org-agenda-current-time-string "------------------------------- now -------------------------------      ")
+(setq org-agenda-current-time-string "------------------------------- now -------------------------------")
 (setq ym-org-agenda-planning-header-now "Now:")
 (setq ym-org-agenda-planning-header-paused "Paused:")
 (setq ym-org-agenda-planning-header-top "Top:")
@@ -248,8 +248,6 @@
 (add-hook 'org-clock-in-hook (lambda () (call-process "/usr/bin/osascript" nil 0 nil "-e" (concat "tell application \"org-clock-statusbar\" to clock in \"" org-clock-current-task "\""))))
 (add-hook 'org-clock-out-hook (lambda () (call-process "/usr/bin/osascript" nil 0 nil "-e" "tell application \"org-clock-statusbar\" to clock out")))
 ;; -------------------------------------------------------------------
-
-
 
 
 
