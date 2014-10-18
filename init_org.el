@@ -119,8 +119,8 @@
 (setq org-global-properties '(("Effort_ALL" . "1:00 2:00 3:00 4:00 5:00 0:50 0:40 0:30 0:20 0:10")))
 ;; -------------------------------------------------------------------
 ;; "unstuck" tag is for toplevel projects that I don't want to see in stuck projects, example:   * Ruby  :PROJECT:UNSTUCK:
-(setq org-stuck-projects '("PROJECT" ("NEXT" "WORKING" "PAUSED") ("UNSTUCK") nil))   ; STATES   
-
+;; (setq org-stuck-projects '("PROJECT" ("NEXT" "WORKING" "PAUSED") ("UNSTUCK") nil))   ; STATES   
+(setq org-stuck-projects '("PROJECT" ("NEXT") nil nil))
 
 ;; TODO: remove helper functions below
 ;; helper functions for finding stuck projects
