@@ -160,14 +160,12 @@ With prefix arg STOP, stop it entirely."
 (defun org-timer-stop ()
   "Stop the relative timer."
   (interactive)
-  (if (not org-timer-current-timer)
-      (message "No running timer")
-    (run-hooks 'org-timer-stop-hook)
-    (setq org-timer-start-time nil
-	  org-timer-pause-time nil
-	  org-timer-current-timer nil)
-    (org-timer-set-mode-line 'off)
-    (message "Timer stopped")))
+  (run-hooks 'org-timer-stop-hook)
+  (setq org-timer-start-time nil
+	org-timer-pause-time nil
+	org-timer-current-timer nil)
+  (org-timer-set-mode-line 'off)
+  (message "Timer stopped"))
 
 ;;;###autoload
 (defun org-timer (&optional restart no-insert-p)
@@ -354,14 +352,13 @@ VALUE can be `on', `off', or `pause'."
 (defun org-timer-cancel-timer ()
   "Cancel the current timer."
   (interactive)
-  (if (not org-timer-current-timer)
-      (message "No timer to cancel")
+  (when (eval org-timer-current-timer)
     (run-hooks 'org-timer-cancel-hook)
     (cancel-timer org-timer-current-timer)
-    (setq org-timer-current-timer nil
-	  org-timer-timer-is-countdown nil)
-    (org-timer-set-mode-line 'off)
-    (message "Last timer canceled")))
+    (setq org-timer-current-timer nil)
+    (setq org-timer-timer-is-countdown nil)
+    (org-timer-set-mode-line 'off))
+  (message "Last timer canceled"))
 
 (defun org-timer-show-remaining-time ()
   "Display the remaining time before the timer ends."
@@ -395,17 +392,9 @@ without prompting the user for a duration.
 
 With two `C-u' prefix arguments, use `org-timer-default-timer'
 without prompting the user for a duration and automatically
-replace any running timer.
-
-By default, the timer duration will be set to the number of
-minutes in the Effort property, if any.  You can ignore this by
-using three `C-u' prefix arguments."
+replace any running timer."
   (interactive "P")
-  (let* ((effort-minutes (org-get-at-eol 'effort-minutes 1))
-	 (minutes (or (and (not (equal opt '(64)))
-			   effort-minutes
-			   (number-to-string effort-minutes))
-		     (and (numberp opt) (number-to-string opt))
+  (let ((minutes (or (and (numberp opt) (number-to-string opt))
 		     (and (listp opt) (not (null opt))
 			  (number-to-string org-timer-default-timer))
 		     (read-from-minibuffer

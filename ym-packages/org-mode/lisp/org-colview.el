@@ -900,7 +900,7 @@ display, or in the #+COLUMNS line of the current buffer."
 	      (org-entry-put nil "COLUMNS" fmt)
 	    (goto-char (point-min))
 	    ;; Overwrite all #+COLUMNS lines....
-	    (while (re-search-forward "^[ \t]*#\\+COLUMNS:.*" nil t)
+	    (while (re-search-forward "^#\\+COLUMNS:.*" nil t)
 	      (setq cnt (1+ cnt))
 	      (replace-match (concat "#+COLUMNS: " fmt) t t))
 	    (unless (> cnt 0)
@@ -1124,7 +1124,7 @@ display, or in the #+COLUMNS line of the current buffer."
 
 (defun org-columns-uncompile-format (cfmt)
   "Turn the compiled columns format back into a string representation."
-  (let ((rtn "") e s prop title op op-match width fmt printf fun calc ee map)
+  (let ((rtn "") e s prop title op op-match width fmt printf fun calc)
     (while (setq e (pop cfmt))
       (setq prop (car e)
 	    title (nth 1 e)
@@ -1134,10 +1134,8 @@ display, or in the #+COLUMNS line of the current buffer."
 	    printf (nth 5 e)
 	    fun (nth 6 e)
 	    calc (nth 7 e))
-      (setq map (copy-sequence org-columns-compile-map))
-      (while (setq ee (pop map))
-	(if (equal fmt (nth 1 ee))
-	    (setq op (car ee) map nil)))
+      (when (setq op-match (rassoc (list fmt fun calc) org-columns-compile-map))
+	(setq op (car op-match)))
       (if (and op printf) (setq op (concat op ";" printf)))
       (if (equal title prop) (setq title nil))
       (setq s (concat "%" (if width (number-to-string width))
@@ -1201,6 +1199,8 @@ containing the title row and all other rows.  Each row is a list
 of fields."
   (save-excursion
     (let* ((title (mapcar 'cadr org-columns-current-fmt-compiled))
+	   (re-comment (format org-heading-keyword-regexp-format
+			       org-comment-string))
 	   (re-archive (concat ".*:" org-archive-tag ":"))
 	   (n (length title)) row tbl)
       (goto-char (point-min))
@@ -1212,9 +1212,9 @@ of fields."
 				 (/ (1+ (length (match-string 1))) 2)
 			       (length (match-string 1)))))
 		     (get-char-property (match-beginning 0) 'org-columns-key))
-	    (when (or (org-in-commented-heading-p t)
-		      (save-excursion
-			(beginning-of-line)
+	    (when (save-excursion
+		    (goto-char (point-at-bol))
+		    (or (looking-at re-comment)
 			(looking-at re-archive)))
 	      (org-end-of-subtree t)
 	      (throw 'next t))
