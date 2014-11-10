@@ -1,8 +1,8 @@
 (require 'org)
 (require 'org-inlinetask)
-(require 'org-special-blocks)
+;;(require 'org-special-blocks)
 (require 'org-habit)
-
+(require 'org-id)
 
 
 (setq org-log-repeat nil)

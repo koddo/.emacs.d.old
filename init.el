@@ -1,3 +1,4 @@
+(require 'cl)
 (defun ym-add-everything-to-load-path-in (base)
     (add-to-list 'load-path base)
     (dolist (f (directory-files base))
@@ -7,6 +8,9 @@
                    (not (equal f ".")))
           (add-to-list 'load-path name)))))
 (ym-add-everything-to-load-path-in "~/.emacs.d/ym-packages")
+(setq load-path
+      (remove-if (lambda (s) (string-match "lisp/org$" s))
+                 load-path))
 (add-to-list 'load-path "~/.emacs.d/ym-packages/org-mode/contrib/lisp")
 (add-to-list 'load-path "~/.emacs.d/ym-packages/org-mode/lisp")
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
@@ -14,8 +18,6 @@
 (load-file "~/.emacs.d/init__preinit_this_machine.el")
 (setq custom-file "~/.emacs.d/init_custom.el")
 (load custom-file 'noerror)
-
-;; (load-file "~/tmp/init_tmp.el")
 
 (load-file "~/.emacs.d/init_emacs.el")
 (load-file "~/.emacs.d/init_org.el")
