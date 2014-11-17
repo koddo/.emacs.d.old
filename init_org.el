@@ -3,7 +3,7 @@
 ;;(require 'org-special-blocks)
 (require 'org-habit)
 (require 'org-id)
-
+(require 'org-table)
 
 (setq org-log-repeat nil)
 
