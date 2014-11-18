@@ -27,3 +27,4 @@ pulled org-mode git://orgmode.org/org-mode.git maint -- 1b17e8c..fdd9b18
 pulled org-mode git://orgmode.org/org-mode.git master -- fdd9b18..c27d86d
 pulled org-mode git://orgmode.org/org-mode.git maint -- c27d86d..fdd9b18
 added restclient https://github.com/pashky/restclient.el master -- 7c22b1b
+added distel https://github.com/massemanet/distel master -- b635013
