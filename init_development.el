@@ -170,13 +170,14 @@
 (add-to-list 'load-path
              (car (file-expand-wildcards (concat erlang-root-dir "/lib/tools-*/emacs"))))
 (require 'erlang-start)
+(add-to-list 'load-path "~/.emacs.d/ym-packages/distel/elisp")
 (require 'distel)
 (distel-setup)
 (add-hook 'erlang-mode-hook
           (lambda ()
-            (setq inferior-erlang-machine-options '("-sname" "emacs"))   ; default node name
+            (setq inferior-erlang-machine-options '("-name" "emacs@127.0.0.1"))   ; default node name
             (setq erlang-compile-extra-opts '(debug_info))
-            ))
+            )) ; (setq erlang-mode-hook nil)
 ;; (require 'erlang-flymake)
 ;; (erlang-flymake-only-on-save)
 ;; ;; maybe http://blog.erlware.org/2012/05/15/getting-flymake-and-rebar-to-play-nice/
@@ -218,7 +219,7 @@
                                (erlang-RET-command)
                                )))
         (if (not found)
-            (progn (insert (concat "r " node))
+            (progn (insert (concat "r '" node "'"))
                    (erlang-RET-command)
                    (insert "j")
                    (erlang-RET-command)

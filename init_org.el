@@ -4,6 +4,8 @@
 (require 'org-habit)
 (require 'org-id)
 (require 'org-table)
+(require 'org-colview)
+(require 'org-datetree)
 
 (setq org-log-repeat nil)
 
