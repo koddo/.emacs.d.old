@@ -177,6 +177,7 @@
 (ym-define-key (kbd "C-S-e") 'ym-dired-current-buffer-dir)
 (ym-define-key (kbd "C-S-e") 'ym-dired-current-buffer-dir)
 (ym-define-key (kbd "C-/") 'ym-comment-or-uncomment-region-or-line)
+(ym-define-key (kbd "C-M-S-t") (lambda () (interactive) (insert (concat comment-start " TODO: "))))
 (ym-define-key (kbd "C-<backspace>") 'ym-backward-kill-word)
 (ym-define-key (kbd "M-<backspace>") 'ym-backward-kill-word)
 (ym-define-key (kbd "M-.") 'ym-find-tag-at-point)
