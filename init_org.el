@@ -6,6 +6,7 @@
 (require 'org-table)
 (require 'org-colview)
 (require 'org-datetree)
+(require 'org-archive)
 
 (setq org-log-repeat nil)
 
