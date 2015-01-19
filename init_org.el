@@ -24,6 +24,7 @@
                    (lambda () (setq org-habit-show-habits t)))
        (run-at-time "07:00am" (* 60 60 24)
                    (lambda () (setq org-habit-show-habits t)))))
+(defun org-habit-get-priority (habit &optional moment) 1000)   ; this disables sorting by scheduled time, shows in the same order as in org file
 ;; -------------------------------------------------------------------
 (setq org-startup-with-inline-images t)
 (setq org-cycle-separator-lines 0)
@@ -74,7 +75,11 @@
 ;; -------------------------------------------------------------------
 (setq org-agenda-time-grid '((daily today)
                              "----------------"
-                             (800 1000 1200 1400 1600 1800 2000 2200 2350)))
+                             (700 800 900 1000 1100 1200 1300 1400 1500 1600
+                                  1700 1800 1900 2000 2100 2200 2300 2359)))
+;; (setq org-agenda-time-grid '((daily today)
+;;                              "----------------"
+;;                              (800 1000 1200 1400 1600 1800 2000 2200 2350)))
 (setq org-agenda-sorting-strategy
       '((agenda habit-down time-up priority-down category-up todo-state-down)
         (todo todo-state-down priority-down category-up)
