@@ -51,6 +51,17 @@
  '(org-habit-alert-future-face          ((t (:background "LightSteelBlue2"))) t)
  '(org-habit-overdue-face               ((t (:background "grey95"))) t)
  '(org-habit-overdue-future-face        ((t (:background "grey95"))) t))
+(custom-set-faces
+ ;; '(outline-1                 ((t (:foreground "Blue1"))) t)
+ '(outline-1                 ((t (:foreground "Red"))) t)
+ '(outline-2                 ((t (:foreground "Blue1"))) t)
+ '(outline-3                 ((t (:foreground "grey40"))) t)
+ '(outline-4                 ((t (:foreground "grey70"))) t)
+ '(outline-5                 ((t (:foreground "grey70"))) t)
+ '(outline-6                 ((t (:foreground "grey70"))) t)
+ '(outline-7                 ((t (:foreground "grey70"))) t)
+ '(outline-8                 ((t (:foreground "grey70"))) t)
+ )
 ;; -------------------------------------------------------------------
 (add-hook 'org-agenda-finalize-hook (lambda ()
                                       (beginning-of-buffer)
@@ -172,6 +183,9 @@
     (message "%S" properties)
     )
   )
+;; -------------------------------------------------------------------
+
+
 
 ;; -------------------------------------------------------------------
 ;; (defface ym-diredp-org-extension '((t :foreground "red")) "My face for org-mode files in dired+.")
