@@ -249,6 +249,8 @@
 (define-key org-mode-map (kbd "C-c C-x C-t") 'ym-org-insert-inline-task)
 (define-key org-mode-map (kbd "RET")     (lambda () (interactive) (org-return) (indent-for-tab-command)))   ; org-return-indent behaves strangely
 (define-key org-mode-map [(shift tab)]     (lambda () (interactive) (org-shifttab (- org-inlinetask-min-level 1))))
+(define-key org-mode-map (kbd "C-c C-t") 'org-todo)
+(define-key org-mode-map (kbd "C-c C-S-t") 'ym-org-todo-with-date-prompt)
 ;; -------------------------------------------------------------------
 
 (defun ym-org-agenda-later ()
@@ -679,6 +681,18 @@ narrowed."
         (t (narrow-to-defun))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; http://emacs.stackexchange.com/questions/9433/how-to-make-org-prompt-for-a-timestamp-when-changing-state-of-a-todo
+(defun ym-org-todo-with-date-prompt (&optional arg)
+  (interactive "P")
+  (cl-letf ((my-current-time (org-read-date t t nil "when:" nil "-1d 23:59" nil))
+            ((symbol-function #'current-time)
+             #'(lambda () my-current-time)))
+    (org-todo arg)
+    ))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 
 
