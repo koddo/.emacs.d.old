@@ -10,6 +10,15 @@ if (true) {
   var y;
 }
 
+var x = y,
+    cd = 3;
+if (true) {
+  var x = y,
+      cd = 3;
+  export const {x, y} = z,
+               a = 10;
+}
+
 var pathData = this.barData
                    .map(function(d) {
                      return [{x: d.start_time_ms, vol: d.volume},
@@ -65,3 +74,13 @@ newB.firstMethod('x')
 var bar = 1;
 var foo = (bar == 1) ?
           "ONE" : "OTHER";  // THIS IS THE PROBLEM
+
+function fieldIsValid( field, fieldSpec) {
+  // todo: add remote possibility
+  var value = field.value;
+  if ( value.length < fieldSpec.minNumberOfChar ||
+       value.length > fieldSpec.maxNumberOfChar ||
+       value.match( fieldSpec.pattern) )
+    return true;
+  return false;
+}

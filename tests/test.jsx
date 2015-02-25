@@ -2,11 +2,41 @@
 var React = require('react/addons');
 var Component = require('./component');
 
+'use strict';
+
+var React = require('react'),
+    Explore = require('./components/Explore'),
+    DocumentTitle = require('react-document-title'),
+    { RouteHandler } = require('react-router'),
+    { PropTypes } = React;
+
+var App = React.createClass({
+  propTypes: {
+    params: PropTypes.object.isRequired,
+    query: PropTypes.object.isRequired
+  },
+
+  render() {
+    return (
+      <DocumentTitle title='Sample App'>
+        <div className='App'>
+          <Explore />
+          <hr />
+          <RouteHandler {...this.props} />
+        </div>
+      </DocumentTitle>
+    );
+  }
+});
+
+module.exports = App;
+
 module.exports = React.createClass({
   render() {
     return (
       <div>
-        <Component />
+        <Component attr="cqs" xs="xs"
+                   xsxs="sxx" />
         <Component />
         <Component />
       </div>
@@ -68,3 +98,21 @@ define(function (require) {
 
   return InviteLink;
 });
+
+function hello() {
+
+  return (
+    <div>
+      {somevar}
+      <div className="row">
+        <div className="col-md-4">
+          Column1
+        </div>
+        <div className="col-md-4">
+          Column2
+        </div>
+      </div>
+    </div>
+  );
+
+}
