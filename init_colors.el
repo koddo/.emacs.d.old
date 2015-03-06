@@ -45,10 +45,10 @@
 (custom-set-faces
  '(org-habit-clear-face                 ((t (:background "grey95"))) t)
  '(org-habit-clear-future-face          ((t (:background "grey95"))) t)
- '(org-habit-ready-face                 ((t (:background "LightSteelBlue2"))) t)
- '(org-habit-ready-future-face          ((t (:background "LightSteelBlue2"))) t)
- '(org-habit-alert-face                 ((t (:background "LightSteelBlue2"))) t)
- '(org-habit-alert-future-face          ((t (:background "LightSteelBlue2"))) t)
+ '(org-habit-ready-face                 ((t (:background "grey95"))) t) ; was LightSteelBlue2
+ '(org-habit-ready-future-face          ((t (:background "grey95"))) t)
+ '(org-habit-alert-face                 ((t (:background "grey95"))) t)
+ '(org-habit-alert-future-face          ((t (:background "grey95"))) t)
  '(org-habit-overdue-face               ((t (:background "grey95"))) t)
  '(org-habit-overdue-future-face        ((t (:background "grey95"))) t))
 (custom-set-faces

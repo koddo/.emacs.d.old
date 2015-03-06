@@ -9,14 +9,14 @@ cd "$(dirname "$0")"
 
 
 function usage() {
-    echo "usage: ym-packages.sh <add|pull|remove> name git ref"
+    echo "usage: $0 <add|pull|remove> name git ref"
     echo
     echo "commit your changes before using"
     echo
     echo "note: You can get specific commit if needed by adding or pulling by it's ref"
     echo 
     echo "git subtree doesn't support remembering repositories"
-    echo "and everything out of the box so I just use ym-packages.log"
+    echo "and everything out of the box, so I just use ym-packages.log"
 }
 [[ -n $(git status -s) ]] && \
     echo "$(usage)" && exit 1
