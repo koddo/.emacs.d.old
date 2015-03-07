@@ -1235,7 +1235,7 @@ The following issues are influenced by this variable:
   body starts with text at column 0, indentation is not changed at all.
 
 - Property drawers and planning information is inserted indented when
-  this variable s set.  When nil, they will not be indented.
+  this variable is set.  When nil, they will not be indented.
 
 - TAB indents a line relative to context.  The lines below a headline
   will be indented when this variable is set.
@@ -4213,7 +4213,7 @@ Normal means, no org-mode-specific context."
 (defvar mark-active)
 
 ;; Various packages
-(declare-function calendar-absolute-from-iso    "cal-iso"    (date))
+(declare-function calendar-iso-to-absolute    "cal-iso"    (date))
 (declare-function calendar-forward-day          "cal-move"   (arg))
 (declare-function calendar-goto-date            "cal-move"   (date))
 (declare-function calendar-goto-today           "cal-move"   ())
@@ -7399,8 +7399,14 @@ or nil."
 
 (defvar org-goto-local-auto-isearch-map (make-sparse-keymap))
 (set-keymap-parent org-goto-local-auto-isearch-map isearch-mode-map)
-(define-key org-goto-local-auto-isearch-map "\C-i" 'isearch-other-control-char)
-(define-key org-goto-local-auto-isearch-map "\C-m" 'isearch-other-control-char)
+;; `isearch-other-control-char' was removed in Emacs 24.4.
+(if (fboundp 'isearch-other-control-char)
+    (progn
+      (define-key org-goto-local-auto-isearch-map "\C-i" 'isearch-other-control-char)
+      (define-key org-goto-local-auto-isearch-map "\C-m" 'isearch-other-control-char))
+  (define-key org-goto-local-auto-isearch-map "\C-i" nil)
+  (define-key org-goto-local-auto-isearch-map "\C-m" nil)
+  (define-key org-goto-local-auto-isearch-map [return] nil))
 
 (defun org-goto-local-search-headings (string bound noerror)
   "Search and make sure that any matches are in headlines."
@@ -7615,9 +7621,7 @@ command."
 	       (insert "\n* ")))
       (run-hooks 'org-insert-heading-hook))
 
-     ((and itemp (not (member arg '((4) (16)))))
-      ;; Insert an item
-      (org-insert-item))
+     ((and itemp (not (member arg '((4) (16)))) (org-insert-item)))
 
      (t
       ;; Maybe move at the end of the subtree
@@ -16285,10 +16289,10 @@ So these are more for recording a certain time/date."
                   (message "")))
     (org-defkey map ">"
                 (lambda () (interactive)
-                  (org-eval-in-calendar '(scroll-calendar-left 1))))
+                  (org-eval-in-calendar '(calendar-scroll-left 1))))
     (org-defkey map "<"
                 (lambda () (interactive)
-                  (org-eval-in-calendar '(scroll-calendar-right 1))))
+                  (org-eval-in-calendar '(calendar-scroll-right 1))))
     (org-defkey map "\C-v"
                 (lambda () (interactive)
                   (org-eval-in-calendar
@@ -16631,7 +16635,7 @@ user."
 	    day (or iso-weekday wday 1)
 	    wday nil ; to make sure that the trigger below does not match
 	    iso-date (calendar-gregorian-from-absolute
-		      (calendar-absolute-from-iso
+		      (calendar-iso-to-absolute
 		       (list iso-week day year))))
 					; FIXME:  Should we also push ISO weeks into the future?
 					;      (when (and org-read-date-prefer-future
@@ -16640,7 +16644,7 @@ user."
 					;		    (time-to-days (current-time))))
 					;	(setq year (1+ year)
 					;	      iso-date (calendar-gregorian-from-absolute
-					;			(calendar-absolute-from-iso
+					;			(calendar-iso-to-absolute
 					;			 (list iso-week day year)))))
       (setq month (car iso-date)
 	    year (nth 2 iso-date)
@@ -18087,7 +18091,7 @@ Optional argument FILE means use this file instead of the current."
 	(progn
 	  (org-store-new-agenda-file-list files)
 	  (org-install-agenda-files-menu)
-	  (message "Removed file: %s" afile))
+	  (message "Removed from Org Agenda list: %s" afile))
       (message "File was not in list: %s (not removed)" afile))))
 
 (defun org-file-menu-entry (file)
