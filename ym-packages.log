@@ -32,3 +32,4 @@ added distel https://github.com/massemanet/distel master -- b635013
 pulled web-mode https://github.com/fxbois/web-mode master -- af203a5..6a22ac3
 pulled web-mode https://github.com/fxbois/web-mode master -- 6a22ac3..706a22f
 pulled web-mode https://github.com/fxbois/web-mode v11 -- 706a22f..d5c45e7
+pulled org-mode git://orgmode.org/org-mode.git maint -- fdd9b18..c41bbc5
