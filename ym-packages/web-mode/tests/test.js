@@ -1,12 +1,3 @@
-var cs = {completed: this.props.todo.completed,
-          editing: this.props.editing};
-
-return {
-  nowShowing: Const.ALL_TODOS,
-  editing: null
-};
-
-
 if (true) {
   var x;
   /*
@@ -25,7 +16,7 @@ if (true) {
   var x = y,
       cd = 3;
   export const {x, y} = z,
-      a = 10;
+               a = 10;
 }
 
 var pathData = this.barData
