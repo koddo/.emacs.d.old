@@ -3,7 +3,7 @@
 
 # keybindings
 
-I use org-mode with [org-clock-statusbar-app](https://github.com/koddo/org-clock-statusbar-app) to track my time.
+To track my time I use org-mode and [org-clock-statusbar-app](https://github.com/koddo/org-clock-statusbar-app).
 
 In bettertouchtool for osx:
 
