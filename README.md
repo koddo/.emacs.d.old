@@ -11,6 +11,8 @@ in bettertouchtool for osx
 | C-S-F12 | osascript ~/.emacs.d/org-clock.applescript clock_out |
 | C-S-F10 | osascript ~/.emacs.d/org-clock.applescript show_current |
 
+I use org-mode with [org-clock-statusbar-app](https://github.com/koddo/org-clock-statusbar-app) to track my time.
+
 TODO: same thing in linux
 
 
