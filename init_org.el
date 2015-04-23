@@ -16,8 +16,8 @@
 (setq org-habit-show-all-today t)
 (setq org-habit-show-habits t)
 (setq org-habit-graph-column 55)
-(setq org-habit-preceding-days 28)
-(setq org-habit-following-days 7)
+(setq org-habit-preceding-days 35)
+(setq org-habit-following-days 2)
 (setq ym-timer-list-to-show-habits   ; (dolist (x ym-timer-list-to-show-habits) (cancel-timer x))
       (list
        (run-at-time "07:00pm" (* 60 60 24)
