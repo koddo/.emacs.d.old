@@ -29,7 +29,7 @@ or if you'd rather keep it in your dotfiles:
 
 ```el
 (unless (package-installed-p 'clojure-mode)
-  (package-install 'clojure-mode))
+  (package-refresh-contents))
 ```
 
 If the installation doesn't work try refreshing the package list:
@@ -51,70 +51,37 @@ To see a list of available configuration options do `M-x customize-group RET clo
 
 The default indentation rules in `clojure-mode` are derived from the
 [community Clojure Style Guide](https://github.com/bbatsov/clojure-style-guide).
-Please, refer to the guide for the general Clojure indentation rules.
 
-The indentation of special forms and macros with bodies is controlled via
-`put-clojure-indent`, `define-clojure-indent` and `clojure-backtracking-indent`.
-Nearly all special forms and built-in macros with bodies have special indentation
-settings in `clojure-mode`. You can add/alter the indentation settings in your
-personal config. Let's assume you want to indent `->>` and `->` like this:
+Characterizing them is difficult to do in summary; this is one
+attempt:
 
-```clojure
-(->> something
-  ala
-  bala
-  portokala)
-```
+1. Bodies of parenthesized forms are indented such that arguments are aligned to
+  the start column of the first argument, _except_ for a class of forms
+  identified by the symbol in function position, the bodies of which are
+  indented two spaces, regardless of the position of their first argument (this
+  is called "defun" indentation, for historical reasons):
+  1. Known special forms (e.g. `loop`, `try`, etc)
+  2. Nearly all "core" macros that ship as part of Clojure itself
+  3. Userland macros (and any other form?) that are locally registered via
+  `put-clojure-indent`, `define-clojure-indent` (helpers for adding mappings to
+  `clojure-indent-function`).
+2. The bodies of certain more complicated macros and special forms
+  (e.g. `letfn`, `deftype`, `extend-protocol`, etc) are indented using a
+  contextual backtracking indentation method, controlled by
+  `clojure-backtracking-indent`.
+3. The bodies of other forms (e.g. vector, map, and set literals) are indented
+  such that each new line within the form is set just inside of the opening
+  delimiter of the form.
 
-You can do so by putting the following in your config:
-
-```el
-(put-clojure-indent '-> 1)
-(put-clojure-indent '->> 1)
-```
-
-This means that the body of the `->/->>` is after the first argument.
-
-A more compact way to do the same thing is:
-
-```el
-(define-clojure-indent
-  (-> 1)
-  (->> 1))
-```
-
-The bodies of certain more complicated macros and special forms
-(e.g. `letfn`, `deftype`, `extend-protocol`, etc) are indented using
-a contextual backtracking indentation method, controlled by
-`clojure-backtracking-indent`. Here's some example config code:
-
-```el
-(put 'implement 'clojure-backtracking-indent '(4 (2)))
-(put 'letfn 'clojure-backtracking-indent '((2) 2))
-(put 'proxy 'clojure-backtracking-indent '(4 4 (2)))
-(put 'reify 'clojure-backtracking-indent '((2)))
-(put 'deftype 'clojure-backtracking-indent '(4 4 (2)))
-(put 'defrecord 'clojure-backtracking-indent '(4 4 (2)))
-(put 'defprotocol 'clojure-backtracking-indent '(4 (2)))
-(put 'extend-type 'clojure-backtracking-indent '(4 (2)))
-(put 'extend-protocol 'clojure-backtracking-indent '(4 (2)))
-(put 'specify 'clojure-backtracking-indent '(4 (2)))
-(put 'specify! 'clojure-backtracking-indent '(4 (2)))
-```
-
-Don't use special indentation settings for forms with names that are not unique,
-as `clojure-mode`'s indentation engine is not namespace-aware and you might
-end up getting strange indentation in unexpected places.
-
-Please, see the docstrings of the Emacs Lisp functions/vars noted above for
-information about customizing this indentation behavior.
+Please see the docstrings of the Emacs Lisp functions/vars noted above for
+information about customizing this indentation behaviour.
 
 ## Related packages
 
 * [clojure-mode-extra-font-locking][] provides additional font-locking
 for built-in methods and macros.  The font-locking is pretty
 imprecise, because it doesn't take namespaces into account and it
-won't font-lock a function at all possible positions in a sexp, but
+won't font-lock a functions at all possible positions in a sexp, but
 if you don't mind its imperfections you can easily enable it:
 
 ```el
@@ -124,13 +91,7 @@ if you don't mind its imperfections you can easily enable it:
 The code in `clojure-mode-font-locking` used to be bundled with
 `clojure-mode` before version 3.0.
 
-You can also use the code in this package as a basis for extending the
-font-locking further (e.g. functions/macros from more
-namespaces). Generally you should avoid adding special font-locking
-for things that don't have fairly unique names, as this will result in
-plenty of incorrect font-locking.
-
-* [clj-refactor][] provides refactoring support.
+* [clj-refactor][] provides simple refactoring support.
 
 * Enabling `CamelCase` support for editing commands(like
 `forward-word`, `backward-word`, etc) in `clojure-mode` is quite
@@ -139,7 +100,7 @@ names. The built-in Emacs minor mode `subword-mode` provides such
 functionality:
 
 ```el
-(add-hook 'clojure-mode-hook #'subword-mode)
+(add-hook 'clojure-mode-hook 'subword-mode)
 ```
 
 * The use of [paredit][] when editing Clojure (or any other Lisp) code
@@ -149,7 +110,7 @@ structure at a higher level than just characters and words. To enable
 it for Clojure buffers:
 
 ```el
-(add-hook 'clojure-mode-hook #'paredit-mode)
+(add-hook 'clojure-mode-hook 'paredit-mode)
 ```
 
 * [smartparens][] is an excellent
@@ -158,7 +119,7 @@ it for Clojure buffers:
   `smartparens` use the following code:
 
 ```el
-(add-hook 'clojure-mode-hook #'smartparens-strict-mode)
+(add-hook 'clojure-mode-hook 'smartparens-strict-mode)
 ```
 
 * [RainbowDelimiters][] is a
@@ -170,7 +131,7 @@ it for Clojure buffers:
   enable it like this:
 
 ```el
-(add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
+(add-hook 'clojure-mode-hook 'rainbow-delimiters-mode)
 ```
 
 ## REPL Interaction
@@ -193,7 +154,7 @@ An extensive changelog is available [here](CHANGELOG.md).
 
 ## License
 
-Copyright © 2007-2015 Jeffrey Chu, Lennart Staflin, Phil Hagelberg, Bozhidar Batsov
+Copyright © 2007-2014 Jeffrey Chu, Lennart Staflin, Phil Hagelberg, Bozhidar Batsov
 and [contributors][].
 
 Distributed under the GNU General Public License; type <kbd>C-h C-c</kbd> to view it.

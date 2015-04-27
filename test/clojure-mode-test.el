@@ -1,6 +1,6 @@
 ;;; clojure-mode-test.el --- Clojure Mode: Unit test suite  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2014-2015 Bozhidar Batsov <bozhidar@batsov.com>
+;; Copyright (C) 2014  Bozhidar Batsov <bozhidar@batsov.com>
 
 ;; This file is not part of GNU Emacs.
 
@@ -205,9 +205,7 @@ POS."
   (should (eq (clojure-test-face-at 1 2 "\\1") 'clojure-character-face))
   (should (eq (clojure-test-face-at 1 6 "\\u0032") 'clojure-character-face))
   (should (eq (clojure-test-face-at 1 2 "\\+") 'clojure-character-face))
-  (should (eq (clojure-test-face-at 1 2 "\\.") 'clojure-character-face))
-  (should (eq (clojure-test-face-at 1 2 "\\,") 'clojure-character-face))
-  (should (eq (clojure-test-face-at 1 2 "\\;") 'clojure-character-face)))
+  (should (eq (clojure-test-face-at 1 2 "\\.") 'clojure-character-face)))
 
 (ert-deftest clojure-mode-syntax-table/cljx ()
   :tags '(fontification syntax-table)
@@ -222,8 +220,7 @@ POS."
 (ert-deftest clojure-mode-syntax-table/dynamic-var ()
   :tags '(fontification syntax-table)
   (should (eq (clojure-test-face-at 1 10 "*some-var*") 'font-lock-variable-name-face))
-  (should (eq (clojure-test-face-at 2 11 "@*some-var*") 'font-lock-variable-name-face))
-  (should (eq (clojure-test-face-at 9 13 "some.ns/*var*") 'font-lock-variable-name-face)))
+  (should (eq (clojure-test-face-at 2 11 "@*some-var*") 'font-lock-variable-name-face)))
 
 (ert-deftest clojure-mode-syntax-table/ns-macro ()
   :tags '(fontification syntax-table)
