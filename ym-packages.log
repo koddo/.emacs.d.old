@@ -35,3 +35,4 @@ pulled web-mode https://github.com/fxbois/web-mode v11 -- 706a22f..d5c45e7
 pulled org-mode git://orgmode.org/org-mode.git maint -- fdd9b18..c41bbc5
 pulled web-mode https://github.com/fxbois/web-mode master -- d5c45e7..03132be
 added clojure-mode https://github.com/clojure-emacs/clojure-mode master -- 4b7652a
+pulled clojure-mode https://github.com/clojure-emacs/clojure-mode tags/4.0.1 -- 4b7652a..cad8228
