@@ -268,7 +268,11 @@
 ;;                         (:description . "Run Shellscript file")))
 ;; -------------------------------------------------------------------
 (require 'restclient)
-
+;; -------------------------------------------------------------------
+(require 'clojure-mode)
+(add-to-list 'auto-mode-alist '("\\.clj\\'" . clojure-mode))
+(add-to-list 'auto-mode-alist '("\\.cljs\\'" . clojure-mode))
+(add-to-list 'auto-mode-alist '("\\.cljx\\'" . clojure-mode))
 
 
 
