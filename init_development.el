@@ -186,8 +186,9 @@
   (let
       ((current-prefix-arg '(4)))
     (call-interactively 'erlang-compile))
-  (erl-reload-module (erl-target-node) (erlang-get-module))
-  (message "===== %S" (list (erl-target-node) (erlang-get-module))))
+  ;; (erl-reload-module (erl-target-node) (erlang-get-module))
+  ;; (message "===== %S" (list (erl-target-node) (erlang-get-module)))
+  )
 (defun m/erl-shell-on-node ()
   (interactive)
   (erl-choose-nodename)
