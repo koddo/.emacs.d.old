@@ -165,7 +165,7 @@
 ;;       (etags-select-find-tag-at-point)
 ;;     (ym-ido-find-tag)))
 ;; -------------------------------------------------------------------
-(setq erlang-root-dir "~/.kerl_erlang/17.1")   ; maybe smth like this? (setq erlang-root-dir (shell-command-to-string))
+(setq erlang-root-dir "~/.kerl_erlang/17.5")   ; maybe smth like this? (setq erlang-root-dir (shell-command-to-string))
 (add-to-list 'exec-path (concat erlang-root-dir "/bin"))
 (add-to-list 'load-path
              (car (file-expand-wildcards (concat erlang-root-dir "/lib/tools-*/emacs"))))

@@ -97,3 +97,14 @@
   )
 ;; -------------------------------------------------------------------
 
+(defun window-resize-to-70-percent ()
+  (interactive)
+  (window-resize nil (- (truncate (* 0.7 (frame-width))) (window-width)) t))
+
+;; (progn
+;;  (split-window-horizontally)
+;;  (window-resize nil (- (truncate (* 0.3 (frame-width))) (window-width)) t)
+;;  (other-window 1)
+;;  (split-window-horizontally)
+;;  (other-window -1)
+;; )
