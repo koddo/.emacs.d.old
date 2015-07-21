@@ -36,3 +36,4 @@ pulled org-mode git://orgmode.org/org-mode.git maint -- fdd9b18..c41bbc5
 pulled web-mode https://github.com/fxbois/web-mode master -- d5c45e7..03132be
 added clojure-mode https://github.com/clojure-emacs/clojure-mode master -- 4b7652a
 pulled clojure-mode https://github.com/clojure-emacs/clojure-mode tags/4.0.1 -- 4b7652a..cad8228
+added yaml-mode https://github.com/yoshiki/yaml-mode master -- 210b075
