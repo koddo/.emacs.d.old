@@ -2,7 +2,10 @@
 ========
 
 # keybindings
-in bettertouchtool for osx
+
+To track my time I use org-mode and [org-clock-statusbar-app](https://github.com/koddo/org-clock-statusbar-app).
+
+In bettertouchtool for osx:
 
 | keybinding | exec command |
 | --- | --- |
