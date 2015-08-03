@@ -192,6 +192,8 @@
 (defun m/erl-shell-on-node ()
   (interactive)
   (erl-choose-nodename)
+  (erl-ping (erl-target-node))
+  (sleep-for 2)
   (progn
     (erlang-shell-display)
     (end-of-buffer)
