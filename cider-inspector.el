@@ -36,20 +36,6 @@
 
 (defconst cider-inspector-buffer "*cider inspect*")
 
-;;; Customization
-(defgroup cider-inspector nil
-  "Presentation and behaviour of the cider value inspector."
-  :prefix "cider-inspector-"
-  :group 'cider
-  :package-version '(cider . "0.10.0"))
-
-(defcustom cider-inspector-page-size 32
-  "Default page size in paginated inspector view.
-The page size can be also changed interactively within the inspector."
-  :type '(integer :tag "Page size" 32)
-  :group 'cider-inspector
-  :package-version '(cider . "0.10.0"))
-
 (push cider-inspector-buffer cider-ancillary-buffers)
 
 (defvar cider-inspector-mode-map
@@ -60,13 +46,6 @@ The page size can be also changed interactively within the inspector."
     (define-key map [mouse-1] #'cider-inspector-operate-on-click)
     (define-key map "l" #'cider-inspector-pop)
     (define-key map "g" #'cider-inspector-refresh)
-    ;; Page-up/down
-    (define-key map [next] #'cider-inspector-next-page)
-    (define-key map [prior] #'cider-inspector-prev-page)
-    (define-key map " " #'cider-inspector-next-page)
-    (define-key map (kbd "M-SPC") #'cider-inspector-prev-page)
-    (define-key map (kbd "S-SPC") #'cider-inspector-prev-page)
-    (define-key map "s" #'cider-inspector-set-page-size)
     (define-key map [tab] #'cider-inspector-next-inspectable-object)
     (define-key map "\C-i" #'cider-inspector-next-inspectable-object)
     (define-key map [(shift tab)] #'cider-inspector-previous-inspectable-object) ; Emacs translates S-TAB
@@ -123,56 +102,27 @@ Used for all inspector nREPL ops."
 
 (defun cider-inspect-expr (expr ns)
   (cider--prep-interactive-eval expr)
-  (cider-nrepl-send-request (append (nrepl--eval-request expr ns)
-                                    (list "inspect" "true"
-                                          "page-size" (or cider-inspector-page-size 32)))
-                            (cider-inspector-response-handler (current-buffer))))
+  (nrepl-send-request (append (nrepl--eval-request expr ns)
+                              (list "inspect" "true"))
+                      (cider-inspector-response-handler (current-buffer))))
 
 (defun cider-inspector-pop ()
   (interactive)
-  (cider-nrepl-send-request (list "op" "inspect-pop"
-                                  "session" (cider-current-session))
-                            (cider-inspector-response-handler (current-buffer))))
+  (nrepl-send-request (list "op" "inspect-pop"
+                            "session" (nrepl-current-session))
+                      (cider-inspector-response-handler (current-buffer))))
 
 (defun cider-inspector-push (idx)
-  (cider-nrepl-send-request (list "op" "inspect-push"
-                                  "idx" (number-to-string idx)
-                                  "session" (cider-current-session))
-                            (cider-inspector-response-handler (current-buffer))))
+  (nrepl-send-request (list "op" "inspect-push"
+                            "idx" (number-to-string idx)
+                            "session" (nrepl-current-session))
+                      (cider-inspector-response-handler (current-buffer))))
 
 (defun cider-inspector-refresh ()
   (interactive)
-  (cider-nrepl-send-request (list "op" "inspect-refresh"
-                                  "session" (cider-current-session))
-                            (cider-inspector-response-handler (current-buffer))))
-
-(defun cider-inspector-next-page ()
-  "Jump to the next page when inspecting a paginated sequence/map.
-
-Does nothing if already on the last page."
-  (interactive)
-  (cider-nrepl-send-request (list "op" "inspect-next-page"
-                                  "session" (cider-current-session))
-                            (cider-inspector-response-handler (current-buffer))))
-
-(defun cider-inspector-prev-page ()
-  "Jump to the previous page when expecting a paginated sequence/map.
-
-Does nothing if already on the first page."
-  (interactive)
-  (cider-nrepl-send-request (list "op" "inspect-prev-page"
-                                  "session" (cider-current-session))
-                            (cider-inspector-response-handler (current-buffer))))
-
-(defun cider-inspector-set-page-size (page-size)
-  "Set the page size in pagination mode to the specified value.
-
-Current page will be reset to zero."
-  (interactive "nPage size:")
-  (cider-nrepl-send-request (list "op" "inspect-set-page-size"
-                                  "session" (cider-current-session)
-                                  "page-size" page-size)
-                            (cider-inspector-response-handler (current-buffer))))
+  (nrepl-send-request (list "op" "inspect-refresh"
+                            "session" (nrepl-current-session))
+                      (cider-inspector-response-handler (current-buffer))))
 
 ;; Render Inspector from Structured Values
 (defun cider-irender (buffer str)
@@ -194,7 +144,7 @@ Current page will be reset to zero."
         ((and (consp el) (eq (car el) :newline))
          (newline))
         ((and (consp el) (eq (car el) :value))
-         (cider-irender-value (cadr el) (cl-caddr el)))
+         (cider-irender-value (cadr el) (caddr el)))
         (t (message "Unrecognized inspector object: %s" el))))
 
 (defun cider-irender-value (value idx)
@@ -216,7 +166,7 @@ LIMIT is the maximum or minimum position in the current buffer.
 Return a list of two values: If an object could be found, the
 starting position of the found object and T is returned;
 otherwise LIMIT and NIL is returned."
-  (let ((finder (cl-ecase direction
+  (let ((finder (ecase direction
                   (next 'next-single-property-change)
                   (prev 'previous-single-property-change))))
     (let ((prop nil) (curpos (point)))

@@ -1,6 +1,7 @@
 EMACS ?= emacs
 EMACSFLAGS = -L .
 CASK = cask
+VAGRANT = vagrant
 VERSION = $(shell git describe --tags --abbrev=0 | sed 's/^v//')
 PACKAGE_NAME = cider-$(VERSION)
 
@@ -29,6 +30,11 @@ test : build
 	$(CASK) exec $(EMACS) --no-site-file --no-site-lisp --batch \
 		$(EMACSFLAGS) \
 		-l test/run-tests
+
+.PHONY: virtual-test
+virtual-test :
+	$(VAGRANT) up
+	$(VAGRANT) ssh -c "make -C /vagrant EMACS=$(EMACS) clean test"
 
 .PHONY: clean
 clean :

@@ -52,6 +52,11 @@ Possible values are:
   :group 'cider
   :package-version '(cider . "0.7.0"))
 
+(define-obsolete-variable-alias
+  'cider-macroexpansion-suppress-namespaces
+  'cider-macroexpansion-display-namespaces
+  "0.8.0")
+
 (defcustom cider-macroexpansion-print-metadata nil
   "Determines if metadata is included in macroexpansion results."
   :type 'boolean
@@ -72,7 +77,7 @@ The default for DISPLAY-NAMESPACES is taken from
                 (symbol-name cider-macroexpansion-display-namespaces)))
       (append (when cider-macroexpansion-print-metadata
                 (list "print-meta" "true")))
-      (cider-nrepl-send-sync-request)
+      (nrepl-send-sync-request)
       (nrepl-dict-get "expansion")))
 
 (defun cider-macroexpand-undo (&optional arg)
@@ -96,7 +101,7 @@ This variable specifies both what was expanded and the expander.")
   "Substitute the form preceding point with its macroexpansion using EXPANDER."
   (interactive)
   (let* ((expansion (cider-sync-request:macroexpand expander (cider-last-sexp)))
-         (bounds (cons (save-excursion (clojure-backward-logical-sexp 1) (point)) (point))))
+         (bounds (cons (save-excursion (backward-sexp) (point)) (point))))
     (cider-redraw-macroexpansion-buffer
      expansion (current-buffer) (car bounds) (cdr bounds))))
 
@@ -143,7 +148,7 @@ If invoked with a PREFIX argument, use 'macroexpand' instead of
     (erase-buffer)
     (insert (format "%s" expansion))
     (goto-char (point-max))
-    (cider--font-lock-ensure)))
+    (font-lock-fontify-buffer)))
 
 (defun cider-redraw-macroexpansion-buffer (expansion buffer start end)
   "Redraw the macroexpansion with new EXPANSION.
