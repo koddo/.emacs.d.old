@@ -2,49 +2,6 @@
 
 ## master (unreleased)
 
-### New features
-
-* [#1271](https://github.com/clojure-emacs/cider/issues/1271): New possible value (`always-save`) for `cider-prompt-save-file-on-load`.
-* [#1197](https://github.com/clojure-emacs/cider/issues/1197): Display some indication that we're waiting for a result for long-running evaluations.
-* [#1127](https://github.com/clojure-emacs/cider/issues/1127): Make it possible to associate a buffer with a connection (via `cider-assoc-buffer-with-connection`).
-* [#1217](https://github.com/clojure-emacs/cider/issues/1217): Add new command `cider-assoc-project-with-connection` to associate a project directory with a connection.
-* [#1248](https://github.com/clojure-emacs/cider/pull/1248): Add <kbd>TAB</kbd> and <kbd>RET</kbd> keys to the test-report buffer.
-* [#1245](https://github.com/clojure-emacs/cider/pull/1245): New variable, `cider-ovelays-use-font-lock` controls whether results overlay should be font-locked or just use a single face.
-* [#1235](https://github.com/clojure-emacs/cider/pull/1235): Add support for syntax-quoted forms to the debugger.
-* [#1212](https://github.com/clojure-emacs/cider/pull/1212): Add pagination of long collections to inspector.
-* [#1237](https://github.com/clojure-emacs/cider/pull/1237): Add two functions for use with `cider-repl-prompt-function`, `cider-repl-prompt-lastname` and `repl-prompt-abbreviated`.
-* [#1201](https://github.com/clojure-emacs/cider/pull/1201): Integrate overlays with interactive evaluation. `cider-use-overlays` can be used to turn this on or off.
-* [#1195](https://github.com/clojure-emacs/cider/pull/1195): CIDER can [create cljs REPLs](https://github.com/clojure-emacs/cider#clojurescript-usage).
-* [#1191](https://github.com/clojure-emacs/cider/pull/1191): New custom variables `cider-debug-print-level` and `cider-debug-print-length`.
-* [#1188](https://github.com/clojure-emacs/cider/pull/1188): New debugging tool-bar.
-* [#1187](https://github.com/clojure-emacs/cider/pull/1187): The list of keys displayed by the debugger can be configured with `cider-debug-prompt`.
-* [#1187](https://github.com/clojure-emacs/cider/pull/1187): While debugging, there is a menu on the menu-bar listing available commands.
-* [#1184](https://github.com/clojure-emacs/cider/pull/1184): When the user kills the repl buffer, CIDER will offer to kill the nrepl buffer and process too. Also, when the client (repl) process dies, the server (nrepl) process is killed too.
-* [#1182](https://github.com/clojure-emacs/cider/pull/1182): New command `cider-browse-instrumented-defs`, displays a buffer listing all defitions currently instrumented by the debugger.
-* [#1182](https://github.com/clojure-emacs/cider/pull/1182): Definitions currently instrumented by the debugger are marked with a red box in the source buffer.
-* [#1174](https://github.com/clojure-emacs/cider/pull/1174): New command `cider-run`, runs the project's `-main` function.
-* [#1176](https://github.com/clojure-emacs/cider/pull/1176): While debugging, cider's usual eval commands will evaluate code in the current lexical context. Additionally, the <kbd>l</kbd> key now inspects local variables.
-* [#1149](https://github.com/clojure-emacs/cider/pull/1149): [Two new ways](https://github.com/clojure-emacs/cider#cider-debug) to debug code, the `#break` and `#dbg` reader macros.
-* [#1219](https://github.com/clojure-emacs/cider/pull/1219): The output of `cider-refresh` is now sent to a dedicated `*cider-refresh-log*` buffer.
-* [#1219](https://github.com/clojure-emacs/cider/pull/1219): New custom variables `cider-refresh-before-fn` and `cider-refresh-after-fn`.
-* [#1220](https://github.com/clojure-emacs/cider/issues/1220): Treat keywords as symbols in lookup commands like `cider-find-var`.
-* [#1241](https://github.com/clojure-emacs/cider/pull/1241): Passing a double prefix argument to `cider-refresh` will now clear the state of the namespace tracker used by the refresh middleware. This is useful for recovering from errors that a normal reload would not otherwise recover from, but may cause stale code in any deleted files to not be completely unloaded.
-* New defcustom `cider-result-use-clojure-font-lock` allows you disable the use of Clojure font-locking for interactive results.
-* [#1239](https://github.com/clojure-emacs/cider/issues/1239): New defcustom `cider-refresh-show-log-buffer`, controls the behaviour of the `*cider-refresh-log*` buffer when calling `cider-refresh`. When set to nil (the default), the log buffer will still be written to, but not displayed automatically. Instead, the most relevant information will be displayed in the echo area. When set to non-nil, the log buffer will be displayed every time `cider-refresh` is called.
-
-### Changes
-
-* The usage of the default connection has been reduced significantly. Now evaluations & related commands will be routed via the connection matching the current project automatically unless there's some ambiguity when determining the connection (like multiple or no matching connections). Simply put you'll no longer have to mess around much with connecting-setting commands (e.g. `nrepl-connection-browser`, `cider-rotate-default-connection`).
-* [#732](https://github.com/clojure-emacs/cider/issues/732): `cider-quit` and `cider-restart` now operate on the current connection only. With a prefix argument they operate on all connections.
-* `nrepl-log-messages` is now set to `t` by default.
-* Renamed `cider-repl-output-face` to `cider-repl-stdout-face` and `cider-repl-err-output-face` to `cider-repl-stderr-face`.
-
-### Bugs fixed
-* [#1252](https://github.com/clojure-emacs/cider/issues/1252) `cider-repl-clear-buffer` stops working in certain circumstances.
-* [#1164](https://github.com/clojure-emacs/cider/pull/1164): Fix an error in `cider-browse-ns--doc-at-point`.
-* [#1189](https://github.com/clojure-emacs/cider/issues/1189): Don't show result from automatic ns form evaluation.
-* [#1079](https://github.com/clojure-emacs/cider/issues/1079): Don't try to font-lock very long results. The maximum font-lockable result length is controlled by `cider-font-lock-max-length`.
-
 ## 0.9.1 / 2015-06-24
 
 ### New features
@@ -458,8 +415,8 @@ of the evaluated code to the REPL buffer, so you can easily play with the output
 
 ### New features
 
-* <kbd>C-c M-d</kbd> will display default nREPL connection details.
-* <kbd>C-c M-r</kbd> will rotate and display the default nREPL connection.
+* <kbd>C-c M-d</kbd> will display current nREPL connection details.
+* <kbd>C-c M-r</kbd> will rotate and display the current nREPL connection.
 * Setting the variable `nrepl-buffer-name-show-port` will display the port on which the nREPL server is running.
 * The REPL buffer name uses project directory name; `*nrepl*` will appear as `*nrepl project-directory-name*`.
 * The nREPL connection buffer name uses project directory name; `*nrepl-connection*` will appear as `*nrepl-connection project-directory-name*`.

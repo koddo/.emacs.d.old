@@ -32,31 +32,18 @@
 
 (require 'cider-interaction)
 (require 'cider-eldoc)
-(require 'cider-repl)
-
-(defcustom cider-mode-line-show-connection t
-  "If the mode-line lighter should detail the connection."
-  :group 'cider
-  :type 'boolean
-  :package-version '(cider "0.10.0"))
 
 (defun cider--modeline-info ()
   "Return info for the `cider-mode' modeline.
 
 Info contains project name and host:port endpoint."
-  (let ((current-connection (cider-current-repl-buffer)))
+  (let ((current-connection (nrepl-current-connection-buffer t)))
     (if current-connection
         (with-current-buffer current-connection
-          (concat
-           (when nrepl-sibling-buffer-alist
-             (concat cider-repl-type ":"))
-           (when cider-mode-line-show-connection
-             (format "%s@%s:%s"
-                     (or (cider--project-name nrepl-project-dir) "<no project>")
-                     (pcase (car nrepl-endpoint)
-                       ("localhost" "")
-                       (x x))
-                     (cadr nrepl-endpoint)))))
+          (format "%s@%s:%s"
+                  (or (nrepl--project-name nrepl-project-dir) "<no project>")
+                  (car nrepl-endpoint)
+                  (cadr nrepl-endpoint)))
       "not connected")))
 
 ;;;###autoload
@@ -114,8 +101,8 @@ entirely."
     (define-key map (kbd "C-c M-,") #'cider-test-run-test)
     (define-key map (kbd "C-c C-t") #'cider-test-show-report)
     (define-key map (kbd "C-c M-s") #'cider-selector)
-    (define-key map (kbd "C-c M-r") #'cider-rotate-default-connection)
-    (define-key map (kbd "C-c M-d") #'cider-display-connection-info)
+    (define-key map (kbd "C-c M-r") #'cider-rotate-connection)
+    (define-key map (kbd "C-c M-d") #'cider-display-current-connection-info)
     (define-key map (kbd "C-c C-x") #'cider-refresh)
     (define-key map (kbd "C-c C-q") #'cider-quit)
     (easy-menu-define cider-mode-menu map
@@ -150,14 +137,12 @@ entirely."
          ["Rerun failed/erring tests" cider-test-rerun-tests]
          ["Show test report" cider-test-show-report])
         "--"
-        ["Run project (-main function)" cider-run]
         ["Inspect" cider-inspect]
         ["Toggle var tracing" cider-toggle-trace-var]
         ["Toggle ns tracing" cider-toggle-trace-ns]
         ["Refresh loaded code" cider-refresh]
         "--"
         ["Debug top-level form" cider-debug-defun-at-point]
-        ["List instrumented defs" cider-browse-instrumented-defs]
         "--"
         ["Set ns" cider-repl-set-ns]
         ["Switch to REPL" cider-switch-to-repl-buffer]
@@ -168,8 +153,8 @@ entirely."
         ("nREPL"
          ["Describe session" cider-describe-nrepl-session]
          ["Close session" cider-close-nrepl-session]
-         ["Connection info" cider-display-connection-info]
-         ["Rotate default connection" cider-rotate-default-connection])
+         ["Connection info" cider-display-current-connection-info]
+         ["Rotate connection" cider-rotate-connection])
         "--"
         ["Interrupt evaluation" cider-interrupt]
         "--"

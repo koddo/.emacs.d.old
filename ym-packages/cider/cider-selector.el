@@ -32,6 +32,7 @@
 
 (require 'cider-client)
 (require 'cider-interaction)
+(require 'cider-repl) ; for cider-get-repl-buffer
 
 (defconst cider-selector-help-buffer "*Selector Help*"
   "The name of the selector's help buffer.")
@@ -118,8 +119,8 @@ is chosen.  The returned buffer is selected with
   (cider-selector)
   (current-buffer))
 
-(cl-pushnew (list ?4 "Select in other window" (lambda () (cider-selector t)))
-            cider-selector-methods :key #'car)
+(pushnew (list ?4 "Select in other window" (lambda () (cider-selector t)))
+         cider-selector-methods :key #'car)
 
 (def-cider-selector-method ?c
   "Most recently visited clojure-mode buffer."
@@ -134,12 +135,12 @@ is chosen.  The returned buffer is selected with
 
 (def-cider-selector-method ?r
   "Current REPL buffer."
-  (cider-current-repl-buffer))
+  (cider-get-repl-buffer))
 
 (def-cider-selector-method ?n
   "Connections browser buffer."
-  (cider-connection-browser)
-  cider--connection-browser-buffer-name)
+  (nrepl-connection-browser)
+  nrepl--connection-browser-buffer-name)
 
 (def-cider-selector-method ?m
   "*nrepl-messages* buffer."
@@ -148,6 +149,11 @@ is chosen.  The returned buffer is selected with
 (def-cider-selector-method ?x
   "*cider-error* buffer."
   cider-error-buffer)
+
+(def-cider-selector-method ?s
+  "Cycle to the next CIDER connection's REPL."
+  (cider-rotate-connection)
+  (cider-get-repl-buffer))
 
 (provide 'cider-selector)
 

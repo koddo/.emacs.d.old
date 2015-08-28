@@ -175,18 +175,11 @@
   "Open the source for the current symbol, if available."
   (interactive)
   (if cider-docview-file
-      (-if-let (buffer (and (not (cider--tooling-file-p cider-docview-file))
-                            (cider-find-file cider-docview-file)))
-          (cider-jump-to buffer (if cider-docview-line
-                                    (cons cider-docview-line nil)
-                                  cider-docview-symbol)
-                         nil)
-        (user-error
-         (substitute-command-keys
-          "Can't find the source because it wasn't defined with `cider-eval-buffer'")))
+      (let ((buffer (and cider-docview-file
+                         (not (cider--tooling-file-p cider-docview-file))
+                         (cider-find-file cider-docview-file))))
+        (cider-jump-to buffer (cons cider-docview-line nil) nil))
     (error "No source location for %s" cider-docview-symbol)))
-
-(defvar cider-buffer-ns)
 
 (defun cider-docview-grimoire ()
   (interactive)

@@ -75,21 +75,17 @@
               'mouse-face 'highlight
               'keymap cider-browse-ns-mouse-map))
 
-(defun cider-browse-ns--list (buffer title items &optional ns noerase)
-  "Reset contents of BUFFER.  Then display TITLE at the top and ITEMS are indented underneath.
-If NS is non-nil, it is added to each item as the
-`cider-browse-ns-current-ns' text property. If NOERASE is non-nil, the
-contents of the buffer are not reset before inserting TITLE and ITEMS."
+(defun cider-browse-ns--list (buffer title items)
+  "Reset contents of BUFFER.  Then display TITLE at the top and ITEMS are indented underneath."
   (with-current-buffer buffer
     (cider-browse-ns-mode)
     (let ((inhibit-read-only t))
-      (unless noerase (erase-buffer))
-      (goto-char (point-max))
-      (insert (propertize title 'font-lock-face 'font-lock-type-face)
-              "\n")
+      (erase-buffer)
+      (insert (propertize title 'font-lock-face 'font-lock-type-face))
+      (newline)
       (dolist (item items)
-        (insert (propertize (concat "  " item "\n")
-                            'cider-browse-ns-current-ns ns)))
+        (insert "  " item)
+        (newline))
       (goto-char (point-min)))))
 
 ;; Interactive Functions
@@ -122,22 +118,19 @@ contents of the buffer are not reset before inserting TITLE and ITEMS."
       (setq-local cider-browse-ns-current-ns nil))))
 
 (defun cider-browse-ns--var-at-point ()
-  (let ((line (thing-at-point 'line)))
-    (when (string-match " +\\(.+\\)\n?" line)
-      (format "%s/%s"
-              (or (get-text-property (point) 'cider-browse-ns-current-ns)
-                  cider-browse-ns-current-ns)
-              (match-string 1 line)))))
+  (let ((line (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
+    (when (string-match " +\\(.+\\)" line)
+      (format "%s/%s" cider-browse-ns-current-ns (match-string 1 line)))))
 
 (defun cider-browse-ns--doc-at-point ()
   "Expand browser according to thing at current point."
   (interactive)
   (-when-let (var (cider-browse-ns--var-at-point))
-    (cider-doc-lookup var)))
+    ((cider-doc-lookup var))))
 
 (defun cider-browse-ns--find-at-point ()
   (interactive)
-  (-when-let (var (cider-browse-ns--var-at-point))
+  (when-let (var (cider-browse-ns--var-at-point))
     (cider-find-var current-prefix-arg var)))
 
 (defun cider-browse-ns--handle-mouse (event)
