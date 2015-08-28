@@ -1,0 +1,10 @@
+*~
+*\#*\#
+*.\#*
+*.elc
+.cask
+elpa
+.depend
+TAGS
+.DS_STORE
+dist
