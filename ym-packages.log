@@ -38,3 +38,4 @@ added clojure-mode https://github.com/clojure-emacs/clojure-mode master -- 4b765
 pulled clojure-mode https://github.com/clojure-emacs/clojure-mode tags/4.0.1 -- 4b7652a..cad8228
 added yaml-mode https://github.com/yoshiki/yaml-mode master -- 210b075
 pulled restclient https://github.com/pashky/restclient.el master -- 7c22b1b..7dadac6
+added cider https://github.com/clojure-emacs/cider master -- 71bb17b
