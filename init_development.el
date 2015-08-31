@@ -276,6 +276,8 @@
 (add-to-list 'auto-mode-alist '("\\.clj\\'" . clojure-mode))
 (add-to-list 'auto-mode-alist '("\\.cljs\\'" . clojure-mode))
 (add-to-list 'auto-mode-alist '("\\.cljx\\'" . clojure-mode))
+(require 'queue)
+(require 'cider)
 ;; -------------------------------------------------------------------
 (require 'yaml-mode)
 (setq yaml-indent-offset 4)
