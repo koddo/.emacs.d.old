@@ -26,8 +26,6 @@
 (load-file "~/.emacs.d/init_functions.el")
 (load-file "~/.emacs.d/init_colors.el")
 
-
-
 (dired "~/")
 (dired "~/Downloads")
 (dired "~/workspace")
