@@ -40,3 +40,4 @@ added yaml-mode https://github.com/yoshiki/yaml-mode master -- 210b075
 pulled restclient https://github.com/pashky/restclient.el master -- 7c22b1b..7dadac6
 added cider https://github.com/clojure-emacs/cider master -- 71bb17b
 pulled cider https://github.com/clojure-emacs/cider v0.9.1 -- 71bb17b..89e6217
+added major-mode-dedication https://github.com/tom-seddon/major-mode-dedication master -- 6fe8fb8
