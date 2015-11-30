@@ -14,8 +14,6 @@ In bettertouchtool for osx:
 | C-S-F12 | osascript ~/.emacs.d/org-clock.applescript clock_out |
 | C-S-F10 | osascript ~/.emacs.d/org-clock.applescript show_current |
 
-I use org-mode with [org-clock-statusbar-app](https://github.com/koddo/org-clock-statusbar-app) to track my time.
-
 TODO: same thing in linux
 
 
@@ -48,3 +46,15 @@ If you want to get specific commit, then add master and then pull refspec.
 
 TODO: in org-clock.applescript find a better way to get full path of emacsclient --- in osx it's in Emacs.app, not one installed systemwide
 
+
+# Grayscale favicons in browser
+
+Favicons in tabs are bright and distracting. This will make them grayscale in firefox:
+
+~/Library/Application Support/Firefox/Profiles/[...].default/chrome/userChrome.css:
+
+```
+.tabbrowser-tab .tab-content, toolbarbutton { filter: grayscale(1) !important; }
+```
+
+Source: https://addons.mozilla.org/en-us/firefox/addon/gray-scale-toolbar-icons/reviews/670602/
