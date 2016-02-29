@@ -323,7 +323,7 @@
 (defun ym-org-journal-view ()
   (interactive)
   (ym-org-datetree-find-today ym-org-journal-file)
-  (message "  --- What good things happened to you today?\n  --- What is the most important thing for tomorrow?\n  --- What can i do for my family and friends?\n"))
+  (message "  --- What good things happened to you today?\n  --- What is the most important thing for tomorrow?\n  --- What can you do for your family and friends?\n"))
 (defun ym-org-contacts-view ()
   (interactive)
   (delete-other-windows)
