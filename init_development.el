@@ -251,7 +251,7 @@
                                         ;; <------------------------ my
                                         "alter"
                                         "reset"
-                                        "begin" "end" "commit"
+                                        "begin" "end" "commit" "return" "declare"
                                         "$$"
                                         "--") t) "\\(\\b\\|\\s-\\)\\)\\|\\(^```$\\)"))
 (defun m/align-sql (start end)
