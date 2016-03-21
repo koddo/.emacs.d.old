@@ -252,7 +252,9 @@
                                         "alter"
                                         "reset"
                                         "begin" "end" "commit" "return" "declare"
+                                        "if"
                                         "$$"
+                                        "grant"
                                         "--") t) "\\(\\b\\|\\s-\\)\\)\\|\\(^```$\\)"))
 (defun m/align-sql (start end)
  (interactive "*r")

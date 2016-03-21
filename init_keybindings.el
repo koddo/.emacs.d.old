@@ -208,6 +208,7 @@
 (ym-define-key (kbd "C-<right>")    'winner-redo)
 (ym-define-key (kbd "M-x") 'smex)
 (ym-define-key (kbd "C-`") 'other-frame)
+(ym-define-key (kbd "M-_") (lambda () (interactive) (insert "—")))
 (global-set-key (kbd "C-c '") #'narrow-or-widen-dwim)
 ;; (ym-define-key (kbd "<left>") (lambda () (interactive) (ignore-errors (windmove-left))))
 ;; (ym-define-key (kbd "<right>") (lambda () (interactive) (ignore-errors (windmove-right))))
