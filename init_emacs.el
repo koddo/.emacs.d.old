@@ -50,10 +50,17 @@
 ;; -------------------------------------------------------------------
 (setq backup-inhibited t)
 (setq make-backup-files nil)
-(setq auto-save-visited-file-name t)    ; just autosave files, not their backups
 (setq auto-save-list-file-name nil)
 (setq auto-save-list-file-prefix nil)
-(setq auto-save-include-big-deletions t)   ; do not track auto-save backups
+(setq auto-save-include-big-deletions t)
+(setq create-lockfiles nil)
+;; (setq auto-save-visited-file-name t) -- I found this glitchy, sometimes it saves to #auto-save-files#, but not to originals
+(defun save-buffer-if-visiting-file (&optional args)   ; https://shreevatsa.wordpress.com/2008/01/22/emacs-auto-save/, http://bryan-murdock.blogspot.ru/2008/03/beat-save-habit.html
+  "Save the current buffer only if it is visiting a file"
+  (interactive)
+  (if (buffer-file-name)
+      (save-buffer args)))
+(add-hook 'auto-save-hook 'save-buffer-if-visiting-file)   ; forces saving the buffer to file, still creates #files#, but they are gitignored
 ;; -------------------------------------------------------------------
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)

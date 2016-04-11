@@ -260,6 +260,7 @@
  (interactive "*r")
  (align-regexp start end "\\s-*[^[:space:]]*\\(\\s-*\\)" 1 3 nil)
  )
+(add-to-list 'auto-mode-alist '("\\.pgtap$" . sql-mode))
 ;; -------------------------------------------------------------------
 (require 'web-mode)
 (add-to-list 'auto-mode-alist '("\\.html?$" . web-mode))
