@@ -8,4 +8,4 @@
                        ("ymyasnippetautoinsertmodetemplate" "#!/usr/bin/env bash\n\n$0\n\n" "ymyasnippetautoinsertmodetemplate" nil nil nil nil nil nil)))
 
 
-;;; Do not edit! File generated at Sat Oct 11 17:07:52 2014
+;;; Do not edit! File generated at Sun May 22 15:58:39 2016

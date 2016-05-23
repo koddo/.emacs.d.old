@@ -301,6 +301,5 @@
 (require 'cider)
 ;; -------------------------------------------------------------------
 (require 'yaml-mode)
-(setq yaml-indent-offset 4)
 
 
