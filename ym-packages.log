@@ -43,3 +43,4 @@ pulled cider https://github.com/clojure-emacs/cider v0.9.1 -- 71bb17b..89e6217
 added major-mode-dedication https://github.com/tom-seddon/major-mode-dedication master -- 6fe8fb8
 removed major-mode-dedication https://github.com/tom-seddon/major-mode-dedication master -- 6fe8fb8
 added sql-indent https://github.com/bsvingen/sql-indent master -- f85bc91
+added markdown-mode https://github.com/jrblevin/markdown-mode master -- c560ddd
