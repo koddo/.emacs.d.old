@@ -301,4 +301,68 @@
 (require 'cider)
 ;; -------------------------------------------------------------------
 (require 'yaml-mode)
+;; -------------------------------------------------------------------
+(autoload 'markdown-mode "markdown-mode"
+  "Major mode for editing Markdown files" t)
+(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+(autoload 'gfm-mode "markdown-mode"
+  "Major mode for editing GitHub Flavored Markdown files" t)
+(add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
+;; -------------------------------------------------------------------
+(defun ym-jekyll-post-template ()
+  (interactive)
+  (yas-expand-snippet (yas--template-content (yas--get-template-by-uuid major-mode "ymjekyllposttemplate"))))
+(defun ym-rename-current-buffer-file (&optional suggestion)   ; http://emacs.stackexchange.com/questions/2849/save-current-file-with-a-slightly-different-name/2850#2850
+  "Renames current buffer and file it is visiting."
+  (interactive)
+  (let ((name (buffer-name))
+        (filename (buffer-file-name)))
+    (if (not (and filename (file-exists-p filename)))
+        (error "Buffer '%s' is not visiting a file!" name)
+      (let ((new-name (read-file-name "New name: " nil nil 'confirm
+                                      (if suggestion
+                                          suggestion
+                                        filename)   ; a bug here -- when using ido-everywhere and falling back to a regular read-file-name with C-f, it inserts a name twice, but this doesn't bother me, because I never use this fallback
+                                      )))
+        (if (get-buffer new-name)
+            (error "A buffer named '%s' already exists!" new-name)
+          (rename-file filename new-name 1)
+          (rename-buffer new-name)
+          (set-visited-file-name new-name)
+          (set-buffer-modified-p nil)
+          (message "File '%s' successfully renamed to '%s'."
+                   name (file-name-nondirectory new-name)))))))
+(defun ym-jekyll-regenerate-date-and-filename ()
+  (interactive)
+  (beginning-of-buffer)
+  (search-forward-regexp "^--- *$" nil t 2)
+  (let ((end-of-front-matter (point)))
+    (beginning-of-buffer)
+    (search-forward-regexp "^date:.*$" end-of-front-matter t)
+    (delete-region (line-beginning-position)
+                   (line-end-position))
+    (insert "date:   " (format-time-string "%Y-%m-%d %H:%M:%S %z"))
+    (beginning-of-buffer)
+    (search-forward-regexp "^title:.*$" end-of-front-matter t)
+    (let ((title-line (buffer-substring (line-beginning-position)
+                                  (line-end-position))))
+      (save-match-data
+        (string-match "title:  \"\\(.*\\)\"" title-line)
+        (let ((title
+               (s-replace-all '((" " . "-") ("'" . "") ("\"" . "") ("!" . "") ("?" . "") ("." . "") ("," . ""))
+                              (downcase (match-string 1 title-line)))))
+          (ym-rename-current-buffer-file (concat (format-time-string "%Y-%m-%d") "-" title ".markdown"))
+          )
+        )
+      )
+    )
+  )
+
+
+
+
+
+
+
 

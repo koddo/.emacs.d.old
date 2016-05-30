@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: ymjekyllposttemplate
+# key: ymjekyllposttemplate
+# --
+---
+layout: post
+title:  "$0"
+date:   `(format-time-string "%Y-%m-%d %H:%M:%S %z")`
+tags:   []
+comments: true
+disqus_identifier: `(shell-command "uuidgen" t)`
+---
+

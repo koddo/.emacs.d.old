@@ -29,7 +29,9 @@
 (defun m/org-img-screenshot (&optional relative-path dont-insert-at-point-and-display)
   "Take a screenshot into a unique-named file. When relative-path is nil, .images/ is used."
   (interactive)
-  (if (not (eq major-mode 'org-mode))
+  (if (not (or
+            (eq major-mode 'org-mode)
+            (eq major-mode 'markdown-mode)))
       (message "Can insert a screenshot only in org-mode buffers.")
     (let* ((rel-path (if (null relative-path) ".images/" relative-path))
            (file-name (ym-aux-make-unique-image-name rel-path "screenshot" "png"))
