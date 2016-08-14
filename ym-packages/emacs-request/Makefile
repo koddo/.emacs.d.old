@@ -1,5 +1,6 @@
 CASK ?= cask
-EMACS ?= emacs
+# EMACS ?= emacs
+EMACS ?= /Users/alex/Applications/Emacs.app/Contents/MacOS/Emacs
 VIRTUAL_EMACS = ${CASK} exec ${EMACS}
 
 ELPA_DIR = \
