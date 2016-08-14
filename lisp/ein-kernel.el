@@ -114,28 +114,28 @@
 (defun ein:kernel-start (kernel notebook)
   "Start kernel of the notebook whose id is NOTEBOOK-ID."
   (unless (ein:$kernel-running kernel)
-    (if (= (ein:$kernel-api-version kernel) 2)
-        (let ((path (substring (ein:$notebook-notebook-path notebook)
-                               0
-                               (or (position ?/ (ein:$notebook-notebook-path notebook)
-                                             :from-end t)
-                                   0))))
-          (ein:kernel-start--legacy kernel
-                                    (ein:$notebook-notebook-name notebook)
-                                    path))
-      (let ((kernelspec (ein:$notebook-kernelspec notebook)))
-        (ein:query-singleton-ajax
-         (list 'kernel-start (ein:$kernel-kernel-id kernel))
-         (ein:url (ein:$kernel-url-or-port kernel)
-                  "api/sessions")
-         :type "POST"
-         :data (json-encode `(("notebook" .
-                               (("path" . ,(ein:$notebook-notebook-path notebook))))
-                              ,@(if kernelspec
-                                    `(("kernel" .
-                                       (("name" . ,(ein:$kernelspec-name kernelspec))))))))
-         :parser #'ein:json-read
-         :success (apply-partially #'ein:kernel--kernel-started kernel))))))
+    (let ((kernelspec (ein:$notebook-kernelspec notebook)))
+      (if (= (ein:$kernel-api-version kernel) 2)
+	  (let ((path (substring (ein:$notebook-notebook-path notebook)
+				 0
+				 (or (position ?/ (ein:$notebook-notebook-path notebook)
+					       :from-end t)
+				     0))))
+	    (ein:kernel-start--legacy kernel
+				      (ein:$notebook-notebook-name notebook)
+				      path))
+	(ein:query-singleton-ajax
+	 (list 'kernel-start (ein:$kernel-kernel-id kernel))
+	 (ein:url (ein:$kernel-url-or-port kernel)
+		  "api/sessions")
+	 :type "POST"
+	 :data (json-encode `(("notebook" .
+			       (("path" . ,(ein:$notebook-notebook-path notebook))))
+			      ,@(if kernelspec
+				    `(("kernel" .
+				       (("name" . ,(ein:$kernelspec-name kernelspec))))))))
+	 :parser #'ein:json-read
+	 :success (apply-partially #'ein:kernel--kernel-started kernel))))))
 
 (defun ein:kernel-start--legacy (kernel notebook-id path)
   (unless (ein:$kernel-running kernel)
@@ -146,6 +146,7 @@
      (ein:url (ein:$kernel-url-or-port kernel)
               "api/sessions")
      :type "POST"
+     
      :data (json-encode `(("notebook" .
                            (("name" . ,notebook-id)
                             ("path" . ,path)))))
@@ -206,11 +207,7 @@
 (defun ein:kernel--ws-url (url-or-port &optional securep)
   "Use `ein:$kernel-url-or-port' if BASE_URL is an empty string.
 See: https://github.com/ipython/ipython/pull/3307"
-  (let ((protocol (if (or securep
-                          (and (stringp url-or-port)
-                               (string-match "^https://" url-or-port)))
-                      "wss"
-                    "ws")))
+  (let ((protocol (if securep "wss" "ws")))
     (if (integerp url-or-port)
         (format "%s://127.0.0.1:%s" protocol url-or-port)
       (let* ((url (if (string-match "^https?://" url-or-port)
