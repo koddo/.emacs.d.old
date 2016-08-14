@@ -273,7 +273,7 @@
 (require 's)
 (require 'epl)
 (projectile-global-mode)
-                                        ; TODO: what about flx-ido -- highly recommended by projectile?
+;; TODO: what about flx-ido -- highly recommended by projectile?
 ;; (add-hook 'js-mode-hook 'projectile-on)
 ;; (add-hook 'css-mode-hook 'projectile-on)
 ;; (add-hook 'web-mode-hook 'projectile-on)
@@ -360,6 +360,8 @@
   )
 
 
+;; -------------------------------------------------------------------
+;; TODO: importmagic
 
 
 
