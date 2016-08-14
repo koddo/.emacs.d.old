@@ -47,3 +47,4 @@ added markdown-mode https://github.com/jrblevin/markdown-mode master -- c560ddd
 pulled markdown-mode https://github.com/jrblevin/markdown-mode stable -- c560ddd..c6eb56e
 added elpy https://github.com/jorgenschaefer/elpy master -- c0a9233
 pulled elpy https://github.com/jorgenschaefer/elpy release -- c0a9233..ea73f74
+added pyvenv https://github.com/jorgenschaefer/pyvenv master -- 726940c
