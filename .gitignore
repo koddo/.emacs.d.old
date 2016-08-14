@@ -1,0 +1,12 @@
+.ropeproject
+.coverage
+*.pyc
+*.elc
+MANIFEST
+.cask/
+dist/
+build/
+.tox/
+elpy.egg-info/
+_build
+.cache
