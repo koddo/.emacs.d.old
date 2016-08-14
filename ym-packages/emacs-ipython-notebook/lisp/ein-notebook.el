@@ -355,7 +355,7 @@ See `ein:notebook-open' for more information."
     (ein:log 'debug "Opening notebook at %s" path)
     (ein:content-query-contents path url-or-port nil
                                 (apply-partially #'ein:notebook-request-open-callback-with-callback
-                                                 notebook callback cbargs))
+                                                notebook callback cbargs))
     ;; (ein:query-singleton-ajax
     ;;  (list 'notebook-open url-or-port api-version path)
     ;;  url
@@ -468,7 +468,7 @@ of minor mode."
 
 (defun ein:kernelspec-for-nb-metadata (kernelspec)
   (let ((display-name (plist-get (ein:$kernelspec-spec kernelspec) :display_name)))
- `((:name . ,(ein:$kernelspec-name kernelspec))
+    `((:name . ,(ein:$kernelspec-name kernelspec))
       (:display_name . ,(format "%s" display-name)))))
 
 (defun ein:get-kernelspec (url-or-port name)
@@ -500,15 +500,15 @@ on server url/port."
 
 (defun* ein:query-kernelspecs-success (url-or-port &key data &allow-other-keys)
   (let ((ks (list :default  (plist-get data :default)))
-        (specs (ein:plist-iter (plist-get data :kernelspecs))))
+	(specs (ein:plist-iter (plist-get data :kernelspecs))))
     (setf (gethash url-or-port ein:available-kernelspecs)
-          (ein:flatten (dolist (spec specs ks)
-                         (let ((name (car spec))
-                               (info (cdr spec)))
-                           (push (list name (make-ein:$kernelspec :name (plist-get info :name)
-                                                                  :resources (plist-get info :resources)
-                                                                  :spec (plist-get info :spec)))
-                                 ks)))))))
+	  (ein:flatten (dolist (spec specs ks)
+			 (let ((name (car spec))
+			       (info (cdr spec)))
+			   (push (list name (make-ein:$kernelspec :name (plist-get info :name)
+								  :resources (plist-get info :resources)
+								  :spec (plist-get info :spec)))
+				 ks)))))))
 
 (defun* ein:query-kernelspecs-error (&key symbol-status response &allow-other-keys)
   (ein:log 'verbose
@@ -702,7 +702,6 @@ This is equivalent to do ``C-c`` in the console program."
          (ws-cells (mapcar (lambda (data) (ein:cell-from-json data)) cells))
          (worksheet (ein:notebook--worksheet-new notebook)))
     (oset worksheet :saved-cells ws-cells)
-    ;(mapcar (lambda (data) (message "test %s" (oref data :metadata))) ws-cells)
     (list worksheet)))
 
 (defun ein:notebook-to-json (notebook)
@@ -742,9 +741,7 @@ This is equivalent to do ``C-c`` in the console program."
     `((metadata . ,(ein:aif (ein:$notebook-metadata notebook)
                        it
                      (make-hash-table)))
-      (cells . ,(apply #'vector all-cells)))
-
-    ))
+      (cells . ,(apply #'vector all-cells)))))
 
 (defun ein:notebook-save-notebook (notebook retry &optional callback cbargs)
   (let ((content (ein:content-from-notebook notebook)))
@@ -1251,7 +1248,6 @@ This hook is run regardless the actual major mode used."
 (defvar ein:notebook-mode-map (make-sparse-keymap))
 
 (let ((map ein:notebook-mode-map))
-  (define-key map "\C-cS" 'ein:worksheet-toggle-slideshow-view)
   (define-key map "\C-c\C-c" 'ein:worksheet-execute-cell)
   (define-key map (kbd "M-RET") 'ein:worksheet-execute-cell-and-goto-next)
   (define-key map (kbd "<M-S-return>")
@@ -1269,7 +1265,6 @@ This hook is run regardless the actual major mode used."
   (define-key map "\C-c\C-a" 'ein:worksheet-insert-cell-above)
   (define-key map "\C-c\C-b" 'ein:worksheet-insert-cell-below)
   (define-key map "\C-c\C-t" 'ein:worksheet-toggle-cell-type)
-  (define-key map "\C-c\C-d" 'ein:worksheet-toggle-slide-type)
   (define-key map "\C-c\C-u" 'ein:worksheet-change-cell-type)
   (define-key map "\C-c\C-s" 'ein:worksheet-split-cell-at-point)
   (define-key map "\C-c\C-m" 'ein:worksheet-merge-cell)
@@ -1331,7 +1326,6 @@ This hook is run regardless the actual major mode used."
             ("Insert cell above" ein:worksheet-insert-cell-above)
             ("Insert cell below" ein:worksheet-insert-cell-below)
             ("Toggle cell type" ein:worksheet-toggle-cell-type)
-            ("Toggle slide type" ein:worksheet-toggle-slide-type)
             ("Change cell type" ein:worksheet-change-cell-type)
             ("Split cell at point" ein:worksheet-split-cell-at-point)
             ("Merge cell" ein:worksheet-merge-cell)
@@ -1390,8 +1384,7 @@ This hook is run regardless the actual major mode used."
             ("Interrupt kernel" ein:notebook-kernel-interrupt-command))))
       ("Worksheets [Experimental]"
        ,@(ein:generate-menu
-          '(("Toggle slide metadata view" ein:worksheet-toggle-slideshow-view)
-            ("Rename worksheet" ein:worksheet-rename-sheet)
+          '(("Rename worksheet" ein:worksheet-rename-sheet)
             ("Insert next worksheet"
              ein:notebook-worksheet-insert-next)
             ("Insert previous worksheet"
