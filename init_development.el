@@ -361,10 +361,18 @@
 
 
 ;; -------------------------------------------------------------------
-;; TODO: importmagic
-
-
-
-
+;; $ pip install rope jedi flake8 importmagic autopep8 yapf
+(require 'elpy)
+(require 'pyvenv)
+(pyvenv-workon "default351")
+(setq elpy-rpc-backend "jedi")
+;; (require 'company)
+;; (require 'highlight-indentation)
+;; (autoload 'find-file-in-project "find-file-in-project" nil t)
+;; (autoload 'find-file-in-project-by-selected "find-file-in-project" nil t)
+;; (autoload 'find-directory-in-project-by-selected "find-file-in-project" nil t)
+;; (autoload 'ffip-show-diff "find-file-in-project" nil t)
+;; (autoload 'ffip-save-ivy-last "find-file-in-project" nil t)
+;; (autoload 'ffip-ivy-resume "find-file-in-project" nil t)
 
 
