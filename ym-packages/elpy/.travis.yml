@@ -1,0 +1,39 @@
+language: python
+sudo: no
+python:
+  - 2.7
+  - 3.3
+  - 3.4
+  - 3.5
+env:
+  # - EVM_EMACS=emacs-24.1-travis
+  # - EVM_EMACS=emacs-24.2-travis
+  - EVM_EMACS=emacs-24.3-travis
+  - EVM_EMACS=emacs-24.4-travis
+  - EVM_EMACS=emacs-24.5-travis
+  # - EVM_EMACS=emacs-git-snapshot
+before_install:
+  - curl -fsSkL https://gist.github.com/rejeep/ebcd57c3af83b049833b/raw > travis.sh && source ./travis.sh
+  - evm install $EVM_EMACS --use --skip
+  - cask
+install:
+  - pip install jedi
+  - if [[ "$TRAVIS_PYTHON_VERSION" == 2.6 ]] ; then
+      pip install unittest2 ;
+    fi
+  - if [[ "$TRAVIS_PYTHON_VERSION" == 2.* ]] ; then
+      pip install rope ;
+    fi
+  - if [[ "$TRAVIS_PYTHON_VERSION" == 3.* ]] ; then
+      pip install rope_py3k ;
+    fi
+  - pip install importmagic
+  - pip install autopep8
+  - pip install yapf
+  - pip install coveralls
+script:
+  - nosetests
+  - PYTHONPATH="`pwd`" cask exec ert-runner
+after_success:
+  - coverage run -m nose.__main__
+  - coveralls
