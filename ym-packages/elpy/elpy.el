@@ -153,7 +153,7 @@ uninteresting information, but if you rely on your modeline in other modes,
 you might want to keep it."
   :type 'boolean
   :group 'elpy)
-
+  
 (defcustom elpy-dedicated-shells nil
   "Non-nil if Elpy should use dedicated shells.
 
@@ -338,11 +338,6 @@ edited instead. Setting this variable to nil disables this feature."
 (defcustom elpy-disable-backend-error-display t
   "Non-nil if Elpy should disable backed error display."
   :type 'boolean
-  :group 'elpy)
-
-(defcustom elpy-syntax-check-command "flake8"
-  "The command to use for `elpy-check'."
-  :type 'string
   :group 'elpy)
 
 ;;;;;;;;;;;;;
@@ -903,8 +898,8 @@ item in another window.\n\n")
                      :package "yapf" :upgrade t)
       (insert "\n\n"))
 
-    ;; Syntax checker not available
-    (when (not (executable-find elpy-syntax-check-command))
+    ;; flake8, the default syntax checker, not found
+    (when (not (executable-find python-check-command))
       (elpy-insert--para
        "The configured syntax checker could not be found. Elpy uses this "
        "program to provide syntax checks of your programs, so you might "
@@ -1054,14 +1049,14 @@ virtual_env_short"
                                                   yapf-latest))
             ("Syntax checker" . ,(let ((syntax-checker
                                         (executable-find
-                                         elpy-syntax-check-command)))
+                                         python-check-command)))
                                    (if  syntax-checker
                                        (format "%s (%s)"
                                                (file-name-nondirectory
                                                 syntax-checker)
                                                syntax-checker)
                                      (format "Not found (%s)"
-                                             elpy-syntax-check-command))))))
+                                             python-check-command))))))
     (setq maxwidth 0)
     (dolist (row table)
       (when (> (length (car row))
@@ -1616,20 +1611,20 @@ code is executed."
 (defun elpy-shell-get-or-create-process ()
   "Get or create an inferior Python process for current buffer and return it."
   (let* ((bufname (format "*%s*" (python-shell-get-process-name nil)))
-         (dedbufname (format "*%s*" (python-shell-get-process-name t)))
-         (proc (get-buffer-process bufname))
-         (dedproc (get-buffer-process dedbufname)))
+	 (dedbufname (format "*%s*" (python-shell-get-process-name t)))
+	 (proc (get-buffer-process bufname))
+	 (dedproc (get-buffer-process dedbufname)))
     (if elpy-dedicated-shells
-        (if dedproc
-            dedproc
-          (run-python (python-shell-parse-command) t)
-          (get-buffer-process dedbufname))
+	(if dedproc
+	    dedproc
+	  (run-python (python-shell-parse-command) t)
+	  (get-buffer-process dedbufname))
       (if dedproc
-          dedproc
-        (if proc
-            proc
-          (run-python (python-shell-parse-command))
-          (get-buffer-process bufname))))))
+	  dedproc
+	(if proc
+	    proc
+	  (run-python (python-shell-parse-command))
+	  (get-buffer-process bufname))))))
 
 (defun elpy-shell--region-without-indentation (beg end)
   "Return the current region as a string, but without indentation."
@@ -1677,13 +1672,10 @@ with a prefix argument)."
                                          (buffer-file-name))
                                    (buffer-file-name))))
         (extra-args (if whole-project-p
-                        (concat
-                         (if (equal python-check-command "pylint")
-                             " --ignore="
-                           " --exclude=")
-                         (mapconcat #'identity
-                                    elpy-project-ignored-directories
-                                    ","))
+                        (concat " --exclude="
+                                (mapconcat #'identity
+                                           elpy-project-ignored-directories
+                                           ","))
                       "")))
     (compilation-start (concat python-check-command
                                " "
@@ -2296,18 +2288,14 @@ Also sort the imports in the import statement blocks."
     (if (use-region-p)
         (let ((new-block (elpy-rpc method (list (elpy-rpc--region-contents))))
               (beg (region-beginning)) (end (region-end)))
-          (elpy-buffer--replace-region
-           beg end
-           (replace-regexp-in-string "\n$" "" new-block))
-          (goto-char end)
-          (deactivate-mark))
+          (elpy-buffer--replace-region beg end new-block))
       ;; Vector instead of list, json.el in Emacs 24.3 and before
       ;; breaks for single-element lists of alists.
       (let ((new-block (elpy-rpc method (vector (elpy-rpc--buffer-contents))))
             (beg (point-min)) (end (point-max)))
-        (elpy-buffer--replace-region beg end new-block)
-        (forward-line (1- line))
-        (forward-char col)))))
+        (elpy-buffer--replace-region beg end new-block)))
+    (forward-line (1- line))
+    (forward-char col)))
 
 ;;;;;;;;;;;;;;
 ;;; Multi-Edit
@@ -3230,7 +3218,7 @@ Make sure global-init is called first."
   "Remove the lighter for MODE-NAME.
 
 It should not be necessary to see (Python Elpy yas company ElDoc) all the
-time.
+time. 
 
 If you need your modeline, you can set the variable `elpy-remove-modeline-lighter' to nil
 "
@@ -3583,7 +3571,10 @@ display the current class and method instead."
      (require 'flymake)
      (elpy-modules-remove-modeline-lighter 'flymake-mode)
      ;; Flymake support using flake8, including warning faces.
-     (setq python-check-command elpy-syntax-check-command)
+     (when (and (executable-find "flake8")
+                (equal python-check-command
+                       (elpy-flymake--standard-value 'python-check-command)))
+       (setq python-check-command "flake8"))
 
      ;; Add our initializer function
      (add-to-list 'flymake-allowed-file-name-masks
