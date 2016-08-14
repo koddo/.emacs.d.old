@@ -96,7 +96,7 @@ comments or strings."
                      (`t (list major-mode))
                      (`code company-dabbrev-code-modes)
                      (`all `all))
-                   (not company-dabbrev-code-everywhere))))
+                   t)))
     (ignore-case company-dabbrev-code-ignore-case)
     (duplicates t)))
 
