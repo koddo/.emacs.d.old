@@ -59,3 +59,4 @@ added pos-tip https://github.com/pitkali/pos-tip master -- 051e08f
 added emacs-websocket https://github.com/ahyatt/emacs-websocket master -- 5675553
 added emacs-request https://github.com/tkf/emacs-request master -- 40ac53c
 pulled emacs-request https://github.com/tkf/emacs-request v0.2.0 -- 40ac53c..efbe231
+added emacs-ipython-notebook https://github.com/millejoh/emacs-ipython-notebook master -- a973631
