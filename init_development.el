@@ -364,8 +364,10 @@
 ;; $ pip install rope jedi flake8 importmagic autopep8 yapf
 (require 'elpy)
 (require 'pyvenv)
+(require 'company-quickhelp)
 (pyvenv-workon "default351")
 (setq elpy-rpc-backend "jedi")
+(company-quickhelp-mode 1)
 ;; (require 'company)
 ;; (require 'highlight-indentation)
 ;; (autoload 'find-file-in-project "find-file-in-project" nil t)
