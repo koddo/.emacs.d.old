@@ -56,3 +56,4 @@ added highlight-indentation https://github.com/antonj/Highlight-Indentation-for-
 added company-quickhelp https://github.com/expez/company-quickhelp master -- 39e206f
 pulled company-quickhelp https://github.com/expez/company-quickhelp 1.3.0 -- 39e206f..e7db802
 added pos-tip https://github.com/pitkali/pos-tip master -- 051e08f
+added emacs-websocket https://github.com/ahyatt/emacs-websocket master -- 5675553
