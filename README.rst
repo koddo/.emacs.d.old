@@ -36,9 +36,7 @@ See `monkey patches for url.el`_ for the bugs fixed by request.el.
 Examples
 ========
 
-GET:
-
-.. code:: emacs-lisp
+GET::
 
   (request
    "http://httpbin.org/get"
@@ -48,9 +46,7 @@ GET:
              (lambda (&key data &allow-other-keys)
                (message "I sent: %S" (assoc-default 'args data)))))
 
-POST:
-
-.. code:: emacs-lisp
+POST::
 
   (request
    "http://httpbin.org/post"
@@ -62,9 +58,7 @@ POST:
              (lambda (&key data &allow-other-keys)
                (message "I sent: %S" (assoc-default 'form data)))))
 
-POST file (**WARNING**: it will send the contents of the current buffer!):
-
-.. code:: emacs-lisp
+POST file (**WARNING**: it will send the contents of the current buffer!)::
 
   (request
    "http://httpbin.org/post"
@@ -76,9 +70,7 @@ POST file (**WARNING**: it will send the contents of the current buffer!):
              (lambda (&key data &allow-other-keys)
                (message "I sent: %S" (assoc-default 'files data)))))
 
-Rich callback dispatch (like `jQuery.ajax`):
-
-.. code:: emacs-lisp
+Rich callback dispatch (like `jQuery.ajax`)::
 
   (request
    "http://httpbin.org/status/418"     ; try other codes, for example:
@@ -99,9 +91,7 @@ Rich callback dispatch (like `jQuery.ajax`):
    :status-code '((400 . (lambda (&rest _) (message "Got 400.")))
                   (418 . (lambda (&rest _) (message "Got 418.")))))
 
-Flexible PARSER option:
-
-.. code:: emacs-lisp
+Flexible PARSER option::
 
   (request
    "https://github.com/tkf/emacs-request/commits/master.atom"
@@ -121,9 +111,7 @@ Flexible PARSER option:
                           (funcall get data 'entry 'title)
                           (funcall get data 'entry 'author 'name))))))
 
-PUT JSON data:
-
-.. code:: emacs-lisp
+PUT JSON data::
 
   (request
    "http://httpbin.org/put"
@@ -135,9 +123,7 @@ PUT JSON data:
              (lambda (&key data &allow-other-keys)
                (message "I sent: %S" (assoc-default 'json data)))))
 
-Another PUT JSON example (nested JSON using alist structure, how to represent a boolean & how to selectively evaluate lisp):
-
-.. code:: emacs-lisp
+Another PUT JSON example (nested JSON using alist structure, how to represent a boolean & how to selectively evaluate lisp)::
 
   ;; (1) Prepend alist structure with a backtick (`) rather than single quote (')
   ;;     to allow elisp evaluation of selected elements prefixed with a comma (,)
@@ -155,9 +141,7 @@ Another PUT JSON example (nested JSON using alist structure, how to represent a 
              (lambda (&key data &allow-other-keys)
                (message "I sent: %S" (assoc-default 'json data)))))
 
-GET with Unix domain socket data:
-
-.. code:: emacs-lisp
+GET with Unix domain socket data::
 
   (request
    "http:/hello.txt"
