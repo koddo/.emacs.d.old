@@ -53,3 +53,4 @@ pulled company-mode https://github.com/company-mode/company-mode 0.9.0 -- e6689e
 added find-file-in-project https://github.com/technomancy/find-file-in-project master -- a32ab79
 pulled find-file-in-project https://github.com/technomancy/find-file-in-project 5.2.4 -- a32ab79..b69411d
 added highlight-indentation https://github.com/antonj/Highlight-Indentation-for-Emacs master -- cd6d816
+added company-quickhelp https://github.com/expez/company-quickhelp master -- 39e206f
