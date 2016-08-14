@@ -45,3 +45,4 @@ removed major-mode-dedication https://github.com/tom-seddon/major-mode-dedicatio
 added sql-indent https://github.com/bsvingen/sql-indent master -- f85bc91
 added markdown-mode https://github.com/jrblevin/markdown-mode master -- c560ddd
 pulled markdown-mode https://github.com/jrblevin/markdown-mode stable -- c560ddd..c6eb56e
+added elpy https://github.com/jorgenschaefer/elpy master -- c0a9233
