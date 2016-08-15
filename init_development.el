@@ -362,14 +362,14 @@
 
 ;; -------------------------------------------------------------------
 ;; $ pip install rope jedi flake8 importmagic autopep8 yapf
-(require 'elpy)
 (require 'pyvenv)
-(require 'company-quickhelp)
 (pyvenv-workon "default351")
+(require 'elpy)
 (setq elpy-rpc-backend "jedi")
+(require 'company-quickhelp)
 (company-quickhelp-mode 1)
-;; (require 'company)
-;; (require 'highlight-indentation)
+(require 'company)
+(require 'highlight-indentation)
 ;; (autoload 'find-file-in-project "find-file-in-project" nil t)
 ;; (autoload 'find-file-in-project-by-selected "find-file-in-project" nil t)
 ;; (autoload 'find-directory-in-project-by-selected "find-file-in-project" nil t)

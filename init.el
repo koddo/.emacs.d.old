@@ -13,6 +13,7 @@
                  load-path))
 (add-to-list 'load-path "~/.emacs.d/ym-packages/org-mode/contrib/lisp")
 (add-to-list 'load-path "~/.emacs.d/ym-packages/org-mode/lisp")
+(add-to-list 'load-path "~/.emacs.d/ym-packages/emacs-ipython-notebook/lisp")
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 
 (load-file "~/.emacs.d/init__preinit_this_machine.el")
