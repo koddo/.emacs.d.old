@@ -7,16 +7,6 @@ Previous Versions
 master
 ------
 
-Ag search commands now show N lines of context when called with
-numeric prefix argument N.
-
-Ag search commands can now group output. See ``ag-group-matches``.
-
-Docstring improvements.
-
-0.47
-~~~~
-
 Added a workaround for an ag bug on windows where results were shown
 without filenames (see issue #97). Note this only applies when
 ``ag-highlight-search`` is nil.
