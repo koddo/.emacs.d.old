@@ -98,6 +98,9 @@
 (setq epa-file-inhibit-auto-save t)   ; it's on by default, but for sure
 ;; -------------------------------------------------------------------
 (require 'ido)   ; InteractivelyDoThings -- input completion without having to hit TAB
+;; (require 'flx-ido)
+;; (setq flx-ido-use-faces nil)
+;; (flx-ido-mode 1)
 (setq ido-ignore-buffers '("\\` " "\\.muse\\'" "\\*Ibuffer\\*" "\\*Ido Completions\\*"))
 (setq ido-enable-flex-matching t)
 (setq ido-use-filename-at-point 'guess)   ;; may be nil, guess and t(literal filename)
@@ -106,7 +109,9 @@
 (setq ido-show-dot-for-dired t)
 (setq ido-use-virtual-buffers t)
 (setq ido-enable-tramp-completion nil)
+(ido-mode 1)
 (ido-everywhere 1)
+(setq ido-use-faces t)
 (setq ido-case-fold t)
 (setq ido-max-prospects 7)
 (defun ido-sort-mtime ()   ; sort ido filelist by mtime instead of alphabetically

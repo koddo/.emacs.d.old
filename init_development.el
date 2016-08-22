@@ -268,7 +268,7 @@
 (setq web-mode-code-indent-offset 4)
 ;; -------------------------------------------------------------------
 (require 'projectile)
-(require 'ack-and-a-half)
+;; (require 'ack-and-a-half)
 (require 'dash)
 (require 's)
 (require 'epl)
