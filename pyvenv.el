@@ -162,14 +162,9 @@ This is usually the base name of `pyvenv-virtual-env'.")
         pyvenv-old-process-environment process-environment
         ;; For some reason, Emacs adds some directories to `exec-path'
         ;; but not to `process-environment'?
-        exec-path (append
-                   ;; Unix
-                   (when (file-exists-p (format "%s/bin" directory))
-                     (list (format "%s/bin" directory)))
-                   ;; Windows
-                   (when (file-exists-p (format "%s/Scripts" directory))
-                     (list (format "%s/Scripts" directory)))
-                   exec-path)
+        exec-path (if (file-exists-p (format "%s/Scripts" directory))
+                      (cons (format "%s/Scripts" directory) exec-path)
+                    (cons (format "%s/bin" directory) exec-path))
         process-environment (append
                              (list
                               (format "VIRTUAL_ENV=%s" directory)
@@ -335,8 +330,7 @@ they specify a virtualenv different from the current one, switch
 to that virtualenv."
   (cond
    (pyvenv-activate
-    (when (and (not (equal (file-name-as-directory pyvenv-activate)
-                           pyvenv-virtual-env))
+    (when (and (not (equal pyvenv-activate pyvenv-virtual-env))
                (or (not pyvenv-tracking-ask-before-change)
                    (y-or-n-p (format "Switch to virtualenv %s (currently %s)"
                                      pyvenv-activate pyvenv-virtual-env))))
@@ -358,7 +352,12 @@ CAREFUL! This will modify your `process-environment' and
 `exec-path'."
   (when (pyvenv-hook-dir)
     (with-temp-buffer
-      (let ((tmpfile (make-temp-file "pyvenv-virtualenvwrapper-")))
+      (let ((tmpfile (make-temp-file "pyvenv-virtualenvwrapper-"))
+            ;; `call-process-shell-command' uses `shell-file-name',
+            ;; which can be bound to various shells with incompatible
+            ;; syntaxes. Avoid quoting hell by using the least likely
+            ;; to break. See #36
+            (shell-file-name "/bin/sh"))
         (unwind-protect
             (progn
               (apply #'call-process
@@ -372,7 +371,7 @@ CAREFUL! This will modify your `process-environment' and
                                (cons hook args))
                        (cons hook args)))
               (call-process-shell-command
-               (format ". '%s' ; python -c 'import os, json; print(\"\\n=-=-=\"); print(json.dumps(dict(os.environ)))'"
+               (format ". '%s' ; echo ; echo =-=-= ; python -c \"import os, json ; print(json.dumps(dict(os.environ)))\""
                        tmpfile)
                nil t nil))
           (delete-file tmpfile)))
@@ -396,8 +395,7 @@ CAREFUL! This will modify your `process-environment' and
             (when (not (member env process-environment))
               (setq process-environment (cons env process-environment))))
           (when (eq (car binding) 'PATH)
-            (setq exec-path (split-string (cdr binding)
-                                          path-separator))))))))
+            (setq exec-path (split-string (cdr binding) ":"))))))))
 
 ;;;###autoload
 (defun pyvenv-restart-python ()
