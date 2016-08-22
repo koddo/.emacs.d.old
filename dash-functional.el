@@ -1,10 +1,10 @@
 ;;; dash-functional.el --- Collection of useful combinators for Emacs Lisp  -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013-2014 Matus Goljer, Magnar Sveen
+;; Copyright (C) 2013-2014 Free Software Foundation, Inc.
 
 ;; Authors: Matus Goljer <matus.goljer@gmail.com>
 ;;          Magnar Sveen <magnars@gmail.com>
-;; Version: 1.1.0
+;; Version: 1.2.0
 ;; Package-Requires: ((dash "2.0.0") (emacs "24"))
 ;; Keywords: lisp functions combinators
 
@@ -96,16 +96,19 @@ See SRFI-26 for detailed description."
          (args (mapcar (lambda (_) (setq i (1+ i)) (make-symbol (format "D%d" i)))
                        (-filter (-partial 'eq '<>) params))))
     `(lambda ,args
-       ,(--map (if (eq it '<>) (pop args) it) params))))
+       ,(let ((body (--map (if (eq it '<>) (pop args) it) params)))
+          (if (eq (car params) '<>)
+              (cons 'funcall body)
+            body)))))
 
 (defun -not (pred)
-  "Take an unary predicates PRED and return an unary predicate
+  "Take a unary predicate PRED and return a unary predicate
 that returns t if PRED returns nil and nil if PRED returns
 non-nil."
   (lambda (x) (not (funcall pred x))))
 
 (defun -orfn (&rest preds)
-  "Take list of unary predicates PREDS and return an unary
+  "Take list of unary predicates PREDS and return a unary
 predicate with argument x that returns non-nil if at least one of
 the PREDS returns non-nil on x.
 
@@ -113,7 +116,7 @@ In types: [a -> Bool] -> a -> Bool"
   (lambda (x) (-any? (-cut funcall <> x) preds)))
 
 (defun -andfn (&rest preds)
-  "Take list of unary predicates PREDS and return an unary
+  "Take list of unary predicates PREDS and return a unary
 predicate with argument x that returns non-nil if all of the
 PREDS returns non-nil on x.
 
@@ -124,7 +127,7 @@ In types: [a -> Bool] -> a -> Bool"
   "Return a function FN composed N times with itself.
 
 FN is a unary function.  If you need to use a function of higher
-arity, use `-applify' first to turn it into an unary function.
+arity, use `-applify' first to turn it into a unary function.
 
 With n = 0, this acts as identity function.
 
@@ -135,18 +138,65 @@ This function satisfies the following law:
   (funcall (-iteratefn fn n) init) = (-last-item (-iterate fn init (1+ n)))."
   (lambda (x) (--dotimes n (setq x (funcall fn x))) x))
 
-(defun -fixfn (fn)
+(defun -counter (&optional beg end inc)
+  "Return a closure that counts from BEG to END, with increment INC.
+
+The closure will return the next value in the counting sequence
+each time it is called, and nil after END is reached. BEG
+defaults to 0, INC defaults to 1, and if END is nil, the counter
+will increment indefinitely.
+
+The closure accepts any number of arguments, which are discarded."
+  (let ((inc (or inc 1))
+    (n (or beg 0)))
+    (lambda (&rest _)
+      (when (or (not end) (< n end))
+    (prog1 n
+      (setq n (+ n inc)))))))
+
+(defvar -fixfn-max-iterations 1000
+  "The default maximum number of iterations performed by `-fixfn'
+  unless otherwise specified.")
+
+(defun -fixfn (fn &optional equal-test halt-test)
   "Return a function that computes the (least) fixpoint of FN.
 
-FN is a unary function, results are compared with `equal'.
+FN must be a unary function. The returned lambda takes a single
+argument, X, the initial value for the fixpoint iteration. The
+iteration halts when either of the following conditions is satisified:
+
+ 1. Iteration converges to the fixpoint, with equality being
+    tested using EQUAL-TEST. If EQUAL-TEST is not specified,
+    `equal' is used. For functions over the floating point
+    numbers, it may be necessary to provide an appropriate
+    appoximate comparsion test.
+
+ 2. HALT-TEST returns a non-nil value. HALT-TEST defaults to a
+    simple counter that returns t after `-fixfn-max-iterations',
+    to guard against infinite iteration. Otherwise, HALT-TEST
+    must be a function that accepts a single argument, the
+    current value of X, and returns non-nil as long as iteration
+    should continue. In this way, a more sophisticated
+    convergence test may be supplied by the caller.
+
+The return value of the lambda is either the fixpoint or, if
+iteration halted before converging, a cons with car `halted' and
+cdr the final output from HALT-TEST.
 
 In types: (a -> a) -> a -> a."
-  (lambda (x)
-    (let ((re (funcall fn x)))
-      (while (not (equal x re))
-        (setq x re)
-        (setq re (funcall fn re)))
-      re)))
+  (let ((eqfn   (or equal-test 'equal))
+    (haltfn (or halt-test
+            (-not
+              (-counter 0 -fixfn-max-iterations)))))
+    (lambda (x)
+      (let ((re (funcall fn x))
+        (halt? (funcall haltfn x)))
+    (while (and (not halt?) (not (funcall eqfn x re)))
+      (setq x     re
+        re    (funcall fn re)
+        halt? (funcall haltfn re)))
+    (if halt? (cons 'halted halt?)
+      re)))))
 
 (defun -prodfn (&rest fns)
   "Take a list of n functions and return a function that takes a
