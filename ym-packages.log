@@ -67,3 +67,4 @@ pulled flx-ido https://github.com/lewang/flx v0.6.1 -- ae0981b..7fce6a4
 pulled dash https://github.com/magnars/dash.el master -- b1e585d..f1c60c4
 pulled dash https://github.com/magnars/dash.el 2.13.0 -- f1c60c4..3aec816
 pulled elpy https://github.com/jorgenschaefer/elpy 1.12.0 -- ea73f74..c9487a1
+pulled pyvenv https://github.com/jorgenschaefer/pyvenv v1.9 -- 726940c..807f293
