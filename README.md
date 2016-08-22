@@ -49,11 +49,6 @@ This version will always be up-to-date.
 user - `flx-ido` is already properly configured and ready for
 action.
 
-### Debian and Ubuntu
-
-Users of Debian 9 or Ubuntu 16.04 or later may simply `apt-get install
-elpa-flx`.
-
 ## Usage
 
 The sorting algorithm is a balance between word beginnings (abbreviation) and
@@ -117,6 +112,9 @@ kick in again.
 
 As a point of reference for a 2.3 GHz quad-core i7 processor, a value of
 `10000` still provides a reasonable completion experience.
+
+- see `flx-ido-big-demo` for example with 36k string (Emacs 24.3).
+
 
 
 ## Helm support
