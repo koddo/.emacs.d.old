@@ -18,7 +18,7 @@
   (shell-command (concat "open '" filename "'")))
 
 (require 'exec-path-from-shell)   ; TODO: move to init.el after checking it on linux
-(exec-path-from-shell-copy-env ""PATH" "MANPATH" WORKON_HOME")
+(setq exec-path-from-shell-variables '("PATH" "MANPATH" "WORKON_HOME"))
 (exec-path-from-shell-initialize)   ; exec-path-from-shell-variables
 
 
