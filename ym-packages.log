@@ -64,3 +64,4 @@ pulled emacs-ipython-notebook https://github.com/millejoh/emacs-ipython-notebook
 pulled projectile https://github.com/bbatsov/projectile master -- 4a3b56a..60b696a
 added flx-ido https://github.com/lewang/flx master -- ae0981b
 pulled flx-ido https://github.com/lewang/flx v0.6.1 -- ae0981b..7fce6a4
+pulled dash https://github.com/magnars/dash.el master -- b1e585d..f1c60c4
