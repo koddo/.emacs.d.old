@@ -2,8 +2,115 @@
 
 ## master (unreleased)
 
+### New Features
+
+* Consider Ensime configuration file as root marker, `.ensime`.
+
+### Changes
+
+* Ignore backup files in `projectile-get-other-files`.
+* Ignore Ensime cache directory, `.ensime_cache`.
+
+### Bugs fixed
+
+* [#1024](https://github.com/bbatsov/projectile/issues/1024): Do not cache ignored project files.
+* [#1022](https://github.com/bbatsov/projectile/issues/1022): Scan for Fossil's checkout DB, not its config DB.
+* [#1007](https://github.com/bbatsov/projectile/issues/1007): Make use of `projectile-go-function`.
+
+## 0.14.0 (2016-07-08)
+
 ### New features
 
+* Add [elixir](http://elixir-lang.org) project type.
+* Add [emacs-cask](https://github.com/cask/cask) project type.
+* Add [boot-clj](https://github.com/boot-clj/boot) project type.
+* Add [racket](http://racket-lang.org) project type.
+* Add support for projects using gradlew script.
+* Prefer Haskell stack projects over cabal projects.
+* Add ability to use elisp functions for test, compile and run commands.
+* Consider `TAGS` and `GTAGS` root markers.
+* Add relation between the `.h`, `.cxx`, `.ixx` and `.hxx` files in `projectile-other-file-alist`.
+* Add relation between the `.hpp` and `.cc` files in `projectile-other-file-alist`.
+* Add support to specify project name either via `.dir-locals.el` or by providing a customized `projectile-project-name-function'.
+* Add a command to switch between open projects (`projectile-switch-open-project`).
+* Add a command to edit the .dir-locals.el file of the project (`projectile-edit-dir-locals`).
+* Add file local variable `projectile-project-root`, which allows overriding the project root on a per-file basis. This allows navigating a different project from, say, an org file in a another git repository.
+* Add `projectile-grep-finished-hook`.
+* Ignore file suffixes listed in `projectile-globally-ignored-file-suffixes` when using `projectile-grep` and `projectile-ag`.
+* Add `projectile-replace-regexp`, which supports replacement by regexp within a project. `projectile-replace` is now used solely for literal replacements.
+* New command `projectile-run-shell` (<kbd>C-c p x s</kbd>).
+* New command `projectile-run-eshell` (<kbd>C-c p x e</kbd>).
+* New command `projectile-run-term` (<kbd>C-c p x t</kbd>).
+* Let user unignore files in `.projectile` with the ! prefix.
+* Add a command to add all projects in a directory to the cache (`projectile-discover-projects-in-directory`).
+
+### Changes
+
+* Prefer ag's internal .gitignore parsing.
+* Added variable to control use of external find-tag implementations.
+* Specify `--with-keep.source` argument when installing R projects
+
+### Bugs fixed
+
+* [#871](https://github.com/bbatsov/projectile/issues/871): Stop advice for `compilation-find-file` to override other advices.
+* [#557](https://github.com/bbatsov/projectile/issues/557): stack overflow in `projectile-find-tag'.
+* [#955](https://github.com/bbatsov/projectile/issues/955): Error while toggling between test and source file.
+* [#952](https://github.com/bbatsov/projectile/issues/952): VCS submodules brought in even thought not descendent of project root.
+* [#576](https://github.com/bbatsov/projectile/issues/576): `projectile-replace` stomps regular expressions.
+* [#957](https://github.com/bbatsov/projectile/pull/957): When opening a specified file from the terminal, do not error inside of `projectile-cache-current-file`.
+* [#984](https://github.com/bbatsov/projectile/pull/984): Error when a project is a symlink that changes target.
+* [#1013](https://github.com/bbatsov/projectile/issues/1013): projectile-project-buffer-p may return incorrect result on Windows.
+
+## 0.13.0 (2015-10-21)
+
+### New features
+
+* Add `projectile-before-switch-project-hook`.
+* Add the ability to specify the project type via `.dir-locals.el`.
+* Add support for projects using Midje.
+* Add the ability to create missing tests automatically (controlled via the `projectile-create-missing-test-files` defcustom).
+* Add the ability to dynamically decide if a project should be added to `projectile-known-projects` (via new `projectile-ignored-project-function` defcustom).
+* Add the ability to register new project types dynamically with `projectile-register-project-type`.
+* Add the ability to specify a project compilation and test commands via `.dir-locals.el`.
+This is done via the variables `projectile-project-compilation-cmd` and `projectile-project-test-cmd`.
+* [#489](https://github.com/bbatsov/projectile/issues/489): New interactive command `projectile-run-project`.
+* Optionally run [monky](http://ananthakumaran.in/monky/) on Mercurial projects.
+* Add the ability to specify a project compilation directory relative to the root directory via `.dir-locals.el` with the variable `projectile-project-compilation-dir`.
+* When there is a selected region, projectile-ag, projectile-grep, projectile-replace and projectile-find-tag uses it's content as a search term instead of symbol at point.
+
+### Changes
+
+* Rename `projectile-switch-project-hook` to `projectile-after-switch-project-hook`.
+* `projectile-compile-project` now offers appropriate completion
+  targets even when called from a subdirectory.
+* Add an argument specifying the regexp to search to `projectile-grep`.
+* Use `help-projectile-grep` instead of `helm-find-file` when selecting a project.
+* Omit current buffer from `projectile-switch-to-buffer` and `projectile-switch-to-buffer-other-window` choices.
+
+### Bugs fixed
+
+* [#721](https://github.com/bbatsov/projectile/issues/721#issuecomment-100830507): Remove current buffer from `helm-projectile-switch-project`.
+* [#667](https://github.com/bbatsov/projectile/issues/667) Use `file-truename` when caching filenames to prevent duplicate/symlinked filepaths from appearing when opening a project file.
+* [#625](https://github.com/bbatsov/projectile/issues/625): Ensure the directory has a trailing slash while searching for it.
+* [#763](https://github.com/bbatsov/projectile/issues/763): Check for `projectile-use-git-grep` in `helm-projectile-grep`
+* Fix `projectile-parse-dirconfig-file` to parse non-ASCII characters properly.
+
+## 0.12.0 (2015-03-29)
+
+### New features
+
+* Replace Helm equivalent commands in `projectile-commander` when using Helm.
+* Add replacement commands projectile-grep, projectile-ack and projectile-ag with its Helm version.
+* Add virtual directory manager that allows to create/update (add or delete files) a Dired buffer based on Projectile files.
+* Add a new Helm command: `helm-projectile-find-file-in-known-projects` that opens all files in all known projects.
+* Add an action for `helm-projectile-switch-project` to delete multiple marked projects.
+* Add the ability to retrieve files in all sub-projects under a project root.
+* Add `projectile-find-file-dwim` and `helm-projectile-find-file-dwim` commands.
+* Provide actual Helm commands for common Projectile commands.
+* Use existing Helm actions and map in `helm-find-files` that allows `helm-source-projectile-files-list`
+to behave like `helm-find-files`, such as multifile selection and opening or delete on selected files.
+* Add compile action to `helm-projectile`.
+* Allows using Eshell and Magit outside of a project in `helm-projectile`.
 * Add Helm action for incremental grep in the selected projects.
 * Add command projectile-find-other-file  Switch between files with
   the same  name but different extensions.
@@ -13,20 +120,28 @@
 * Add support for `cargo.toml` projects
 * Try to use projectile to find files in compilation buffers
 * Support `helm` as a completion system
-* New `defcustom` `projectile-globally-ignored-buffers` allows you ignore
+* New command `projectile-project-info` displays basic info about the current project.
+* New `defcustom` `projectile-globally-ignored-buffers` allows you to ignore
   buffers by name
+* New `defcustom` `projectile-globally-ignored-file-suffixes` allows
+  you to globally ignore files with particular extensions
 
 ### Changes
 
+* get-other-files returns more accurate results for files with the same name placed under different directories
 * Collect search tool (`grep`, `ag`, `ack`) keybindings under a common keymap prefix (`C-c p s`)
+* Remove `defcustom` `projectile-remember-window-configs` in favor of
+  `persp-projectile.el`.
+* Progress reporter for the native indexing method.
 
 ### Bugs fixed
 
+* Fix `projectile-regenerate-tags` to work in directories that include spaces.
 * Prevent `projectile-kill-buffers` from trying to kill indirect
 buffers.
 * [#412](https://github.com/bbatsov/projectile/issues/412): Handle multiple possible targets in `projectile-toggle-between-implementation-or-test`.
 
-## 0.11.0 (05/27/2014)
+## 0.11.0 (2014-05-27)
 
 ### New features
 
@@ -103,7 +218,7 @@ understandable error if current buffer is not visiting a file.
 * [#244] Correct folder picked up by `projectile-ack` after project-switch.
 * [#182] Invalidate project cache if .projectile is modified.
 
-## 0.10.0 (12/09/2013)
+## 0.10.0 (2013-12-09)
 
 ### New features
 
@@ -134,7 +249,7 @@ the switch action is `projectile-commander`.
 
 * `projectile-find-test-file` now properly displays only test files (#145).
 
-## 0.9.2 (07/16/2013)
+## 0.9.2 (2013-07-16)
 
 ### New features
 
@@ -165,7 +280,7 @@ the switch action is `projectile-commander`.
   `compile` command
 * `projectile-switch-project` (<kbd>C-c p s</kbd>) now runs `projectile-find-file` instead of `dired`.
 
-## 0.9.1 (04/26/2013)
+## 0.9.1 (2013-04-26)
 
 ### New features
 
@@ -175,7 +290,7 @@ the switch action is `projectile-commander`.
 
 * #95 - handle properly missing project root
 
-## 0.9.0 (04/24/2013)
+## 0.9.0 (2013-04-24)
 
 ### New features
 
