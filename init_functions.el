@@ -29,9 +29,7 @@
 (defun m/org-img-screenshot (&optional relative-path dont-insert-at-point-and-display)
   "Take a screenshot into a unique-named file. When relative-path is nil, .images/ is used."
   (interactive)
-  (if (not (or
-            (eq major-mode 'org-mode)
-            (eq major-mode 'markdown-mode)))
+  (if (not (eq major-mode 'org-mode))
       (message "Can insert a screenshot only in org-mode buffers.")
     (let* ((rel-path (if (null relative-path) ".images/" relative-path))
            (file-name (ym-aux-make-unique-image-name rel-path "screenshot" "png"))
@@ -43,6 +41,24 @@
         (when (not dont-insert-at-point-and-display)
           (insert (concat "[[" relative-file-name "]]"))
           (org-display-inline-images)
+          )
+        relative-file-name
+        ))))
+(defun m/md-img-screenshot (&optional relative-path dont-insert-at-point-and-display)
+  "Take a screenshot into a unique-named file. When relative-path is nil, .images/ is used."
+  (interactive)
+  (if (not (eq major-mode 'markdown-mode))
+      (message "Can insert a screenshot only in markdown buffers.")
+    (let* ((rel-path (if (null relative-path) "images/" relative-path))
+           (file-name (ym-aux-make-unique-image-name rel-path "screenshot" "png"))
+           (relative-file-name (file-relative-name file-name (file-name-directory (buffer-file-name))))
+           )
+      (call-process "screencapture" nil nil nil "-i" file-name)
+      (if (zerop (nth 7 (file-attributes file-name)))
+          (delete-file file-name)
+        (when (not dont-insert-at-point-and-display)
+          (insert (concat "![alt](" relative-file-name ")"))
+          ;; (org-display-inline-images)
           )
         relative-file-name
         ))))
