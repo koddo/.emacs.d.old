@@ -268,10 +268,11 @@
 (setq web-mode-code-indent-offset 4)
 ;; -------------------------------------------------------------------
 (require 'projectile)
-;; (require 'ack-and-a-half)
+;; (require 'ack-and-a-half)  ; TODO: remove the package
 (require 'dash)
 (require 's)
 (require 'epl)
+(require 'ag)
 (projectile-global-mode)
 ;; (add-hook 'js-mode-hook 'projectile-on)
 ;; (add-hook 'css-mode-hook 'projectile-on)
@@ -377,3 +378,7 @@
 ;; (autoload 'ffip-ivy-resume "find-file-in-project" nil t)
 
 
+
+;; helm
+;; https://github.com/syohex/emacs-helm-ag
+;; https://github.com/bbatsov/helm-projectile
