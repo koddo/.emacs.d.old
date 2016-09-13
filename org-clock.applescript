@@ -9,20 +9,20 @@ on run argv
             set emacs_active to " t"
         end if
         set task_name to do shell script ". ~/.profile ; $EMACSCLIENT --no-wait --eval '(ym-clock-in-and-notify" & emacs_active & ")' | xargs echo"
-        display notification task_name with title "clock in"
-        tell application "org-clock-statusbar" to clock in task_name
         do shell script "afplay ~/.emacs.d/org-clock-in.wav"
+        display notification task_name with title "clock in"
+        # tell application "org-clock-statusbar" to clock in task_name
     else if cmd is equal to "clock_in_default"
         set task_name to do shell script ". ~/.profile ; $EMACSCLIENT --no-wait --eval '(ym-clock-in-default-and-notify)' | xargs echo"
-        display notification task_name with title "clock in default"
-        tell application "org-clock-statusbar" to clock in task_name
         do shell script "afplay ~/.emacs.d/org-clock-in.wav"
+        display notification task_name with title "clock in default"
+        # tell application "org-clock-statusbar" to clock in task_name
     else if cmd is equal to "clock_out"
         set task_name to do shell script ". ~/.profile ; $EMACSCLIENT --no-wait --eval '(ym-clock-out-and-notify)' | xargs echo"
+        do shell script "afplay ~/.emacs.d/org-clock-out.wav"
         display notification "--- " & task_name with title "clock out"
         # display notification "--- " with title "clock out"
-        tell application "org-clock-statusbar" to clock out
-        do shell script "afplay ~/.emacs.d/org-clock-out.wav"
+        # tell application "org-clock-statusbar" to clock out
     else if cmd is equal to "show_current"
         do shell script ". ~/.profile ; $EMACSCLIENT --no-wait --eval '(ym-clock-show-current)'"
         tell application "Emacs"
