@@ -47,7 +47,7 @@
 (defun m/md-img-screenshot (&optional relative-path dont-insert-at-point-and-display)
   "Take a screenshot into a unique-named file. When relative-path is nil, .images/ is used."
   (interactive)
-  (if (not (eq major-mode 'markdown-mode))
+  (if (not (or(eq major-mode 'markdown-mode)))
       (message "Can insert a screenshot only in markdown buffers.")
     (let* ((rel-path (if (null relative-path) "images/" relative-path))
            (file-name (ym-aux-make-unique-image-name rel-path "screenshot" "png"))
