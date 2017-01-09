@@ -71,3 +71,4 @@ pulled pyvenv https://github.com/jorgenschaefer/pyvenv v1.9 -- 726940c..807f293
 added ag.el https://github.com/Wilfred/ag.el master -- e93d45f
 pulled ag.el https://github.com/Wilfred/ag.el 0.47 -- e93d45f..f2cfea2
 added ledger-mode https://github.com/ledger/ledger-mode master -- a2ce924c4
+pulled ledger-mode https://github.com/ledger/ledger-mode v3.1.1 -- a2ce924c4..bc66b8f06
