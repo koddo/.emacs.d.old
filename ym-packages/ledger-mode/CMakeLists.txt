@@ -24,7 +24,8 @@ set(EMACS_LISP_SOURCES_UNCOMPILABLE
   ledger-context.el)
 
 # find emacs and complain if not found
-find_program(EMACS_EXECUTABLE emacs)
+#find_program(EMACS_EXECUTABLE emacs)
+find_program(EMACS_EXECUTABLE /Users/alex/Applications/Emacs.app/Contents/MacOS/Emacs)
 
 macro(add_emacs_lisp_target el)
   configure_file(${el} ${CMAKE_CURRENT_BINARY_DIR}/${el})

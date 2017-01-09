@@ -11,7 +11,7 @@
 (menu-bar-mode t)
 (setq trash-directory "~/.Trash")
 
-(load "/opt/local/share/emacs/site-lisp/ledger.el")
+;;(load "/opt/local/share/emacs/site-lisp/ledger.el")
 
 
 (defun open-file-with-os (filename)   ; TODO: why?
