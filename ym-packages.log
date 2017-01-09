@@ -70,3 +70,4 @@ pulled elpy https://github.com/jorgenschaefer/elpy 1.12.0 -- ea73f74..c9487a1
 pulled pyvenv https://github.com/jorgenschaefer/pyvenv v1.9 -- 726940c..807f293
 added ag.el https://github.com/Wilfred/ag.el master -- e93d45f
 pulled ag.el https://github.com/Wilfred/ag.el 0.47 -- e93d45f..f2cfea2
+added ledger-mode https://github.com/ledger/ledger-mode master -- a2ce924c4
