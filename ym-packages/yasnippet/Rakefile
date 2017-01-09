@@ -45,8 +45,12 @@ task :release => [:package, 'doc:archive'] do
 end
 
 desc "Generate document"
-task :doc do
-  sh "#{$EMACS} -Q -L . --batch -l doc/yas-doc-helper.el" +
+task :doc, [:htmlize] do |t, args|
+  load_path = '-L .'
+  if args[:htmlize]
+    load_path += " -L #{args[:htmlize]}"
+  end
+  sh "#{$EMACS} -Q #{load_path} --batch -l doc/yas-doc-helper.el" +
     " -f yas--generate-html-batch"
 end
 
@@ -94,7 +98,12 @@ end
 desc "Compile yasnippet.el into yasnippet.elc"
 
 rule '.elc' => '.el' do |t|
-  sh "#{$EMACS} --batch -L . --eval \"(byte-compile-file \\\"#{t.source}\\\")\""
+  set_warnings = ""
+  if ENV['warnings']
+    set_warnings = " --eval \"(setq byte-compile-warnings #{ENV['warnings']})\""
+  end
+  sh "#{$EMACS} --batch -L . --eval \"(setq byte-compile-error-on-warn t)\"" +
+     "#{set_warnings} -f batch-byte-compile #{t.source}"
 end
 task :compile => FileList["yasnippet.el"].ext('elc')
 
