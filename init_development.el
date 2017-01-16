@@ -308,7 +308,6 @@
 (add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode))
 (autoload 'gfm-mode "markdown-mode"
   "Major mode for editing GitHub Flavored Markdown files" t)
-(add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
 ;; -------------------------------------------------------------------
 (defun ym-jekyll-post-template ()
   (interactive)
@@ -363,7 +362,7 @@
 ;; -------------------------------------------------------------------
 ;; $ pip install rope jedi flake8 importmagic autopep8 yapf
 (require 'pyvenv)
-(pyvenv-workon "default351")
+(pyvenv-workon "default352")
 (require 'elpy)
 (setq elpy-rpc-backend "jedi")
 (require 'company-quickhelp)
