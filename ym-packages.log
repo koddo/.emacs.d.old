@@ -90,3 +90,4 @@ pulled flycheck https://github.com/flycheck/flycheck 30 -- 4a08b2160..2995618b8
 pulled restclient https://github.com/pashky/restclient.el master -- 7dadac687..10671d044
 pulled macrostep https://github.com/joddie/macrostep master -- 51d5b6af7..424e3734a
 pulled smex https://github.com/nonsequitur/smex master -- f1f854376..55aaebe3d
+pulled autopair https://github.com/capitaomorte/autopair master -- b991f7055..2b6d72bcc
