@@ -1,5 +1,18 @@
 # History of user-visible changes
 
+## 2016-11-12 (0.9.1)
+
+* `company-indent-or-complete-common` skips trying to indent if
+  `indent-line-function` is `indent-relative` or `indent-relative-maybe`.
+* Better visualization of search matches. New face `company-tooltip-search-selection`.
+* New variable `company-files-exclusions`.
+* `company-next-page` and `company-previous-page` adhere to
+  `company-selection-wrap-around` docstring more closely and only wrap around
+  when the selection is at the start of the end of the list.
+* `company-pseudo-tooltip-unless-just-one-frontend-with-delay` handles custom
+  frontends derived from `company-preview-frontend` better.
+* `company-idle-delay` is automatically adjusted to a non-zero value.
+
 ## 2016-06-23 (0.9.0)
 
 * Group of backends can now contain keyword `:separate`, which makes candidates
