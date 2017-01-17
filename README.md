@@ -1,10 +1,10 @@
-# s.el [![Build Status](https://secure.travis-ci.org/magnars/s.el.png)](http://travis-ci.org/magnars/s.el)
+# s.el [![Build Status](https://secure.travis-ci.org/magnars/s.el.png)](http://travis-ci.org/magnars/s.el) [![Coverage Status](https://coveralls.io/repos/magnars/s.el/badge.svg?branch=master)](https://coveralls.io/r/magnars/s.el?branch=master)
 
 The long lost Emacs string manipulation library.
 
 ## Installation
 
-It's available on [marmalade](http://marmalade-repo.org/) and [Melpa](http://melpa.milkbox.net/):
+It's available on [marmalade](http://marmalade-repo.org/) and [Melpa](https://melpa.org/):
 
     M-x package-install s
 
@@ -49,6 +49,7 @@ Or you can just dump `s.el` in your load path somewhere.
 * [s-lines](#s-lines-s) `(s)`
 * [s-match](#s-match-regexp-s-optional-start) `(regexp s &optional start)`
 * [s-match-strings-all](#s-match-strings-all-regex-string) `(regex string)`
+* [s-matched-positions-all](#s-matched-positions-all-regexp-string-optional-subexp-depth) `(regexp string &optional subexp-depth)`
 * [s-slice-at](#s-slice-at-regexp-s) `(regexp s)`
 * [s-split](#s-split-separator-s-optional-omit-nulls) `(separator s &optional omit-nulls)`
 * [s-split-up-to](#s-split-up-to-separator-s-n-optional-omit-nulls) `(separator s n &optional omit-nulls)`
@@ -85,6 +86,7 @@ Or you can just dump `s.el` in your load path somewhere.
 * [s-format](#s-format-template-replacer-optional-extra) `(template replacer &optional extra)`
 * [s-lex-format](#s-lex-format-format-str) `(format-str)`
 * [s-count-matches](#s-count-matches-regexp-s-optional-start-end) `(regexp s &optional start end)`
+* [s-wrap](#s-wrap-s-prefix-optional-suffix) `(s prefix &optional suffix)`
 
 ### Pertaining to words
 
@@ -308,7 +310,6 @@ Concatenate `s` and `suffix`.
 (s-append "abc" "def") ;; => "defabc"
 ```
 
-
 ### s-lines `(s)`
 
 Splits `s` into a list of strings on newline characters.
@@ -345,6 +346,17 @@ ignored after the first.
 (s-match-strings-all "{\\([^}]+\\)}" "x is {x} and y is {y}") ;; => '(("{x}" "x") ("{y}" "y"))
 (s-match-strings-all "ab." "abXabY") ;; => '(("abX") ("abY"))
 (s-match-strings-all "\\<" "foo bar baz") ;; => '(("") ("") (""))
+```
+
+### s-matched-positions-all `(regexp string &optional subexp-depth)`
+
+Return a list of matched positions for `regexp` in `string`.
+`subexp-depth` is 0 by default.
+
+```cl
+(s-matched-positions-all "l+" "{{Hello}} World, {{Emacs}}!" 0) ;; => '((4 . 6) (13 . 14))
+(s-matched-positions-all "{{\\(.+?\\)}}" "{{Hello}} World, {{Emacs}}!" 0) ;; => '((0 . 9) (17 . 26))
+(s-matched-positions-all "{{\\(.+?\\)}}" "{{Hello}} World, {{Emacs}}!" 1) ;; => '((2 . 7) (19 . 24))
 ```
 
 ### s-slice-at `(regexp s)`
@@ -706,6 +718,20 @@ to match.
 (s-count-matches "\\w\\{2\\}[0-9]+" "ab1bab2frobinator") ;; => 2
 ```
 
+### s-wrap `(s prefix &optional suffix)`
+
+Wrap string `s` with `prefix` and optionally `suffix`.
+
+Return string `s` with `prefix` prepended.  If `suffix` is present, it
+is appended, otherwise `prefix` is used as both prefix and
+suffix.
+
+```cl
+(s-wrap "foo" "\"") ;; => "\"foo\""
+(s-wrap "foo" "(" ")") ;; => "(foo)"
+(s-wrap "foo" "bar") ;; => "barfoobar"
+```
+
 
 ### s-split-words `(s)`
 
@@ -810,6 +836,16 @@ calculate the Levenshtein distance between two strings.
 
 ## Changelist
 
+### From 1.10.0 to 1.11.0
+
+- Add `s-matched-positions-all` (ono hiroko)
+
+### From 1.9.0 to 1.10.0
+
+- Add `s-wrap` (Johan Andersson)
+- Add `s-split-up-to` (Matus Goljer)
+- Fix `s-reverse` for Unicode combining characters. (Christopher Wellons)
+
 ### From 1.8.0 to 1.9.0
 
 - Add `s-count-matches` (Lars Andersen)
@@ -870,6 +906,7 @@ calculate the Levenshtein distance between two strings.
 * [Geoff Gole](https://github.com/gsg) contributed `s-all-match-strings`
 * [Sylvain Rousseau](https://github.com/thisirs) contributed `s-word-initials`
 * [Lars Andersen](https://github.com/expez) contributed `s-count-matches`
+* [ono hiroko](https://github.com/kuanyui) contributed `s-matched-positions-all`
 
 Thanks!
 
@@ -901,7 +938,7 @@ Change `readme-template.md` or `examples-to-docs.el` instead.
 
 ## License
 
-Copyright (C) 2012 Magnar Sveen
+Copyright (C) 2012-2015 Magnar Sveen
 
 Authors: Magnar Sveen <magnars@gmail.com>
 Keywords: strings
