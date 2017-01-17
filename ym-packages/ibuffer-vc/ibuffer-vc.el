@@ -1,6 +1,6 @@
 ;;; ibuffer-vc.el --- Group ibuffer's list by VC project, or show VC status
 ;;
-;; Copyright (C) 2011-2012 Steve Purcell
+;; Copyright (C) 2011-2014 Steve Purcell
 ;;
 ;; Author: Steve Purcell <steve@sanityinc.com>
 ;; Keywords: themes
@@ -85,24 +85,41 @@
   :type 'boolean
   :group 'ibuffer-vc)
 
+(defcustom ibuffer-vc-include-function 'identity
+  "A function which tells whether a given file should be grouped.
+
+The function is passed a filename, and should return non-nil if the file
+is to be grouped.
+
+This option can be used to exclude certain files from the grouping mechanism."
+  :type 'function
+  :group 'ibuffer-vc)
+
 ;;; Group and filter ibuffer entries by parent vc directory
 
 (defun ibuffer-vc--include-file-p (file)
   "Return t iff FILE should be included in ibuffer-vc's filtering."
-  (and file (or (null ibuffer-vc-skip-if-remote)
-                (not (file-remote-p file)))))
+  (and file
+       (or (null ibuffer-vc-skip-if-remote)
+           (not (file-remote-p file)))
+       (funcall ibuffer-vc-include-function file)))
 
 (defun ibuffer-vc--deduce-backend (file)
   "Return the vc backend for FILE, or nil if not under VC supervision."
-  (or (vc-backend file)
-      (cl-loop for backend in vc-handled-backends
-               when (vc-call-backend backend 'responsible-p file)
-               return backend)))
+  (if (fboundp 'vc-responsible-backend)
+      (ignore-errors (vc-responsible-backend file))
+    (or (vc-backend file)
+        (cl-loop for backend in vc-handled-backends
+                 when (vc-call-backend backend 'responsible-p file)
+                 return backend))))
 
 (defun ibuffer-vc-root (buf)
   "Return a cons cell (backend-name . root-dir) for BUF.
 If the file is not under version control, nil is returned instead."
-  (let ((file-name (with-current-buffer buf (or buffer-file-name default-directory))))
+  (let ((file-name (with-current-buffer buf
+                     (or (when buffer-file-name
+                           (file-truename buffer-file-name))
+                         default-directory))))
     (when (ibuffer-vc--include-file-p file-name)
       (let ((backend (ibuffer-vc--deduce-backend file-name)))
         (when backend
@@ -112,6 +129,8 @@ If the file is not under version control, nil is returned instead."
                    ((fboundp root-fn-name) (funcall root-fn-name file-name)) ; git, svn, hg, bzr (at least)
                    ((memq backend '(darcs DARCS)) (vc-darcs-find-root file-name))
                    ((memq backend '(cvs CVS)) (vc-find-root file-name "CVS"))
+                   ((memq backend '(rcs RCS)) (or (vc-find-root file-name "RCS")
+                                                  (concat file-name ",v")))
                    (t (error "ibuffer-vc: don't know how to find root for vc backend '%s' - please submit a bug report or patch" backend)))))
             (cons backend root-dir)))))))
 
@@ -147,10 +166,14 @@ If the file is not under version control, nil is returned instead."
 
 ;;; Display vc status info in the ibuffer list
 
+(defun ibuffer-vc--state (file)
+  "Return the `vc-state' for FILE, or nil if unregistered."
+  (ignore-errors (vc-state file)))
+
 (defun ibuffer-vc--status-string ()
   "Return a short string to represent the current buffer's status."
   (when (and buffer-file-name (ibuffer-vc--include-file-p buffer-file-name))
-    (let ((state (vc-state buffer-file-name)))
+    (let ((state (ibuffer-vc--state buffer-file-name)))
       (if state
           (symbol-name state)
         "-"))))
@@ -164,7 +187,7 @@ If the file is not under version control, nil is returned instead."
 (define-ibuffer-column vc-status-mini
   (:name "V")
   (if (and buffer-file-name (ibuffer-vc--include-file-p buffer-file-name))
-      (let ((state (vc-state buffer-file-name)))
+      (let ((state (ibuffer-vc--state buffer-file-name)))
         (cond
          ((eq 'added state) "A")
          ((eq 'removed state) "D")
