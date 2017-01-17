@@ -79,3 +79,4 @@ pulled highlight-indentation https://github.com/antonj/Highlight-Indentation-for
 pulled find-file-in-project https://github.com/technomancy/find-file-in-project 5.2.7 -- b69411d15..1ac2c0a71
 pulled sql-indent https://github.com/bsvingen/sql-indent master -- f85bc9153..761a5724d
 pulled company-quickhelp https://github.com/expez/company-quickhelp 2.0.0 -- 39e206f77..c0aaa5b14
+pulled pos-tip https://github.com/pitkali/pos-tip master -- 051e08f
