@@ -155,7 +155,6 @@ To suppress popup, you can pass a function `ein:do-nothing' as CALLBACK."
   (unless path (setq path ""))
   (if (and (stringp url-or-port) (not (string-match "^https?://" url-or-port)))
       (setq url-or-port (format "http://%s" url-or-port)))
-  (ein:query-kernelspecs url-or-port)
   (ein:subpackages-load)
   (let ((success
          (if no-popup
@@ -172,6 +171,8 @@ To suppress popup, you can pass a function `ein:do-nothing' as CALLBACK."
         (path (ein:$content-path content))
         (ipy-version (ein:$content-ipython-version content))
         (data (ein:$content-raw-content content)))
+    (when (>= ipy-version 3)
+      (ein:query-kernelspecs url-or-port))
     (with-current-buffer (ein:notebooklist-get-buffer url-or-port)
       (let ((already-opened-p (ein:notebooklist-list-get url-or-port))
             (orig-point (point)))
@@ -181,7 +182,9 @@ To suppress popup, you can pass a function `ein:do-nothing' as CALLBACK."
                                       :data data
                                       :api-version ipy-version))
         (ein:notebooklist-list-add ein:%notebooklist%)
-        (ein:notebooklist-render)
+        (if (< ipy-version 3)
+            (ein:notebooklist-render-ipy2)
+          (ein:notebooklist-render))
         (goto-char orig-point)
         (ein:log 'info "Opened notebook list at %s with path %s" url-or-port path)
         (unless already-opened-p
@@ -217,7 +220,7 @@ This function is called via `ein:notebook-after-rename-hook'."
 (defun ein:notebooklist-open-notebook (nblist path &optional callback cbargs)
   (ein:notebook-open (ein:$notebooklist-url-or-port nblist)
                      path
-		     nil
+                     nil
                      callback
                      cbargs))
 
@@ -296,13 +299,13 @@ You may find the new one in the notebook list." error)
   (ein:notebooklist-open url-or-port no-popup))
 
 ;;;###autoload
-(defun ein:notebooklist-new-notebook-with-name (name &optional kernelspec url-or-port path)
+(defun ein:notebooklist-new-notebook-with-name (name kernelspec url-or-port &optional path)
   "Open new notebook and rename the notebook."
   (interactive (let* ((url-or-port (or (ein:get-url-or-port)
                                        (ein:default-url-or-port)))
-		      (kernelspec (completing-read
-				   "Select kernel [default]: "
-				   (ein:list-available-kernels url-or-port) nil t nil nil "default" nil))
+                      (kernelspec (completing-read
+                                   "Select kernel [default]: "
+                                   (ein:list-available-kernels url-or-port) nil t nil nil "default" nil))
                       (name (read-from-minibuffer
                              (format "Notebook name (at %s): " url-or-port))))
                  (list name kernelspec url-or-port)))
@@ -359,8 +362,8 @@ You may find the new one in the notebook list." error)
       (setf current-path (concat current-path "/" p)
             pairs (append pairs (list (cons p current-path)))))))
 
-(defun ein:notebooklist-render ()
-  "Render notebook list widget.
+(defun ein:notebooklist-render-ipy2 ()
+  "Render notebook list for IPython 2.x sessions.
 Notebook list data is passed via the buffer local variable
 `ein:notebooklist-data'."
   (kill-all-local-variables)
@@ -377,43 +380,30 @@ Notebook list data is passed via the buffer local variable
         (widget-create
          'link
          :notify (lambda (&rest ignore) (ein:notebooklist-open
-					 (ein:$notebooklist-url-or-port ein:%notebooklist%)
-					 path))
+                                         (ein:$notebooklist-url-or-port ein:%notebooklist%)
+                                         path))
          name)))
     (widget-insert " |\n\n"))
-  (let* ((kernels (ein:list-available-kernels (ein:$notebooklist-url-or-port ein:%notebooklist%)))
-	 (default-kernel (ein:get-kernelspec (ein:$notebooklist-url-or-port ein:%notebooklist%) (first kernels))))
-    (widget-create
-     'link
-     :notify (lambda (&rest ignore) (ein:notebooklist-new-notebook
-                                     (ein:$notebooklist-url-or-port ein:%notebooklist%)
-                                     default-kernel))
-     "New Notebook")
-    (widget-insert " ")
-    (widget-create
-     'link
-     :notify (lambda (&rest ignore) (ein:notebooklist-reload))
-     "Reload List")
-    (widget-insert " ")
-    (widget-create
-     'link
-     :notify (lambda (&rest ignore)
-	       (browse-url
-		(ein:url (ein:$notebooklist-url-or-port ein:%notebooklist%))))
-     "Open In Browser")
-    (widget-insert "\n\nCreate New Notebooks Using Kernel: \n")
-    (let* ((radio-widget (widget-create 'radio-button-choice
-					:value (first kernels)
-					:notify (lambda (widget &rest ignore)
-						  (setq default-kernel
-							(ein:get-kernelspec (ein:$notebooklist-url-or-port ein:%notebooklist%) (widget-value widget)))
-						  (message "New notebooks will be started using the %s kernel."
-							   (widget-value widget))))))
-      (dolist (k kernels)
-	(widget-radio-add-item radio-widget (list 'item :value k)))))
+  (widget-create
+   'link
+   :notify (lambda (&rest ignore) (ein:notebooklist-new-notebook
+                                   (ein:$notebooklist-url-or-port ein:%notebooklist%)))
+   "New Notebook")
+  (widget-insert " ")
+  (widget-create
+   'link
+   :notify (lambda (&rest ignore) (ein:notebooklist-reload))
+   "Reload List")
+  (widget-insert " ")
+  (widget-create
+   'link
+   :notify (lambda (&rest ignore)
+             (browse-url
+              (ein:url (ein:$notebooklist-url-or-port ein:%notebooklist%))))
+   "Open In Browser")
   (widget-insert "\n")
   (let ((api-version (ein:$notebooklist-api-version ein:%notebooklist%))
-	(sessions (make-hash-table :test 'equal)))
+        (sessions (make-hash-table :test 'equal)))
     (ein:content-query-sessions sessions (ein:$notebooklist-url-or-port ein:%notebooklist%) t)
     (loop for note in (ein:$notebooklist-data ein:%notebooklist%)
 	  for urlport = (ein:$notebooklist-url-or-port ein:%notebooklist%)
@@ -428,16 +418,16 @@ Notebook list data is passed via the buffer local variable
 	  do (widget-insert " ")
 	  if (string= type "directory")
 	  do (progn (widget-create
-		     'link
-		     :notify (lexical-let ((urlport urlport)
-					   (path name))
-			       (lambda (&rest ignore)
-				 (ein:notebooklist-open urlport
-							(ein:url (ein:$notebooklist-path ein:%notebooklist%)
-								 path))))
-		     "Dir")
-		    (widget-insert " : " name)
-		    (widget-insert "\n"))
+               'link
+               :notify (lexical-let ((urlport urlport)
+                                     (path name))
+                         (lambda (&rest ignore)
+                           (ein:notebooklist-open urlport
+                                                  (ein:url (ein:$notebooklist-path ein:%notebooklist%)
+                                                           path))))
+               "Dir")
+              (widget-insert " : " name)
+              (widget-insert "\n"))
 	  if (string= type "notebook")
 	  do (progn (widget-create
 		     'link
@@ -472,6 +462,141 @@ Notebook list data is passed via the buffer local variable
 		     "Delete")
 		    (widget-insert " : " name)
 		    (widget-insert "\n"))))
+  (ein:notebooklist-mode)
+  (widget-setup))
+
+(defun ein:notebooklist-render ()
+  "Render notebook list widget.
+Notebook list data is passed via the buffer local variable
+`ein:notebooklist-data'."
+  (kill-all-local-variables)
+  (let ((inhibit-read-only t))
+    (erase-buffer))
+  (remove-overlays)
+  ;; Create notebook list
+  (widget-insert (format "IPython %s Notebook list\n\n" (ein:$notebooklist-api-version ein:%notebooklist%)))
+  (let ((breadcrumbs (generate-breadcrumbs (ein:$notebooklist-path ein:%notebooklist%))))
+    (dolist (p breadcrumbs)
+      (lexical-let ((name (car p))
+                    (path (cdr p)))
+        (widget-insert " | ")
+        (widget-create
+         'link
+         :notify (lambda (&rest ignore) (ein:notebooklist-open
+					 (ein:$notebooklist-url-or-port ein:%notebooklist%)
+					 path))
+         name)))
+    (widget-insert " |\n\n"))
+  (lexical-let* ((kernels (ein:list-available-kernels (ein:$notebooklist-url-or-port ein:%notebooklist%)))
+                 (default-kernel (ein:get-kernelspec (ein:$notebooklist-url-or-port ein:%notebooklist%) (first kernels))))
+    (widget-create
+     'link
+     :notify (lambda (&rest ignore) (ein:notebooklist-new-notebook
+                                     (ein:$notebooklist-url-or-port ein:%notebooklist%)
+                                     default-kernel))
+     "New Notebook")
+    (widget-insert " ")
+    (widget-create
+     'link
+     :notify (lambda (&rest ignore) (ein:notebooklist-reload))
+     "Reload List")
+    (widget-insert " ")
+    (widget-create
+     'link
+     :notify (lambda (&rest ignore)
+               (browse-url
+                (ein:url (ein:$notebooklist-url-or-port ein:%notebooklist%))))
+     "Open In Browser")
+    (widget-insert "\n\nCreate New Notebooks Using Kernel: \n")
+    (let* ((radio-widget (widget-create 'radio-button-choice
+					:value (first kernels)
+					:notify (lambda (widget &rest ignore)
+						  (setq default-kernel
+							(ein:get-kernelspec (ein:$notebooklist-url-or-port ein:%notebooklist%) (widget-value widget)))
+						  (message "New notebooks will be started using the %s kernel."
+							   (widget-value widget))))))
+      (dolist (k kernels)
+	(widget-radio-add-item radio-widget (list 'item :value k)))))
+  (widget-insert "\n")
+  (let ((api-version (ein:$notebooklist-api-version ein:%notebooklist%))
+        (sessions (make-hash-table :test 'equal)))
+    (ein:content-query-sessions sessions (ein:$notebooklist-url-or-port ein:%notebooklist%) t)
+    (loop for note in (ein:$notebooklist-data ein:%notebooklist%)
+          for urlport = (ein:$notebooklist-url-or-port ein:%notebooklist%)
+          for name = (plist-get note :name)
+          for path = (plist-get note :path)
+          ;; (cond ((= 2 api-version)
+          ;;        (plist-get note :path))
+          ;;       ((= 3 api-version)
+          ;;        (ein:get-actual-path (plist-get note :path))))
+          for type = (plist-get note :type)
+          for opened-notebook-maybe = (ein:notebook-get-opened-notebook urlport path)
+          do (widget-insert " ")
+          if (string= type "directory")
+          do (progn (widget-create
+                     'link
+                     :notify (lexical-let ((urlport urlport)
+                                           (path name))
+                               (lambda (&rest ignore)
+                                 (ein:notebooklist-open urlport
+                                                        (ein:url (ein:$notebooklist-path ein:%notebooklist%)
+                                                                 path))))
+                     "Dir")
+                    (widget-insert " : " name)
+                    (widget-insert "\n"))
+          if (string= type "notebook")
+          do (progn (widget-create
+                     'link
+                     :notify (lexical-let ((name name)
+                                           (path path))
+                               (lambda (&rest ignore)
+                                 (run-at-time 3 nil
+                                              #'ein:notebooklist-reload ein:%notebooklist%) ;; TODO using deferred better?
+                                 (ein:notebooklist-open-notebook
+                                  ein:%notebooklist% path)))
+                     "Open")
+                    (widget-insert " ")
+                    (when (gethash path sessions)
+                      (widget-create
+                       'link
+                       :notify (lexical-let ((session (car (gethash path sessions)))
+                                             (nblist ein:%notebooklist%))
+                                 (lambda (&rest ignore)
+                                   (run-at-time 1 nil
+                                                #'ein:notebooklist-reload
+                                                ein:%notebooklist%)
+                                   (ein:kernel-kill (make-ein:$kernel :url-or-port (ein:$notebooklist-url-or-port nblist)
+                                                                      :session-id session))))
+                       "Stop")
+                      (widget-insert " "))
+                    (widget-create
+                     'link
+                     :notify (lexical-let ((path path))
+                               (lambda (&rest ignore)
+                                 (ein:notebooklist-delete-notebook-ask
+                                  path)))
+                     "Delete")
+                    (widget-insert " : " name)
+                    (widget-insert "\n")))
+    (widget-insert "\n---------- All Opened Notebooks ----------\n\n")
+    (loop for buffer in (ein:notebook-opened-buffers)
+          do (progn (widget-create
+                     'link
+                     :notify (lexical-let ((buffer buffer))
+                               (lambda (&rest ignore)
+                                 (switch-to-buffer buffer)))
+                     "Open")
+                    (widget-create
+                     'link
+                     :notify (lexical-let ((buffer buffer))
+                               (lambda (&rest ignore)
+                                 (kill-buffer buffer)
+                                 (run-at-time 1 nil
+                                              #'ein:notebooklist-reload
+                                              ein:%notebooklist%)))
+                     "Close")
+                    (widget-insert " : " (buffer-name buffer))
+                    (widget-insert "\n"))))
   (ein:notebooklist-mode)
   (widget-setup))
 
@@ -664,28 +789,39 @@ Now you can open notebook list by `ein:notebooklist-open'." url-or-port))
 
 ;;; Notebook list mode
 
-(define-derived-mode ein:notebooklist-mode fundamental-mode "ein:notebooklist"
-  "IPython notebook list mode.")
-
 (defun ein:notebooklist-prev-item () (interactive) (move-beginning-of-line 0))
 (defun ein:notebooklist-next-item () (interactive) (move-beginning-of-line 2))
 
-(setq ein:notebooklist-mode-map (copy-keymap widget-keymap))
+(defvar ein:notebooklist-mode-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map (make-composed-keymap widget-keymap
+                                                 special-mode-map))
+    (define-key map "\C-c\C-r" 'ein:notebooklist-reload)
+    (define-key map "p" 'ein:notebooklist-prev-item)
+    (define-key map "n" 'ein:notebooklist-next-item)
+    map)
+  "Keymap for ein:notebooklist-mode.")
 
-(let ((map ein:notebooklist-mode-map))
-  (define-key map "\C-c\C-r" 'ein:notebooklist-reload)
-  (define-key map "g" 'ein:notebooklist-reload)
-  (define-key map "p" 'ein:notebooklist-prev-item)
-  (define-key map "n" 'ein:notebooklist-next-item)
-  (define-key map "q" 'bury-buffer)
-  (easy-menu-define ein:notebooklist-menu map "EIN Notebook List Mode Menu"
-    `("EIN Notebook List"
-      ,@(ein:generate-menu
-         '(("Reload" ein:notebooklist-reload)
-           ("New Notebook" ein:notebooklist-new-notebook)
-           ("New Notebook (with name)"
-            ein:notebooklist-new-notebook-with-name)
-           ("New Junk Notebook" ein:junk-new))))))
+(easy-menu-define ein:notebooklist-menu ein:notebooklist-mode-map
+  "EIN Notebook List Mode Menu"
+  `("EIN Notebook List"
+    ,@(ein:generate-menu
+       '(("Reload" ein:notebooklist-reload)
+         ("New Notebook" ein:notebooklist-new-notebook)
+         ("New Notebook (with name)"
+          ein:notebooklist-new-notebook-with-name)
+         ("New Junk Notebook" ein:junk-new)))))
+
+(defun ein:notebooklist-revert-wrapper (&optional ignore-auto noconfirm preserve-modes)
+  (ein:notebooklist-reload))
+
+(define-derived-mode ein:notebooklist-mode special-mode "ein:notebooklist"
+  "IPython notebook list mode.
+Commands:
+\\{ein:notebooklist-mode-map}}"
+  (set (make-local-variable 'revert-buffer-function)
+       'ein:notebooklist-revert-wrapper))
+
 
 (provide 'ein-notebooklist)
 
