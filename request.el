@@ -67,6 +67,10 @@
   "Executable for curl command."
   :type 'string)
 
+(defcustom request-curl-options nil
+  "curl command options."
+  :type '(repeat string))
+
 (defcustom request-backend (if (executable-find request-curl)
                                'curl
                              'url-retrieve)
@@ -80,6 +84,11 @@ Automatically set to `curl' if curl command is found."
 `nil' means no timeout."
   :type '(choice (integer :tag "Request timeout seconds")
                  (boolean :tag "No timeout" nil)))
+
+(defcustom request-temp-prefix "emacs-request"
+  "Prefix for temporary files created by Request."
+  :type 'string
+  :risky t)
 
 (defcustom request-log-level -1
   "Logging level for request.
@@ -200,16 +209,16 @@ for older Emacs versions.")
              concat sep
              concat (url-hexify-string (format "%s" k))
              concat "="
-             concat (url-hexify-string v))))
+             concat (url-hexify-string (format "%s" v)))))
 
 
 ;;; Header parser
 
 (defun request--parse-response-at-point ()
   "Parse the first header line such as \"HTTP/1.1 200 OK\"."
-  (re-search-forward "\\=[ \t\n]*HTTP/\\([0-9\\.]+\\) +\\([0-9]+\\)")
-  (list :version (match-string 1)
-        :code (string-to-number (match-string 2))))
+  (when (re-search-forward "\\=[ \t\n]*HTTP/\\([0-9\\.]+\\) +\\([0-9]+\\)" nil t)
+    (list :version (match-string 1)
+          :code (string-to-number (match-string 2)))))
 
 (defun request--goto-next-body ()
   (re-search-forward "^\r\n"))
@@ -604,6 +613,10 @@ raw-header slot."
                 (buffer-substring (point-min) (point)))
           (delete-region (point-min) (min (1+ (point)) (point-max))))))))
 
+(defun request-untrampify-filename (file)
+  "Return FILE as the local file name."
+  (or (file-remote-p file 'localname) file))
+
 (defun request--parse-data (response parser)
   "Run PARSER in current buffer if ERROR-THROWN is nil,
 then kill the current buffer."
@@ -614,8 +627,9 @@ then kill the current buffer."
       (with-current-buffer buffer
         (request-log 'trace
           "(buffer-string) at %S =\n%s" buffer (buffer-string))
-        (goto-char (point-min))
-        (setf (request-response-data response) (funcall parser))))))
+        (when (/= (request-response-status-code response) 204)
+          (goto-char (point-min))
+          (setf (request-response-data response) (funcall parser)))))))
 
 (cl-defun request--callback (buffer &key parser success error complete
                                     timeout status-code response
@@ -713,7 +727,7 @@ Explicitly calling from timer.")
           (cl-destructuring-bind (&key code &allow-other-keys)
               (with-current-buffer buffer
                 (goto-char (point-min))
-                (ignore-errors (request--parse-response-at-point)))
+                (request--parse-response-at-point))
             (setf (request-response-status-code response) code)))
         (apply #'request--callback
                buffer
@@ -874,7 +888,7 @@ Currently it is used only for testing.")
     (make-directory (file-name-directory (request--curl-cookie-jar)) t)))
 
 (cl-defun request--curl-command
-    (url &key type data headers timeout files* unix-socket
+    (url &key type data headers timeout response files* unix-socket
          &allow-other-keys
          &aux
          (cookie-jar (convert-standard-filename
@@ -888,14 +902,25 @@ Currently it is used only for testing.")
          ;;        running multiple requests.
          "--cookie" cookie-jar "--cookie-jar" cookie-jar
          "--write-out" request--curl-write-out-template)
+   request-curl-options
    (when unix-socket (list "--unix-socket" unix-socket))
    (cl-loop for (name filename path mime-type) in files*
             collect "--form"
-            collect (format "%s=@%s;filename=%s%s" name path filename
+            collect (format "%s=@%s;filename=%s%s" name
+                            (request-untrampify-filename path) filename
                             (if mime-type
                                 (format ";type=%s" mime-type)
                               "")))
-   (when data (list "--data-binary" "@-"))
+   (when data
+     (let ((tempfile (request--make-temp-file)))
+       (push tempfile (request-response--tempfiles response))
+       (let ((file-coding-system-alist nil)
+             (coding-system-for-write 'binary))
+         (with-temp-file tempfile
+           (setq buffer-file-coding-system 'binary)
+           (set-buffer-multibyte nil)
+           (insert data)))
+       (list "--data-binary" (concat  "@" (request-untrampify-filename tempfile)))))
    (when type (list "--request" type))
    (cl-loop for (k . v) in headers
             collect "--header"
@@ -930,6 +955,19 @@ Currently it is used only for testing.")
                    (write-region (point-min) (point-max) tf nil 'silent))
                  (list name filename tf mime-type)))))))
 
+(defun request--make-temp-file ()
+  "Create a temporary file."
+  (if (file-remote-p default-directory)
+      (let ((tramp-temp-name-prefix request-temp-prefix)
+            (vec (tramp-dissect-file-name default-directory)))
+        (tramp-make-tramp-file-name
+         (tramp-file-name-method vec)
+         (tramp-file-name-user vec)
+         (tramp-file-name-host vec)
+         (tramp-make-tramp-temp-file vec)
+         (tramp-file-name-hop vec)))
+    (make-temp-file request-temp-prefix)))
+
 (defun request--curl-normalize-files (files)
   "Change FILES into a list of (NAME FILENAME PATH MIME-TYPE).
 This is to make `request--curl-command' cleaner by converting
@@ -939,7 +977,7 @@ temporary file paths."
   (let (tempfiles noerror)
     (unwind-protect
         (let* ((get-temp-file (lambda ()
-                                (let ((tf (make-temp-file "emacs-request-")))
+                                (let ((tf (request--make-temp-file)))
                                   (push tf tempfiles)
                                   tf)))
                (files* (request--curl-normalize-files-1 files get-temp-file)))
@@ -980,8 +1018,13 @@ removed from the buffer before it is shown to the parser function.
          (process-connection-type nil)
          ;; Avoid starting program in non-existing directory.
          (home-directory (if (file-remote-p default-directory)
-                             (with-parsed-tramp-file-name default-directory nil
-                               (tramp-make-tramp-file-name method user host "~/"))
+                             (let ((vec (tramp-dissect-file-name default-directory)))
+                               (tramp-make-tramp-file-name
+                                (tramp-file-name-method vec)
+                                (tramp-file-name-user vec)
+                                (tramp-file-name-host vec)
+                                "~/"
+                                (tramp-file-name-hop vec)))
                            "~/"))
          (default-directory (expand-file-name home-directory))
          (buffer (generate-new-buffer " *request curl*"))
@@ -990,17 +1033,14 @@ removed from the buffer before it is shown to the parser function.
                       (request--curl-normalize-files files)
                     (setf (request-response--tempfiles response) tempfiles)
                     (apply #'request--curl-command url :files* files*
-                           settings)))
+                           :response response settings)))
          (proc (apply #'start-file-process "request curl" buffer command)))
     (request-log 'debug "Run: %s" (mapconcat 'identity command " "))
     (setf (request-response--buffer response) buffer)
     (process-put proc :request-response response)
     (set-process-coding-system proc 'binary 'binary)
     (set-process-query-on-exit-flag proc nil)
-    (set-process-sentinel proc #'request--curl-callback)
-    (when data
-      (process-send-string proc data)
-      (process-send-eof proc))))
+    (set-process-sentinel proc #'request--curl-callback)))
 
 (defun request--curl-read-and-delete-tail-info ()
   "Read a sexp at the end of buffer and remove it and preceding character.
@@ -1026,7 +1066,7 @@ See \"set-cookie-av\" in http://www.ietf.org/rfc/rfc2965.txt")
 (defun request--consume-100-continue ()
   "Remove \"HTTP/* 100 Continue\" header at the point."
   (cl-destructuring-bind (&key code &allow-other-keys)
-      (save-excursion (ignore-errors (request--parse-response-at-point)))
+      (save-excursion (request--parse-response-at-point))
     (when (equal code 100)
       (delete-region (point) (progn (request--goto-next-body) (point)))
       ;; FIXME: Does this make sense?  Is it possible to have multiple 100?
@@ -1034,7 +1074,7 @@ See \"set-cookie-av\" in http://www.ietf.org/rfc/rfc2965.txt")
 
 (defun request--consume-200-connection-established ()
   "Remove \"HTTP/* 200 Connection established\" header at the point."
-  (when (looking-at-p "HTTP/1\\.0 200 Connection established")
+  (when (looking-at-p "HTTP/1\\.[0-1] 200 Connection established")
     (delete-region (point) (progn (request--goto-next-body) (point)))))
 
 (defun request--curl-preprocess ()
@@ -1137,33 +1177,31 @@ START-URL is the URL requested."
 (defun request--netscape-cookie-parse ()
   "Parse Netscape/Mozilla cookie format."
   (goto-char (point-min))
-  (let ((tsv-re (concat "^\\="
+  (let ((tsv-re (concat "^\\(#HttpOnly_\\)?"
                         (cl-loop repeat 6 concat "\\([^\t\n]+\\)\t")
                         "\\(.*\\)"))
         cookies)
-    (while
-        (and
-         (cond
-          ((re-search-forward "^\\=#" nil t))
-          ((re-search-forward "^\\=$" nil t))
-          ((re-search-forward tsv-re)
-           (push (cl-loop for i from 1 to 7 collect (match-string i))
-                 cookies)
-           t))
-         (= (forward-line 1) 0)
-         (not (= (point) (point-max)))))
+    (while (not (eobp))
+      ;; HttpOnly cookie starts with '#' but its line is not comment line(#60)
+      (cond ((and (looking-at-p "^#") (not (looking-at-p "^#HttpOnly_"))) t)
+            ((looking-at-p "^$") t)
+            ((looking-at tsv-re)
+             (let ((cookie (cl-loop for i from 1 to 8 collect (match-string i))))
+               (push cookie cookies))))
+      (forward-line 1))
     (setq cookies (nreverse cookies))
-    (cl-loop for (domain flag path secure expiration name value) in cookies
+    (cl-loop for (http-only domain flag path secure expiration name value) in cookies
              collect (list domain
                            (equal flag "TRUE")
                            path
                            (equal secure "TRUE")
+                           (null (not http-only))
                            (string-to-number expiration)
                            name
                            value))))
 
 (defun request--netscape-filter-cookies (cookies host localpart secure)
-  (cl-loop for (domain flag path secure-1 expiration name value) in cookies
+  (cl-loop for (domain flag path secure-1 http-only expiration name value) in cookies
            when (and (equal domain host)
                      (equal path localpart)
                      (or secure (not secure-1)))
