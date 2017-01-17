@@ -94,3 +94,4 @@ pulled autopair https://github.com/capitaomorte/autopair master -- b991f7055..2b
 pulled web-mode https://github.com/fxbois/web-mode master -- 03132be06..3e74b741a
 pulled projectile https://github.com/bbatsov/projectile master -- 60b696ae9..cdf9c228c
 pulled s https://github.com/magnars/s.el master -- fec417a3f..fc395c8d5
+pulled pkg-info https://github.com/lunaryorn/pkg-info.el master -- 475cdeb0b..76ba74154
