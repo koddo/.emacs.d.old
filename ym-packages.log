@@ -83,3 +83,4 @@ pulled pos-tip https://github.com/pitkali/pos-tip master -- 051e08f
 pulled emacs-websocket https://github.com/ahyatt/emacs-websocket master -- 567555360..fbd9e2263
 pulled emacs-request https://github.com/tkf/emacs-request master -- efbe23134..e2b031a4e
 pulled emacs-ipython-notebook https://github.com/millejoh/emacs-ipython-notebook v0.12.0 -- 9fc8dd3be..8e3764044
+pulled projectile https://github.com/bbatsov/projectile master -- 60b696ae9..cdf9c228c
