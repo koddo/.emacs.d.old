@@ -1,6 +1,6 @@
 ;;; pkg-info-tests.el --- Unit tests for pkg-info    -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2013, 2014  Sebastian Wiesner
+;; Copyright (C) 2013-2016  Sebastian Wiesner
 
 ;; Author: Sebastian Wiesner <swiesner@lunaryorn.com>
 ;; Keywords:
@@ -163,9 +163,32 @@
 (ert-deftest pkg-info-format-version/prerelease-version ()
   (should (equal (pkg-info-format-version '(2 1 -3)) "2.1alpha")))
 
-;; Local Variables:
+(ert-deftest pkg-info-get-melpa-recipe/has-a-proper-recipe ()
+  (let ((recipe (pkg-info-get-melpa-recipe 'pkg-info)))
+    (should (equal (cdr (assq 'fetcher recipe)) "github"))
+    (should (equal (cdr (assq 'repo recipe)) "lunaryorn/pkg-info.el"))))
+
+(ert-deftest pkg-info-get-melpa-recipe/package-does-not-exist ()
+  (should-not (pkg-info-get-melpa-recipe 'foobarblubb)))
+
+(ert-deftest pkg-info-get-melpa-fetcher/has-a-fetcher ()
+  (should (equal (pkg-info-get-melpa-fetcher 'pkg-info) "github")))
+
+(ert-deftest pkg-info-get-melpa-fetcher/package-does-not-exist ()
+  (should-not (pkg-info-get-melpa-fetcher 'foobarblubb)))
+
+(ert-deftest pkg-info-wiki-package-p/a-wiki-package ()
+  (should (pkg-info-wiki-package-p 'dired+)))
+
+(ert-deftest pkg-info-wiki-package-p/not-a-wiki-package ()
+  (should-not (pkg-info-wiki-package-p 'pkg-info)))
+
+(ert-deftest pkg-info-wiki-package-p/package-does-not-exist ()
+  (should-not (pkg-info-wiki-package-p 'foobarblubb)))
+
+;; Variables:
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; End:
 
-;;; pkg-info-tests.el ends here
+;;; pkg-info-test.el ends here

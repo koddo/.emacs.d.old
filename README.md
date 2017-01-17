@@ -9,7 +9,7 @@ Provide information about Emacs packages.
 Installation
 ------------
 
-From MELPA_ or Marmalade_ with <kbd>M-x package-install RET pkg-info</kbd>.
+From [MELPA][] with <kbd>M-x package-install RET pkg-info</kbd>.
 
 In your [`Cask`][cask] file:
 
@@ -37,6 +37,9 @@ This library defines the following functions for use in your Emacs extensions:
   from the header of a library defining a function.
 - `pkg-info-package-version` gets the *version* of an installed package.
 - `pkg-info-format-version` formats a *version* as human readable string.
+- `pkg-info-get-melpa-recipe` gets the MELPA recipe for a package.
+- `pkg-info-wiki-package-p` determines whether a package was build from
+  EmacsWiki on MELPA.
 
 All of these functions are interactive commands as well.
 
@@ -66,5 +69,4 @@ See [`COPYING`][copying] for the complete text of the license.
 [badge-travis]: https://travis-ci.org/lunaryorn/pkg-info.el.svg?branch=master
 [travis]: https://travis-ci.org/lunaryorn/pkg-info.el
 [cask]: http://cask.github.io/
-[MELPA]: http://melpa.milkbox.net
-[Marmalade]: http://marmalade-repo.org/
+[MELPA]: http://melpa.org

@@ -4,7 +4,13 @@ Changelog
 master (in development)
 -----------------------
 
+0.6 (May 17, 2015)
+------------------
+
 - Drop dash.el dependency
+- Add `pkg-info-get-melpa-recipe`
+- Add `pkg-info-get-melpa-fetcher`
+- Add `pkg-info-wiki-package-p`
 
 0.5 (Mar 13, 2014)
 ------------------
