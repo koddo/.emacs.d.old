@@ -1,4 +1,4 @@
-# quickrun.el
+# quickrun.el [![travis badge][travis-badge]][travis-link] [![melpa badge][melpa-badge]][melpa-link] [![melpa stable badge][melpa-stable-badge]][melpa-stable-link]
 
 ## Introduction
 
@@ -13,26 +13,81 @@ compiling languages(C, C++, Go, Java etc) and markup language.
 
 ## Requirements
 
-* Emacs 23 or higher.
+* Emacs 24.1 or higher.
 
-I will drop Emacs 23 support when Emacs 24.4 is released.
 
 ## Installation
 
-You can install `quickrun.el` from [MELPA](http://melpa.milkbox.net/) with package.el.
+You can install `quickrun.el` from [MELPA](https://melpa.org/) with package.el.
 
 Or install directly:
 
 ```
 $ cd load-path-dir
-$ wget https://raw.github.com/syohex/emacs-quickrun/master/quickrun.el
+$ wget https://raw.githubusercontent.com/syohex/emacs-quickrun/master/quickrun.el
 ```
 
 After Installation add following to your configuration file(~/.emacs.d/init.el, ~/.emacs etc)
 
-```elisp
+```lisp
 (require 'quickrun)
 ```
+
+## Support Programming Languages
+
+`quickrun.el` supports following programming languages and markup languages
+as default. But you can register your own command and apply other languages.
+
+**Programming Language(commands used)**
+
+* C(gcc or clang or Visual C++)
+* C++(g++ or clang++ or Visual C++)
+* Objective-C(gcc -objc)
+* D Language(dmd)
+* Fortran(gfortran)
+* Java(javac and java)
+* Perl(perl)
+* Perl6(perl6)
+* Ruby(ruby or mruby)
+* Python(python)
+* PHP(php)
+* Emacs Lisp(emacs)
+* Scheme(gosh)
+* Racket(racket)
+* Common Lisp(clisp or sbcl or ccl)
+* Clojure(jark or clj-env-dir)
+* Javascript(node or v8 or js or jrunscript or cscript)
+* Coffee Script(coffee)
+* JSX(jsx)
+* Markdown(Markdown.pl or bluecloth or kramdown or pandoc or redcarpet)
+* Haskell(runghc)
+* Go Language(go or gccgo)
+* Io(io)
+* Lua(lua)
+* Groovy(groovy)
+* Scala(scala) **Please use UTF-8 encoding**
+* HAML(haml)
+* SASS(sass)
+* LESS(lessc)
+* Erlang(escript)
+* OCaml(ocamlc)
+* F#(fsharpc)
+* ShellScript(shebang's shell)
+* AWK(awk)
+* Rust(rustc)
+* Dart(dart)
+* Elixir(elixir)
+* TypeScript(tsc)
+* Tcl(tclsh)
+* Swift(swift, xcrun)
+* ATS2(patscc)
+* R(Rscript)
+* Nim/NimScript(nim)
+* Julia(julia)
+* Gnuplot(gnuplot)
+
+
+See also `quickrun/support-languages` global variable.
 
 
 ## Basic Usage
@@ -66,6 +121,10 @@ quickrun with `C-u C-u` prefix behaves same as quickrun-compile-only.
 
 Replace region of code with its output.
 
+### `quickrun-autorun-mode`
+
+Minor mode which executes `quickrun` after saving buffer.
+
 #### `helm-quickrun`
 
 `M-x quickrun` with helm interface
@@ -74,63 +133,22 @@ Replace region of code with its output.
 
 `M-x quickrun` with anything interface
 
+## Note
 
-## Support Programming Languages
-
-`quickrun.el` supports following programming languages and markup languages
-as default. But you can register your own command and apply other languages.
-
-**Programming Language(commands used)**
-
-* C(gcc or clang or Visual C++)
-* C++(g++ or clang++ or Visual C++)
-* Objective-C(gcc -objc)
-* D Language(dmd)
-* Fortran(gfortran)
-* Java(javac and java)
-* Perl(perl)
-* Ruby(ruby or mruby)
-* Python(python)
-* PHP(php)
-* Emacs Lisp(emacs)
-* Scheme(gosh)
-* Common Lisp(clisp or sbcl or ccl)
-* Clojure(jark or clj-env-dir)
-* Javascript(node or v8 or js or jrunscript or cscript)
-* Coffee Script(coffee)
-* JSX(jsx)
-* Markdown(Markdown.pl or bluecloth or kramdown or pandoc or redcarpet)
-* Haskell(runghc)
-* Go Language(go or gccgo)
-* Io(io)
-* Lua(lua)
-* Groovy(groovy)
-* Scala(scala) **Please use UTF-8 encoding**
-* HAML(haml)
-* SASS(sass)
-* LESS(lessc)
-* Erlang(escript)
-* OCaml(ocamlc)
-* F#(fsharpc)
-* ShellScript(sheban's shell)
-* AWK(awk)
-* Rust(rustc)
-* Dart(dart)
-* Elixir(elixir)
-* TypeScript(tsc)
-* Tcl(tclsh)
-* Swift(swift, xcrun)
-* ATS2(patscc)
-
-
-See also `quickrun/support-languages` global variable.
-
+If quickrun returns `command not found`, please check `(executable-find "THE_COMMAND_NAME")` [for example `(executable-find "gnuplot")`] .
+If this returns `nil`, I strongly recommend you use https://github.com/purcell/exec-path-from-shell
 
 ## Send File to STDIN
 
 If `executed_file.qrinput`(like `foo.c.qrinput`) is existed in directory same as executed
 buffer file, `quickrun.el` sends its content to stdin of executed program. Please set
 `quickrun-input-file-extension` to `nil` If you want to disable this feature.
+
+## Customize
+
+### `quickrun-focus-p`(Default: `t`)
+
+If this value is `nil`, quickrun.el does not move focus to output buffer.
 
 
 ## User Defined Command
@@ -139,9 +157,9 @@ You can add your own command or override existsing command  by `quickrun-add-com
 
 ```lisp
 ;; Use this parameter as C++ default
-(quickrun-add-command "c++/c11"
+(quickrun-add-command "c++/c1z"
                       '((:command . "g++")
-                        (:exec    . ("%c -std=c++0x %o -o %e %s"
+                        (:exec    . ("%c -std=c++1z %o -o %e %s"
                                      "%e %a"))
                         (:remove  . ("%e")))
                       :default "c++")
@@ -154,7 +172,7 @@ You can add your own command or override existsing command  by `quickrun-add-com
 
 ;; You can override existing command
 (quickrun-add-command "c/gcc"
-                      '((:exec . ("%c -std=c++0x %o -o %e %s"
+                      '((:exec . ("%c -std=c++1z %o -o %e %s"
                                   "%e %a")))
                        :override t)
 ```
@@ -214,6 +232,13 @@ Please see Outputter section.
 #### `:default-directory`
 
 Directory where commands are executed.
+
+#### `:tempfile`
+
+Use temporary file or not. `quickrun.el` uses temporary file
+if you omit this parameter.
+
+NOTE: If you set this parameter, you cannot use `quickrun-region`.
 
 #### `:description`
 
@@ -402,3 +427,10 @@ Sample is following:
                         (:default-directory . ,topdir)
                         (:exec . ("%c -bv --color %s"))))))
 ```
+
+[travis-badge]: https://travis-ci.org/syohex/emacs-quickrun.svg
+[travis-link]: https://travis-ci.org/syohex/emacs-quickrun
+[melpa-link]: https://melpa.org/#/quickrun
+[melpa-stable-link]: https://stable.melpa.org/#/quickrun
+[melpa-badge]: https://melpa.org/packages/quickrun-badge.svg
+[melpa-stable-badge]: https://stable.melpa.org/packages/quickrun-badge.svg
