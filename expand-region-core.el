@@ -59,6 +59,12 @@
     (set-register (aref expand-region-autocopy-register 0)
                   (filter-buffer-substring (region-beginning) (region-end)))))
 
+;; save-mark-and-excursion in Emacs 25 works like save-excursion did before
+(eval-when-compile
+  (when (< emacs-major-version 25)
+    (defmacro save-mark-and-excursion (&rest body)
+      `(save-excursion ,@body))))
+
 (defun er--expand-region-1 ()
   "Increase selected region by semantic units.
 Basically it runs all the mark-functions in `er/try-expand-list'
@@ -81,7 +87,7 @@ moving point or mark as little as possible."
     ;; unless we're already at maximum size
     (unless (and (= start best-start)
                  (= end best-end))
-      (push (cons start end) er/history))
+      (push (cons p1 p2) er/history))
 
     (when (and expand-region-skip-whitespace
                (er--point-is-surrounded-by-white-space)
@@ -90,20 +96,25 @@ moving point or mark as little as possible."
       (setq start (point)))
 
     (while try-list
-      (save-excursion
-        (ignore-errors
-          (funcall (car try-list))
-          (when (and (region-active-p)
-                     (er--this-expansion-is-better start end best-start best-end))
-            (setq best-start (point))
-            (setq best-end (mark))
-            (when (and er--show-expansion-message (not (minibufferp)))
-              (message "%S" (car try-list))))))
+      (save-mark-and-excursion
+       (ignore-errors
+         (funcall (car try-list))
+         (when (and (region-active-p)
+                    (er--this-expansion-is-better start end best-start best-end))
+           (setq best-start (point))
+           (setq best-end (mark))
+           (when (and er--show-expansion-message (not (minibufferp)))
+             (message "%S" (car try-list))))))
       (setq try-list (cdr try-list)))
 
     (setq deactivate-mark nil)
-    (goto-char best-start)
-    (set-mark best-end)
+    ;; if smart cursor enabled, decide to put it at start or end of region:
+    (if (and expand-region-smart-cursor
+             (not (= start best-start)))
+        (progn (goto-char best-end)
+               (set-mark best-start))
+      (goto-char best-start)
+      (set-mark best-end))
 
     (er--copy-region-to-register)
 
@@ -182,7 +193,7 @@ before calling `er/expand-region' for the first time."
          (msg (car msg-and-bindings))
          (bindings (cdr msg-and-bindings)))
     (when repeat-key
-      (set-temporary-overlay-map
+      (er/set-temporary-overlay-map
        (let ((map (make-sparse-keymap)))
          (dolist (binding bindings map)
            (define-key map (read-kbd-macro (car binding))
@@ -194,9 +205,10 @@ before calling `er/expand-region' for the first time."
        t)
       (or (minibufferp) (message "%s" msg)))))
 
-(when (not (fboundp 'set-temporary-overlay-map))
+(if (fboundp 'set-temporary-overlay-map)
+    (fset 'er/set-temporary-overlay-map 'set-temporary-overlay-map)
   ;; Backport this function from newer emacs versions
-  (defun set-temporary-overlay-map (map &optional keep-pred)
+  (defun er/set-temporary-overlay-map (map &optional keep-pred)
     "Set a new keymap that will only exist for a short period of time.
 The new keymap to use must be given in the MAP variable. When to
 remove the keymap depends on user input and KEEP-PRED:
