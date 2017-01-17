@@ -2,6 +2,24 @@
 var React = require('react/addons');
 var Component = require('./component');
 
+function f() {
+  return true
+      && <E b={true} />
+      || <E />;
+}
+
+export default class Header extends Component {
+  render() {
+    return (
+      <div {...attributes}
+           onClick={this.onClicked}
+           onKeyDown={this.onKeyDowned}>
+        {this.getChildren()}
+      </div>);
+  }
+}
+
+
 export default React.createClass({
   getInitialState() {
     return { num: this.getRandomNumber() };
@@ -13,12 +31,38 @@ export default React.createClass({
   render(): any {
     return
     <div>
-      Your dice roll:
+      Your dice roll :
       {this.state.num}
     </div>;
   }
 });
 
+function foo() {
+  return <label>
+      First Name:
+      <Input name="name"
+             type="text"
+             validators={[
+               required('You must supply a first name!'),
+               (value) => value > 15 ? 'too long!': null
+             ]} />
+  </label>;
+}
+
+var React = require('react')
+
+return React.render(
+  <div className="fooBar">
+    {
+      conditional &&
+      <myComponent className="myComponent" />
+    }
+    <label>{labelText}</label>
+    <div>
+      <span>Hello</span>
+    </div>
+  </div>
+);
 
 'use strict';
 
@@ -53,7 +97,8 @@ module.exports = React.createClass({
   render() {
     return (
       <div>
-        <Component attr="cqs" xs="xs"
+        <Component header={<ListHeader />} footer={<ListFooter />}
+                   attr="cqs" xs="xs"
                    xsxs="sxx" />
         <Component />
         <Component />
@@ -62,13 +107,38 @@ module.exports = React.createClass({
   }
 });
 
+module.exports = React.createClass({
+  render() {
+    return (
+      <tag>
+        bla { <inside> { <ListHeader /> } </inside> } bla
+      </tag>
+    );
+  }
+});
+
+module.exports = React.createClass({
+  render() {
+    return (
+      <ul>
+        {
+          this.props.list.map(function(element) {
+            return <li>{element}</li>;
+          })
+        }
+      </ul>
+    );
+  }
+});
+
+
 Landing = React.createClass({
   render: function() {
     return (
       <ul>
-        {for(e in list){
-          console.log("not aligned");
-         }}
+        { for(e in list){
+            console.log("not aligned");
+          }}
       </ul>
     );
   }
@@ -86,8 +156,7 @@ var Component = React.createClass({
         default :
           return null;
       }
-    }
-    );
+    });
   }
 });
 
