@@ -96,3 +96,4 @@ pulled projectile https://github.com/bbatsov/projectile master -- 60b696ae9..cdf
 pulled s https://github.com/magnars/s.el master -- fec417a3f..fc395c8d5
 pulled pkg-info https://github.com/lunaryorn/pkg-info.el master -- 475cdeb0b..76ba74154
 pulled epl https://github.com/cask/epl master -- 63c78c08e..a5ad061d0
+pulled maxframe https://github.com/rmm5t/maxframe.el master -- baa98858b..50dc78c7b
