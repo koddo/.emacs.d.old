@@ -100,3 +100,4 @@ pulled maxframe https://github.com/rmm5t/maxframe.el master -- baa98858b..50dc78
 pulled exec-path-from-shell https://github.com/purcell/exec-path-from-shell master -- 8748769a6..0f53502d4
 pulled expand-region https://github.com/magnars/expand-region.el master -- 12df09000..6dd45d90a
 pulled emacs-quickrun https://github.com/syohex/emacs-quickrun master -- 18b93d8c8..70e93e067
+pulled ibuffer-vc https://github.com/purcell/ibuffer-vc master -- ef61ad6fd..de75fb334
