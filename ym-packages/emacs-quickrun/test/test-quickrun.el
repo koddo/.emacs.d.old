@@ -1,10 +1,8 @@
-;;; test-quickrun.el ---
+;;; test-quickrun.el --- test for quickrun
 
-;; Copyright (C) 2012 by Syohei YOSHIDA
+;; Copyright (C) 2017 by Syohei YOSHIDA
 
 ;; Author: Syohei YOSHIDA <syohex@gmail.com>
-;; URL:
-;; Version: 0.01
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -23,22 +21,20 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'cl))
-
 (require 'ert)
 (require 'quickrun)
 
 (ert-deftest quickrun:exec-quickrun ()
   "Exec `quickrun'"
   (let ((buf (find-file-noselect "sample/sample.py")))
-   (with-current-buffer buf
-     (quickrun))
-   ;; quickrun is async function
-   (sleep-for 1)
-   (with-current-buffer "*quickrun*"
-     (let ((str (buffer-substring-no-properties (point-min) (point-max))))
-       (should (string= "Hello Python quickrun.el\n" str))))))
+    (with-current-buffer buf
+      (quickrun))
+    ;; quickrun is async function
+    (sleep-for 1)
+    (with-current-buffer "*quickrun*"
+      (let ((str (buffer-substring-no-properties (point-min) (point-max))))
+        (should (string= "Hello Python quickrun.el\n" str))))
+    (sleep-for 1)))
 
 (ert-deftest quickrun:add-command ()
   "Add new command"
@@ -61,5 +57,24 @@
   (let* ((params (assoc-default "c/gcc" quickrun/language-alist))
          (command (assoc-default :command params)))
     (should (string= command "clang"))))
+
+(ert-deftest quickrun:use-tempfile-p ()
+  "Whether use temporary file or not."
+  (quickrun-add-command "tempfile0" '((:command . "tempfile0") (:tempfile . t)))
+  (let ((use-tempfile (quickrun/use-tempfile-p "tempfile0")))
+    (should use-tempfile))
+
+  (quickrun-add-command "tempfile1" '((:command . "tempfile1") (:tempfile . nil)))
+  (let ((use-tempfile (quickrun/use-tempfile-p "tempfile1")))
+    (should-not use-tempfile))
+
+  ;; use temporary file if :tempfile paramter is not specified
+  (quickrun-add-command "tempfile2" '((:command . "tempfile2")))
+  (let ((use-tempfile (quickrun/use-tempfile-p "tempfile2")))
+    (should use-tempfile))
+
+  (let* ((quickrun/compile-only-flag t)
+         (use-tempfile (quickrun/use-tempfile-p "hoge")))
+    (should-not use-tempfile)))
 
 ;;; test-quickrun.el ends here

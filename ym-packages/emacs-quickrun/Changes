@@ -1,5 +1,53 @@
 Revision history for quickrun.el
 
+Version 2.2.8 2017/01/14 syohex
+  - Support julia(#77)
+  - Support gnuplot(#78)
+  - Support racket(#81)
+  - Fix not focus window case(#85)
+  - Drop older Emacs support for maintenance
+
+Version 2.2.7 2016/02/16 syohex
+  - Support Open source Swift(#68)
+  - Fix nim issue(#71)
+  - Fix ansi color sequence handling issue at error(#72)
+  - Support nimscript(#73)
+
+Version 2.2.6 2015/08/08 syohex
+  - Support perl6
+
+Version 2.2.5 2015/08/08 syohex
+  - Support fish script
+  - Improve quickrun-shell behavior(#62, #63)
+  - Fix recentering issue(#61)
+
+Version 2.2.4 2015/07/10 syohex
+  - Fix quickrun shell behavior
+  - Implement autorun mode(#54)
+  - Improve helm-quickrun history
+  - Add option for focusing popup buffer
+  - Add format place folder '%S'
+
+Version 2.2.3 2015/01/29 syohex
+  - Support nim programming language
+
+Version 2.2.2 2015/01/29 syohex
+  - Add parameter for whether using temporary file
+  - Fix scrolling issue
+
+Version 2.2.1 2014/10/16 syohex
+  - Fix #41
+    Improve for users which set scroll-step other than 0.
+
+Version 2.2.0 2014/10/16 syohex
+  - Drop Emacs 23 support
+
+Version 2.1.1 2014/10/16 tmalsburg
+  - Support R programming language
+
+Version 2.1.0 2014/09/28 syohex
+  - Update swift configuration for newer Xcode
+
 Version 2.0.9 2014/08/24 syohex
   - Fix Fortran file extention regexp
   - Improve F#
