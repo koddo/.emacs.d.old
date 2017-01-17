@@ -87,3 +87,4 @@ pulled projectile https://github.com/bbatsov/projectile master -- 60b696ae9..cdf
 pulled yaml-mode https://github.com/yoshiki/yaml-mode v0.0.13 -- 210b0759d..2ace378be
 pulled cider https://github.com/clojure-emacs/cider v0.14.0 -- 89e6217a1..f3c396ff8
 pulled flycheck https://github.com/flycheck/flycheck 30 -- 4a08b2160..2995618b8
+pulled restclient https://github.com/pashky/restclient.el master -- 7dadac687..10671d044
