@@ -3,42 +3,42 @@
 maxframe provides the ability to maximize the emacs frame and stay within
 the display resolution.
 
-## How You Can Help
+---
 
-**If you like this project, please help. [Donate via Gittip][gittip] or [buy me a coffee with Bitcoin][bitcoin].**<br>
-[![Gittip](http://img.shields.io/gittip/rmm5t.svg)][gittip]
-[![Bitcoin](http://img.shields.io/badge/bitcoin-buy%20me%20a%20coffee-brightgreen.svg)][bitcoin]
+**How You Can Help**
 
-**[Bitcoin][bitcoin]**: `1rmm5tv6f997JK5bLcGbRCZyVjZUPkQ2m`<br>
-[![Bitcoin Donation][bitcoin-qr-small]][bitcoin-qr-big]
-
-## Need Help?
-
-**You can [book a session with me on Codementor][codementor].**<br>
+[![Square Cash](http://img.shields.io/badge/square%20cash-$rmm5t-brightgreen.svg)][square]
+[![Gratipay](http://img.shields.io/gratipay/rmm5t.svg)][gratipay]
 [![Book a Codementor session](http://img.shields.io/badge/codementor-book%20a%20session-orange.svg)][codementor]
 
-[gittip]: https://www.gittip.com/rmm5t/ "Donate to rmm5t for open source!"
-[bitcoin]: https://blockchain.info/address/1rmm5tv6f997JK5bLcGbRCZyVjZUPkQ2m "Buy rmm5t a coffee for open source!"
-[bitcoin-scheme]: bitcoin:1rmm5tv6f997JK5bLcGbRCZyVjZUPkQ2m?amount=0.01&label=Coffee%20to%20rmm5t%20for%20Open%20Source "Buy rmm5t a coffee for open source!"
-[bitcoin-qr-small]: http://chart.apis.google.com/chart?cht=qr&chs=150x150&chl=bitcoin%3A1rmm5tv6f997JK5bLcGbRCZyVjZUPkQ2m%3Famount%3D0.01%26label%3DCoffee%2520to%2520rmm5t%2520for%2520Open%2520Source
-[bitcoin-qr-big]: http://chart.apis.google.com/chart?cht=qr&chs=500x500&chl=bitcoin%3A1rmm5tv6f997JK5bLcGbRCZyVjZUPkQ2m%3Famount%3D0.01%26label%3DCoffee%2520to%2520rmm5t%2520for%2520Open%2520Source
+If you like this project, [buy me a coffee][square], [donate via Gratipay][gratipay], or [book a session with me on Codementor][codementor].
+
+Bitcoin: `1rmm5tv6f997JK5bLcGbRCZyVjZUPkQ2m`
+
+[square]: https://cash.me/$rmm5t "Donate to rmm5t for open source!"
+[gratipay]: https://gratipay.com/rmm5t/ "Donate to rmm5t for open source!"
+[bitcoin]: bitcoin:1rmm5tv6f997JK5bLcGbRCZyVjZUPkQ2m?amount=0.01&label=Coffee%20to%20rmm5t%20for%20Open%20Source "Buy rmm5t a coffee for open source!"
 [codementor]: https://www.codementor.io/rmm5t?utm_campaign=profile&utm_source=button-rmm5t&utm_medium=shields "Book a session with rmm5t on Codementor!"
 
 ## Usage
 
 Example of lines to be added to your .emacs:
 
-    (require 'maxframe)
-    (add-hook 'window-setup-hook 'maximize-frame t)
+```lisp
+(require 'maxframe)
+(add-hook 'window-setup-hook 'maximize-frame t)
+```
 
 If using two framebuffers (monitors), it might be necesssary to specify a
 mf-max-width value set to the pixel width of main framebuffer.  This is
 necessary because emacs does not yet support sniffing different
 framebuffers.  Example:
 
-    (require 'maxframe)
-    (setq mf-max-width 1600)  ;; Pixel width of main monitor.
-    (add-hook 'window-setup-hook 'maximize-frame t)
+```lisp
+(require 'maxframe)
+(setq mf-max-width 1600)  ;; Pixel width of main monitor.
+(add-hook 'window-setup-hook 'maximize-frame t)
+```
 
 To restore the frame to it's original dimensions, call restore-frame:
 
@@ -66,7 +66,7 @@ $ brew install emacs --srgb --cocoa
 ```
 
 See the relevant portion of
-[my emacs config](https://github.com/rmm5t/dotfiles/blob/master/emacs.d/rmm5t/maxframe.el)
+[my emacs config](https://github.com/rmm5t/dotfiles/blob/master/emacs.d/personal/maxframe.el)
 to see how to make the distinction between `ns-toggle-fullscreen` and
 `maxframe`.
 
