@@ -44,6 +44,7 @@
 (require 'ein-kernel)
 (require 'ein-kernelinfo)
 (require 'ein-cell)
+(require 'ein-cell-edit)
 (require 'ein-cell-output)
 (require 'ein-worksheet)
 (require 'ein-scratchsheet)
@@ -61,6 +62,30 @@
 ;;; Configuration
 
 (make-obsolete-variable 'ein:notebook-discard-output-on-save nil "0.2.0")
+
+(defcustom ein:notebook-autosave-frequency 60
+  "Sets the frequency (in seconds) at which the notebook is
+automatically saved.
+
+Autosaves are automatically enabled when a notebook is opened,
+but can be controlled manually via `ein:notebook-enable-autosave'
+and `ein:notebook-disable-autosave'.
+
+If this parameter is changed than you must call
+`ein:notebook-disable-autosave' and then
+`ein:notebook-enable-autosave' on all open notebooks for the
+changes to take effect.
+
+"
+  :type 'number
+  :group 'ein)
+
+(defcustom ein:notebook-create-checkpoint-on-save t
+  "If non-nil a checkpoint will be created every time the
+notebook is saved. Otherwise checkpoints must be created manually
+via `ein:notebook-create-checkpoint'."
+  :type 'boolean
+  :group 'ein)
 
 (defcustom ein:notebook-discard-output-on-save 'no
   "Configure if the output part of the cell should be saved or not.
@@ -206,6 +231,10 @@ Current buffer for these functions is set to the notebook buffer.")
 
 `ein:$notebook-api-version' : integer
    Major version of the IPython notebook server we are talking to.
+
+`ein:$notebook-checkpoints'
+  Names auto-saved checkpoints for content. Stored as a list
+  of (<id> . <last_modified>) pairs.
 "
   url-or-port
   notebook-id ;; In IPython-2.0 this is "[:path]/[:name].ipynb"
@@ -223,7 +252,8 @@ Current buffer for these functions is set to the notebook buffer.")
   worksheets
   scratchsheets
   api-version
-  )
+  autosave-timer
+  checkpoints)
 
 (ein:deflocal ein:%notebook% nil
   "Buffer local variable to store an instance of `ein:$notebook'.")
@@ -355,7 +385,7 @@ See `ein:notebook-open' for more information."
     (ein:log 'debug "Opening notebook at %s" path)
     (ein:content-query-contents path url-or-port nil
                                 (apply-partially #'ein:notebook-request-open-callback-with-callback
-                                                notebook callback cbargs))
+                                                 notebook callback cbargs))
     ;; (ein:query-singleton-ajax
     ;;  (list 'notebook-open url-or-port api-version path)
     ;;  url
@@ -396,8 +426,10 @@ See `ein:notebook-open' for more information."
                               (cons #'ein:notebook-buffer-list notebook)))
     (ein:notebook-put-opened-notebook notebook)
     (ein:notebook--check-nbformat (ein:$content-raw-content content))
+    (ein:notebook-enable-autosaves notebook)
     (ein:log 'info "Notebook %s is ready"
              (ein:$notebook-notebook-name notebook))))
+
 
 (defun ein:notebook--different-number (n1 n2)
   (and (numberp n1) (numberp n2) (not (= n1 n2))))
@@ -428,6 +460,34 @@ of minor mode."
 
 
 ;;; Initialization.
+
+(defun ein:notebook-enable-autosaves (notebook)
+  "Enable automatic, periodic saving for notebook."
+  (interactive
+   (let* ((notebook (or (ein:get-notebook)
+                        (completing-read
+                         "Select notebook [URL-OR-PORT/NAME]: "
+                         (ein:notebook-opened-buffer-names)))))
+     (list notebook)))
+  (if (stringp notebook)
+      (error "Fix me!")) ;; FIXME
+  (setf (ein:$notebook-autosave-timer notebook)
+        (run-at-time 0 ein:notebook-autosave-frequency #'ein:notebook-maybe-save-notebook notebook 0))
+  (ein:log 'info "Enabling autosaves for %s with frequency %s seconds."
+           (ein:$notebook-notebook-name notebook)
+           ein:notebook-autosave-frequency))
+
+(defun ein:notebook-disable-autosaves (notebook)
+  "Disable automatic, periodic saving for current notebook."
+  (interactive
+   (let* ((notebook (or (ein:get-notebook)
+                        (completing-read
+                         "Select notebook [URL-OR-PORT/NAME]: "
+                         (ein:notebook-opened-buffer-names)))))
+     (list notebook)))
+  (ein:log 'info "Disabling auto checkpoints for notebook %s" (ein:$notebook-notebook-name notebook))
+  (when (ein:$notebook-autosave-timer notebook)
+    (cancel-timer (ein:$notebook-autosave-timer notebook))))
 
 (defun ein:notebook-bind-events (notebook events)
   "Bind events related to PAGER to the event handler EVENTS."
@@ -462,7 +522,8 @@ of minor mode."
 "
   name
   resources
-  spec)
+  spec
+  language)
 
 (defvar ein:available-kernelspecs (make-hash-table))
 
@@ -477,6 +538,9 @@ of minor mode."
                   (intern (format ":%s" name))
                 name)))
     (plist-get kernelspecs name)))
+
+(defun ein:get-kernelspec-language (kernelspec)
+  (plist-get (ein:$kernelspec-spec kernelspec) :language))
 
 (defun ein:list-available-kernels (url-or-port)
   (let ((kernelspecs (gethash url-or-port ein:available-kernelspecs)))
@@ -500,21 +564,38 @@ on server url/port."
 
 (defun* ein:query-kernelspecs-success (url-or-port &key data &allow-other-keys)
   (let ((ks (list :default  (plist-get data :default)))
-	(specs (ein:plist-iter (plist-get data :kernelspecs))))
+        (specs (ein:plist-iter (plist-get data :kernelspecs))))
     (setf (gethash url-or-port ein:available-kernelspecs)
-	  (ein:flatten (dolist (spec specs ks)
-			 (let ((name (car spec))
-			       (info (cdr spec)))
-			   (push (list name (make-ein:$kernelspec :name (plist-get info :name)
-								  :resources (plist-get info :resources)
-								  :spec (plist-get info :spec)))
-				 ks)))))))
+          (ein:flatten (dolist (spec specs ks)
+                         (let ((name (car spec))
+                               (info (cdr spec)))
+                           (push (list name (make-ein:$kernelspec :name (plist-get info :name)
+                                                                  :resources (plist-get info :resources)
+                                                                  :spec (plist-get info :spec)))
+                                 ks)))))))
 
 (defun* ein:query-kernelspecs-error (&key symbol-status response &allow-other-keys)
   (ein:log 'verbose
     "Error thrown: %S" (request-response-error-thrown response))
   (ein:log 'error
     "Kernelspc query call failed with status %s." symbol-status))
+
+(defun ein:notebook-switch-kernel (notebook kernel-name)
+  "Change the kernel for a running notebook. If not called from a
+notebook buffer then the user will be prompted to select an opened notebook."
+  (interactive
+   (let* ((notebook (or (ein:get-notebook)
+                        (completing-read
+                         "Select notebook [URL-OR-PORT/NAME]: "
+                         (ein:notebook-opened-buffer-names))))
+          (kernel-name (completing-read
+                        "Select kernel: "
+                        (ein:list-available-kernels (ein:$notebook-url-or-port notebook)))))
+     (list notebook kernel-name)))
+  (setf (ein:$notebook-kernelspec notebook) (ein:get-kernelspec (ein:$notebook-url-or-port notebook)
+                                                                kernel-name))
+  (ein:log 'info "Restarting notebook %s with new kernel %s." (ein:$notebook-notebook-name notebook) kernel-name)
+  (ein:notebook-restart-kernel notebook))
 
 ;;; This no longer works in iPython-2.0. Protocol is to create a session for a
 ;;; notebook, which will automatically create and associate a kernel with the notebook.
@@ -702,6 +783,7 @@ This is equivalent to do ``C-c`` in the console program."
          (ws-cells (mapcar (lambda (data) (ein:cell-from-json data)) cells))
          (worksheet (ein:notebook--worksheet-new notebook)))
     (oset worksheet :saved-cells ws-cells)
+    ;(mapcar (lambda (data) (message "test %s" (oref data :metadata))) ws-cells)
     (list worksheet)))
 
 (defun ein:notebook-to-json (notebook)
@@ -728,7 +810,7 @@ This is equivalent to do ``C-c`` in the console program."
       )))
 
 (defun ein:write-nbformat4-worksheets (notebook)
-  (ein:log 'info "Writing notebook %s as nbformat 4." (ein:$notebook-notebook-name notebook))
+  (ein:log 'verbose "Writing notebook %s as nbformat 4." (ein:$notebook-notebook-name notebook))
   (let ((all-cells (loop for ws in (ein:$notebook-worksheets notebook)
                          for i from 0
                          append (ein:worksheet-to-nb4-json ws i))))
@@ -741,7 +823,16 @@ This is equivalent to do ``C-c`` in the console program."
     `((metadata . ,(ein:aif (ein:$notebook-metadata notebook)
                        it
                      (make-hash-table)))
-      (cells . ,(apply #'vector all-cells)))))
+      (cells . ,(apply #'vector all-cells)))
+
+    ))
+
+(defun ein:notebook-maybe-save-notebook (notebook retry &optional callback cbargs)
+  (if (cl-some #'(lambda (ws)
+                   (buffer-modified-p
+                    (ein:worksheet-buffer ws)))
+               (ein:$notebook-worksheets notebook))
+      (ein:notebook-save-notebook notebook retry callback cbargs)))
 
 (defun ein:notebook-save-notebook (notebook retry &optional callback cbargs)
   (let ((content (ein:content-from-notebook notebook)))
@@ -750,8 +841,8 @@ This is equivalent to do ``C-c`` in the console program."
     (ein:content-save content
                       #'ein:notebook-save-notebook-success
                       (list notebook callback cbargs)
-		      #'ein:notebook-save-notebook-error
-		      (list notebook))))
+                      #'ein:notebook-save-notebook-error
+                      (list notebook))))
 
 (defun ein:notebook-save-notebook-command ()
   "Save the notebook."
@@ -784,14 +875,17 @@ This is equivalent to do ``C-c`` in the console program."
           response-status ein:notebook-save-retry-max)))))
 
 (defun ein:notebook-save-notebook-success (notebook &rest ignore)
-  (ein:log 'info "Notebook is saved.")
+  (ein:log 'verbose "Notebook is saved.")
   (setf (ein:$notebook-dirty notebook) nil)
   (mapc (lambda (ws)
           (ein:worksheet-save-cells ws) ; [#]_
           (ein:worksheet-set-modified-p ws nil))
         (ein:$notebook-worksheets notebook))
   (ein:events-trigger (ein:$notebook-events notebook)
-                      'notebook_saved.Notebook))
+                      'notebook_saved.Notebook)
+  (when ein:notebook-create-checkpoint-on-save
+    (ein:notebook-create-checkpoint notebook)))
+
 ;; .. [#] Consider the following case.
 ;;    (1) Open worksheet WS0 and other worksheets.
 ;;    (2) Edit worksheet WS0 then save the notebook.
@@ -860,6 +954,61 @@ as usual."
       (if (ein:kernel-live-p kernel)
           (ein:kernel-kill kernel #'ein:notebook-close (list ein:%notebook%))
         (ein:notebook-close ein:%notebook%)))))
+
+(defun ein:fast-content-from-notebook (notebook)
+  "Quickly generate a basic content structure from notebook. This
+function does not generate the full json representation of the
+notebook worksheets."
+  (make-ein:$content :name (ein:$notebook-notebook-name notebook)
+                     :path (ein:$notebook-notebook-path notebook)
+                     :url-or-port (ein:$notebook-url-or-port notebook)
+                     :type "notebook"
+                     :ipython-version (ein:$notebook-api-version notebook)))
+
+(defun ein:notebook-create-checkpoint (notebook)
+  "Create checkpoint for current notebook based on most recent save."
+  (interactive
+   (let* ((notebook (ein:get-notebook)))
+     (list notebook)))
+  (ein:events-trigger (ein:$notebook-events notebook)
+                      'notebook_create_checkpoint.Notebook)
+  (ein:content-create-checkpoint (ein:fast-content-from-notebook notebook)
+                                 (lexical-let ((notebook notebook))
+                                   #'(lambda (content)
+                                       (ein:log 'verbose "Checkpoint %s for %s generated."
+                                                (plist-get (first (ein:$content-checkpoints content)) :id)
+                                                (ein:$notebook-notebook-name notebook))
+                                       (ein:events-trigger (ein:$notebook-events notebook)
+                                                           'notebook_checkpoint_created.Notebook)
+                                       (setf (ein:$notebook-checkpoints notebook)
+                                             (ein:$content-checkpoints content))))))
+
+(defun ein:notebook-list-checkpoint-ids (notebook)
+  (unless (ein:$notebook-checkpoints notebook)
+    (ein:content-query-checkpoints (ein:fast-content-from-notebook notebook)
+                                   (lexical-let ((notebook notebook))
+                                     #'(lambda (content)
+                                         (setf (ein:$notebook-checkpoints notebook)
+                                               (ein:$content-checkpoints content)))))
+    (sleep-for 0.5))
+  (loop for cp in (ein:$notebook-checkpoints notebook)
+        collecting (plist-get cp :last_modified)))
+
+(defun ein:notebook-restore-to-checkpoint (notebook checkpoint)
+  "Restore notebook to previous checkpoint saved on the Jupyter
+server. Note that if there are multiple checkpoints the user will
+be prompted on which one to use."
+  (interactive
+   (let* ((notebook (ein:get-notebook))
+          (checkpoint (completing-read
+                       "Select checkpoint: "
+                       (ein:notebook-list-checkpoint-ids notebook))))
+     (list notebook checkpoint)))
+  (ein:content-restore-checkpoint (ein:fast-content-from-notebook notebook)
+                                  checkpoint)
+  (ein:notebook-close notebook)
+  (ein:notebook-open (ein:$notebook-url-or-port notebook)
+                     (ein:$notebook-notebook-path notebook)))
 
 
 ;;; Worksheet
@@ -1248,6 +1397,8 @@ This hook is run regardless the actual major mode used."
 (defvar ein:notebook-mode-map (make-sparse-keymap))
 
 (let ((map ein:notebook-mode-map))
+  (define-key map "\C-c'" 'ein:edit-cell-contents)
+  (define-key map "\C-cS" 'ein:worksheet-toggle-slideshow-view)
   (define-key map "\C-c\C-c" 'ein:worksheet-execute-cell)
   (define-key map (kbd "M-RET") 'ein:worksheet-execute-cell-and-goto-next)
   (define-key map (kbd "<M-S-return>")
@@ -1265,6 +1416,7 @@ This hook is run regardless the actual major mode used."
   (define-key map "\C-c\C-a" 'ein:worksheet-insert-cell-above)
   (define-key map "\C-c\C-b" 'ein:worksheet-insert-cell-below)
   (define-key map "\C-c\C-t" 'ein:worksheet-toggle-cell-type)
+  (define-key map "\C-c\C-d" 'ein:worksheet-toggle-slide-type)
   (define-key map "\C-c\C-u" 'ein:worksheet-change-cell-type)
   (define-key map "\C-c\C-s" 'ein:worksheet-split-cell-at-point)
   (define-key map "\C-c\C-m" 'ein:worksheet-merge-cell)
@@ -1326,6 +1478,7 @@ This hook is run regardless the actual major mode used."
             ("Insert cell above" ein:worksheet-insert-cell-above)
             ("Insert cell below" ein:worksheet-insert-cell-below)
             ("Toggle cell type" ein:worksheet-toggle-cell-type)
+            ("Toggle slide type" ein:worksheet-toggle-slide-type)
             ("Change cell type" ein:worksheet-change-cell-type)
             ("Split cell at point" ein:worksheet-split-cell-at-point)
             ("Merge cell" ein:worksheet-merge-cell)
@@ -1381,10 +1534,12 @@ This hook is run regardless the actual major mode used."
       ("Kernel"
        ,@(ein:generate-menu
           '(("Restart kernel" ein:notebook-restart-kernel-command)
+            ("Switch kernel" ein:notebook-switch-kernel)
             ("Interrupt kernel" ein:notebook-kernel-interrupt-command))))
       ("Worksheets [Experimental]"
        ,@(ein:generate-menu
-          '(("Rename worksheet" ein:worksheet-rename-sheet)
+          '(("Toggle slide metadata view" ein:worksheet-toggle-slideshow-view)
+            ("Rename worksheet" ein:worksheet-rename-sheet)
             ("Insert next worksheet"
              ein:notebook-worksheet-insert-next)
             ("Insert previous worksheet"
@@ -1464,7 +1619,9 @@ Note that print page is not supported in IPython 0.12.1."
   (interactive "P")
   (let ((url (apply #'ein:url
                     (ein:$notebook-url-or-port ein:%notebook%)
-                    (ein:$notebook-notebook-id ein:%notebook%)
+                    (if (>= (ein:$notebook-api-version ein:%notebook%) 3)
+                        "notebooks")
+                    (ein:$notebook-notebook-path ein:%notebook%)
                     (if print (list "print")))))
     (message "Opening %s in browser" url)
     (browse-url url)))
@@ -1549,6 +1706,7 @@ Called via `kill-emacs-query-functions'."
 (defun ein:notebook-kill-buffer-callback ()
   "Call notebook destructor.  This function is called via `kill-buffer-hook'."
   (when (ein:$notebook-p ein:%notebook%)
+    (ein:notebook-disable-autosaves ein:%notebook%)
     (ein:notebook-close-worksheet ein:%notebook% ein:%worksheet%)))
 
 (defun ein:notebook-setup-kill-buffer-hook ()
