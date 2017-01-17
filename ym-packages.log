@@ -81,3 +81,4 @@ pulled sql-indent https://github.com/bsvingen/sql-indent master -- f85bc9153..76
 pulled company-quickhelp https://github.com/expez/company-quickhelp 2.0.0 -- 39e206f77..c0aaa5b14
 pulled pos-tip https://github.com/pitkali/pos-tip master -- 051e08f
 pulled emacs-websocket https://github.com/ahyatt/emacs-websocket master -- 567555360..fbd9e2263
+pulled emacs-request https://github.com/tkf/emacs-request master -- efbe23134..e2b031a4e
