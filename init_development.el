@@ -299,6 +299,7 @@
 (add-to-list 'auto-mode-alist '("\\.cljx\\'" . clojure-mode))
 (require 'queue)
 (require 'cider)
+;; (setq cider-cljs-lein-repl "(do (use 'figwheel-sidecar.repl-api) (start-figwheel!) (cljs-repl))")
 ;; -------------------------------------------------------------------
 (require 'yaml-mode)
 ;; -------------------------------------------------------------------
