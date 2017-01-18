@@ -1,6 +1,6 @@
 ;;; test-helper.el --- Clojure Mode: Non-interactive unit-test setup  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2014  Bozhidar Batsov <bozhidar@batsov.com>
+;; Copyright (C) 2014-2016 Bozhidar Batsov <bozhidar@batsov.com>
 
 ;; This file is not part of GNU Emacs.
 
@@ -32,8 +32,20 @@
   ;; Load the file under test
   (load (expand-file-name "clojure-mode" source-directory)))
 
-;; Local Variables:
-;; indent-tabs-mode: nil
-;; End:
+(defmacro def-refactor-test (name before after &rest body)
+  (declare (indent 3))
+  `(progn
+     (put ',name 'definition-name ',name)
+     (ert-deftest ,name ()
+       (let ((clojure-thread-all-but-last nil)
+             (clojure-use-metadata-for-privacy nil))
+         (with-temp-buffer
+           (insert ,before)
+           (clojure-mode)
+           ,@body
+           (should (equal ,(concat "\n" after)
+                          (concat "\n" (buffer-substring-no-properties
+                                        (point-min) (point-max))))))))))
+
 
 ;;; test-helper.el ends here
