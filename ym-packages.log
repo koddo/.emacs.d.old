@@ -103,3 +103,4 @@ pulled emacs-quickrun https://github.com/syohex/emacs-quickrun master -- 18b93d8
 pulled ibuffer-vc https://github.com/purcell/ibuffer-vc master -- ef61ad6fd..de75fb334
 pulled markdown-mode https://github.com/jrblevin/markdown-mode stable -- c560ddd..c6eb56e
 added spinner https://github.com/Malabarba/spinner.el master -- 0637791f0
+pulled clojure-mode https://github.com/clojure-emacs/clojure-mode 5.6.1 -- cad8228f0..fdbdfb91e
