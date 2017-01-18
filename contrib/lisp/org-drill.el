@@ -1,9 +1,27 @@
-;;; -*- coding: utf-8-unix -*-
+;; -*- coding: utf-8-unix -*-
 ;;; org-drill.el - Self-testing using spaced repetition
 ;;;
+;;; Copyright (C) 2010-2015  Paul Sexton
+;;;
 ;;; Author: Paul Sexton <eeeickythump@gmail.com>
-;;; Version: 2.4.4
+;;; Version: 2.4.7
+;;; Keywords: flashcards, memory, learning, memorization
 ;;; Repository at http://bitbucket.org/eeeickythump/org-drill/
+;;;
+;;; This file is not part of GNU Emacs.
+;;;
+;;; This program is free software; you can redistribute it and/or modify
+;;; it under the terms of the GNU General Public License as published by
+;;; the Free Software Foundation, either version 3 of the License, or
+;;; (at your option) any later version.
+;;;
+;;; This program is distaributed in the hope that it will be useful,
+;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;; GNU General Public License for more details.
+;;;
+;;; You should have received a copy of the GNU General Public License
+;;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;
 ;;;
 ;;; Synopsis
@@ -31,6 +49,7 @@
 (require 'org)
 (require 'org-id)
 (require 'org-learn)
+(require 'savehist)
 
 
 (defgroup org-drill nil
@@ -203,6 +222,8 @@ during a drill session."
                     face default
                     window t))
 
+(add-hook 'org-font-lock-set-keywords-hook 'org-drill-add-cloze-fontification)
+
 
 (defvar org-drill-hint-separator "||"
   "String which, if it occurs within a cloze expression, signifies that the
@@ -231,6 +252,23 @@ the hidden cloze during a test.")
 
 (defvar-local org-drill-cloze-keywords
   (org-drill--compute-cloze-keywords))
+
+
+;; Variables defining what keys can be pressed during drill sessions to quit the
+;; session, edit the item, etc.
+(defvar org-drill--quit-key ?q
+  "If this character is pressed during a drill session, quit the session.")
+(defvar org-drill--edit-key ?e
+  "If this character is pressed during a drill session, suspend the session
+with the cursor at the current item..")
+(defvar org-drill--help-key ??
+  "If this character is pressed during a drill session, show help.")
+(defvar org-drill--skip-key ?s
+  "If this character is pressed during a drill session, skip to the next
+item.")
+(defvar org-drill--tags-key ?t
+  "If this character is pressed during a drill session, edit the tags for
+the current item.")
 
 
 (defcustom org-drill-card-type-alist
@@ -349,16 +387,37 @@ Available choices are:
 
 (defcustom org-drill-optimal-factor-matrix
   nil
-  "DO NOT CHANGE THE VALUE OF THIS VARIABLE.
-
-Persistent matrix of optimal factors, used by the SuperMemo SM5 algorithm.
-The matrix is saved (using the 'customize' facility) at the end of each
-drill session.
-
-Over time, values in the matrix will adapt to the individual user's
-pace of learning."
+  "Obsolete and will be removed in future. The SM5 optimal factor
+matrix data is now stored in the variable
+`org-drill-sm5-optimal-factor-matrix'."
   :group 'org-drill
   :type 'sexp)
+
+
+(defvar org-drill-sm5-optimal-factor-matrix
+  nil
+  "DO NOT CHANGE THE VALUE OF THIS VARIABLE.
+
+Persistent matrix of optimal factors, used by the SuperMemo SM5
+algorithm. The matrix is saved at the end of each drill session.
+
+Over time, values in the matrix will adapt to the individual user's
+pace of learning.")
+
+
+(add-to-list 'savehist-additional-variables
+             'org-drill-sm5-optimal-factor-matrix)
+(unless savehist-mode
+  (savehist-mode 1))
+
+
+(defun org-drill--transfer-optimal-factor-matrix ()
+  (if (and org-drill-optimal-factor-matrix
+           (null org-drill-sm5-optimal-factor-matrix))
+      (setq org-drill-sm5-optimal-factor-matrix
+            org-drill-optimal-factor-matrix)))
+
+(add-hook 'after-init-hook 'org-drill--transfer-optimal-factor-matrix)
 
 
 (defcustom org-drill-sm5-initial-interval
@@ -512,6 +571,11 @@ for review unless they were already reviewed in the recent past?")
   '("LEARN_DATA" "DRILL_LAST_INTERVAL" "DRILL_REPEATS_SINCE_FAIL"
     "DRILL_TOTAL_REPEATS" "DRILL_FAILURE_COUNT" "DRILL_AVERAGE_QUALITY"
     "DRILL_EASE" "DRILL_LAST_QUALITY" "DRILL_LAST_REVIEWED"))
+(defvar org-drill--lapse-very-overdue-entries-p nil
+  "If non-nil, entries more than 90 days overdue are regarded as 'lapsed'.
+This means that when the item is eventually re-tested it will be
+treated as 'failed' (quality 2) for rescheduling purposes,
+regardless of whether the test was successful.")
 
 
 ;;; Make the above settings safe as file-local variables.
@@ -974,7 +1038,7 @@ Returns a list: (INTERVAL REPEATS EF FAILURES MEAN TOTAL-REPEATS OFMATRIX), wher
       ;; When an item is failed, its interval is reset to 0,
       ;; but its EF is unchanged
       (list -1 1 ef (1+ failures) meanq (1+ total-repeats)
-            org-drill-optimal-factor-matrix)
+            org-drill-sm5-optimal-factor-matrix)
     ;; else:
     (let* ((next-ef (modify-e-factor ef quality))
            (interval
@@ -998,7 +1062,7 @@ Returns a list: (INTERVAL REPEATS EF FAILURES MEAN TOTAL-REPEATS OFMATRIX), wher
             (1+ n)
             next-ef
             failures meanq (1+ total-repeats)
-            org-drill-optimal-factor-matrix))))
+            org-drill-sm5-optimal-factor-matrix))))
 
 
 ;;; SM5 Algorithm =============================================================
@@ -1020,7 +1084,7 @@ Returns a list: (INTERVAL REPEATS EF FAILURES MEAN TOTAL-REPEATS OFMATRIX), wher
 
 (defun inter-repetition-interval-sm5 (last-interval n ef &optional of-matrix)
   (let ((of (get-optimal-factor-sm5 n ef (or of-matrix
-                                             org-drill-optimal-factor-matrix))))
+                                             org-drill-sm5-optimal-factor-matrix))))
     (if (= 1 n)
         of
       (* of last-interval))))
@@ -1034,7 +1098,7 @@ Returns a list: (INTERVAL REPEATS EF FAILURES MEAN TOTAL-REPEATS OFMATRIX), wher
   (assert (> n 0))
   (assert (and (>= quality 0) (<= quality 5)))
   (unless of-matrix
-    (setq of-matrix org-drill-optimal-factor-matrix))
+    (setq of-matrix org-drill-sm5-optimal-factor-matrix))
   (setq of-matrix (cl-copy-tree of-matrix))
 
   (setq meanq (if meanq
@@ -1198,9 +1262,9 @@ See the documentation for `org-drill-get-item-data' for a description of these."
   "If DAYS-AHEAD is supplied it must be a positive integer. The
 item will be scheduled exactly this many days into the future."
   (let ((delta-days (- (time-to-days (current-time))
-                   (time-to-days (or (org-get-scheduled-time (point))
-                                     (current-time)))))
-        (ofmatrix org-drill-optimal-factor-matrix)
+                       (time-to-days (or (org-get-scheduled-time (point))
+                                         (current-time)))))
+        (ofmatrix org-drill-sm5-optimal-factor-matrix)
         ;; Entries can have weights, 1 by default. Intervals are divided by the
         ;; item's weight, so an item with a weight of 2 will have all intervals
         ;; halved, meaning you will end up reviewing it twice as often.
@@ -1239,7 +1303,7 @@ item will be scheduled exactly this many days into the future."
                                    total-repeats meanq ease)
 
         (if (eql 'sm5 org-drill-spaced-repetition-algorithm)
-            (setq org-drill-optimal-factor-matrix new-ofmatrix))
+            (setq org-drill-sm5-optimal-factor-matrix new-ofmatrix))
 
         (cond
          ((= 0 days-ahead)
@@ -1269,7 +1333,7 @@ of QUALITY."
             (sm5 (determine-next-interval-sm5 last-interval repetitions
                                               ease quality failures
                                               meanq total-repeats
-                                              org-drill-optimal-factor-matrix))
+                                              org-drill-sm5-optimal-factor-matrix))
             (sm2 (determine-next-interval-sm2 last-interval repetitions
                                               ease quality failures
                                               meanq total-repeats))
@@ -1299,11 +1363,19 @@ of QUALITY."
   "Returns quality rating (0-5), or nil if the user quit."
   (let ((ch nil)
         (input nil)
-        (next-review-dates (org-drill-hypothetical-next-review-dates)))
+        (next-review-dates (org-drill-hypothetical-next-review-dates))
+        (key-prompt (format "(0-5, %c=help, %c=edit, %c=tags, %c=quit)"
+                            org-drill--help-key
+                            org-drill--edit-key
+                            org-drill--tags-key
+                            org-drill--quit-key)))
     (save-excursion
-      (while (not (memq ch '(?q ?e ?0 ?1 ?2 ?3 ?4 ?5)))
+      (while (not (memq ch (list org-drill--quit-key
+                                 org-drill--edit-key
+                                 7          ; C-g
+                                 ?0 ?1 ?2 ?3 ?4 ?5)))
         (setq input (read-key-sequence
-                     (if (eq ch ??)
+                     (if (eq ch org-drill--help-key)
                          (format "0-2 Means you have forgotten the item.
 3-5 Means you have remembered the item.
 
@@ -1314,11 +1386,12 @@ of QUALITY."
 4 - After a little bit of thought you remembered. (+%s days)
 5 - You remembered the item really easily. (+%s days)
 
-How well did you do? (0-5, ?=help, e=edit, t=tags, q=quit)"
+How well did you do? %s"
                                  (round (nth 3 next-review-dates))
                                  (round (nth 4 next-review-dates))
-                                 (round (nth 5 next-review-dates)))
-                       "How well did you do? (0-5, ?=help, e=edit, t=tags, q=quit)")))
+                                 (round (nth 5 next-review-dates))
+                                 key-prompt)
+                       (format "How well did you do? %s" key-prompt))))
         (cond
          ((stringp input)
           (setq ch (elt input 0)))
@@ -1335,7 +1408,7 @@ How well did you do? (0-5, ?=help, e=edit, t=tags, q=quit)"
           (case (car (elt input 0))
             (wheel-up (ignore-errors (mwheel-scroll (elt input 0))))
             (wheel-down (ignore-errors (mwheel-scroll (elt input 0)))))))
-        (if (eql ch ?t)
+        (if (eql ch org-drill--tags-key)
             (org-set-tags-command))))
     (cond
      ((and (>= ch ?0) (<= ch ?5))
@@ -1366,7 +1439,7 @@ How well did you do? (0-5, ?=help, e=edit, t=tags, q=quit)"
           (org-set-property "DRILL_LAST_REVIEWED"
                             (time-to-inactive-org-timestamp (current-time))))
         quality))
-     ((= ch ?e)
+     ((= ch org-drill--edit-key)
       'edit)
      (t
       nil))))
@@ -1437,8 +1510,12 @@ the current topic."
               (apply 'format
                      (first fmt-and-args)
                      (rest fmt-and-args))
-            (concat "Press key for answer, "
-                    "e=edit, t=tags, s=skip, q=quit."))))
+            (format (concat "Press key for answer, "
+                            "%c=edit, %c=tags, %c=skip, %c=quit.")
+                    org-drill--edit-key
+                    org-drill--tags-key
+                    org-drill--skip-key
+                    org-drill--quit-key))))
     (setq prompt
           (format "%s %s %s %s %s %s"
                   (propertize
@@ -1484,7 +1561,7 @@ You seem to be having a lot of trouble memorising this item.
 Consider reformulating the item to make it easier to remember.\n"
                                   'face '(:foreground "red"))
                       prompt)))
-    (while (memq ch '(nil ?t))
+    (while (memq ch '(nil org-drill--tags-key))
       (setq ch nil)
       (while (not (input-pending-p))
         (let ((elapsed (time-subtract (current-time) item-start-time)))
@@ -1495,12 +1572,12 @@ Consider reformulating the item to make it easier to remember.\n"
           (sit-for 1)))
       (setq input (read-key-sequence nil))
       (if (stringp input) (setq ch (elt input 0)))
-      (if (eql ch ?t)
+      (if (eql ch org-drill--tags-key)
           (org-set-tags-command)))
     (case ch
-      (?q nil)
-      (?e 'edit)
-      (?s 'skip)
+      (org-drill--quit-key nil)
+      (org-drill--edit-key 'edit)
+      (org-drill--skip-key 'skip)
       (otherwise t))))
 
 
@@ -1708,7 +1785,9 @@ Note: does not actually alter the item."
     (org-back-to-heading t)
     (let ((lim (save-excursion
                  (outline-next-heading) (point))))
-      (org-end-of-meta-data-and-drawers)
+      (if (fboundp 'org-end-of-meta-data-and-drawers)
+          (org-end-of-meta-data-and-drawers) ; function removed Feb 2015
+        (org-end-of-meta-data t))
       (or (>= (point) lim)
           (null (re-search-forward "[[:graph:]]" lim t))))))
 
@@ -2402,14 +2481,13 @@ all the markers used by Org-Drill will be freed."
 ;;; where POS is a marker pointing to the start of the entry, and
 ;;; DUE is a number indicating how many days ago the entry was due.
 ;;; AGE is the number of days elapsed since item creation (nil if unknown).
-;;; if age > 60, sort by age (oldest first)
-;;; if age < 60, sort by due (biggest first)
+;;; if age > lapse threshold (default 90), sort by age (oldest first)
+;;; if age < lapse threshold, sort by due (biggest first)
 
-;;; if (age a) <= 60 and (age b) <= 60, sort by due
-;;; else sort by age
 
 (defun org-drill-order-overdue-entries (overdue-data)
-  (let* ((lapsed-days 60)
+  (let* ((lapsed-days (if org-drill--lapse-very-overdue-entries-p
+                          90 most-positive-fixnum))
          (not-lapsed (remove-if (lambda (a) (> (or (second a) 0) lapsed-days))
                                 overdue-data))
          (lapsed (remove-if-not (lambda (a) (> (or (second a) 0)
@@ -2424,8 +2502,9 @@ all the markers used by Org-Drill will be freed."
 
 
 (defun org-drill--entry-lapsed-p ()
-  (let ((lapsed-days 60))
-    (> (or (org-drill-entry-days-overdue) 0) lapsed-days)))
+  (let ((lapsed-days 90))
+    (and org-drill--lapse-very-overdue-entries-p
+         (> (or (org-drill-entry-days-overdue) 0) lapsed-days))))
 
 
 
@@ -2510,11 +2589,55 @@ STATUS is one of the following values:
            (sym1 (if (oddp (floor scanned (* 50 meter-width))) ?| ?.))
            (sym2 (if (eql sym1 ?.) ?| ?.)))
       (message "Collecting due drill items:%4d %s%s"
-              collected
-              (make-string (% (ceiling scanned 50) meter-width)
-                           sym2)
-              (make-string (- meter-width (% (ceiling scanned 50) meter-width))
-                           sym1)))))
+               collected
+               (make-string (% (ceiling scanned 50) meter-width)
+                            sym2)
+               (make-string (- meter-width (% (ceiling scanned 50) meter-width))
+                            sym1)))))
+
+
+(defun org-map-drill-entry-function ()
+  (org-drill-progress-message
+   (+ (length *org-drill-new-entries*)
+      (length *org-drill-overdue-entries*)
+      (length *org-drill-young-mature-entries*)
+      (length *org-drill-old-mature-entries*)
+      (length *org-drill-failed-entries*))
+   (incf cnt))
+  (cond
+   ((not (org-drill-entry-p))
+    nil)               ; skip
+   (t
+    (when (and (not warned-about-id-creation)
+               (null (org-id-get)))
+      (message (concat "Creating unique IDs for items "
+                       "(slow, but only happens once)"))
+      (sit-for 0.5)
+      (setq warned-about-id-creation t))
+    (org-id-get-create) ; ensure drill entry has unique ID
+    (destructuring-bind (status due age)
+        (org-drill-entry-status)
+      (case status
+        (:unscheduled
+         (incf *org-drill-dormant-entry-count*))
+        ;; (:tomorrow
+        ;;  (incf *org-drill-dormant-entry-count*)
+        ;;  (incf *org-drill-due-tomorrow-count*))
+        (:future
+         (incf *org-drill-dormant-entry-count*)
+         (if (eq -1 due)
+             (incf *org-drill-due-tomorrow-count*)))
+        (:new
+         (push (point-marker) *org-drill-new-entries*))
+        (:failed
+         (push (point-marker) *org-drill-failed-entries*))
+        (:young
+         (push (point-marker) *org-drill-young-mature-entries*))
+        (:overdue
+         (push (list (point-marker) due age) overdue-data))
+        (:old
+         (push (point-marker) *org-drill-old-mature-entries*))
+        )))))
 
 
 (defun org-drill (&optional scope drill-match resume-p)
@@ -2590,48 +2713,7 @@ work correctly with older versions of org mode. Your org mode version (%s) appea
               (let ((org-trust-scanner-tags t)
                     (warned-about-id-creation nil))
                 (org-map-drill-entries
-                 (lambda ()
-                   (org-drill-progress-message
-                    (+ (length *org-drill-new-entries*)
-                       (length *org-drill-overdue-entries*)
-                       (length *org-drill-young-mature-entries*)
-                       (length *org-drill-old-mature-entries*)
-                       (length *org-drill-failed-entries*))
-                    (incf cnt))
-                   (cond
-                    ((not (org-drill-entry-p))
-                     nil)               ; skip
-                    (t
-                     (when (and (not warned-about-id-creation)
-                                (null (org-id-get)))
-                       (message (concat "Creating unique IDs for items "
-                                        "(slow, but only happens once)"))
-                       (sit-for 0.5)
-                       (setq warned-about-id-creation t))
-                     (org-id-get-create) ; ensure drill entry has unique ID
-                     (destructuring-bind (status due age)
-                         (org-drill-entry-status)
-                       (case status
-                         (:unscheduled
-                          (incf *org-drill-dormant-entry-count*))
-                         ;; (:tomorrow
-                         ;;  (incf *org-drill-dormant-entry-count*)
-                         ;;  (incf *org-drill-due-tomorrow-count*))
-                         (:future
-                          (incf *org-drill-dormant-entry-count*)
-                          (if (eq -1 due)
-                              (incf *org-drill-due-tomorrow-count*)))
-                         (:new
-                          (push (point-marker) *org-drill-new-entries*))
-                         (:failed
-                          (push (point-marker) *org-drill-failed-entries*))
-                         (:young
-                          (push (point-marker) *org-drill-young-mature-entries*))
-                         (:overdue
-                          (push (list (point-marker) due age) overdue-data))
-                         (:old
-                          (push (point-marker) *org-drill-old-mature-entries*))
-                         )))))
+                 'org-map-drill-entry-function
                  scope drill-match)
                 (org-drill-order-overdue-entries overdue-data)
                 (setq *org-drill-overdue-entry-count*
@@ -2674,9 +2756,7 @@ work correctly with older versions of org mode. Your org mode version (%s) appea
 
 
 (defun org-drill-save-optimal-factor-matrix ()
-  (message "Saving optimal factor matrix...")
-  (customize-save-variable 'org-drill-optimal-factor-matrix
-                           org-drill-optimal-factor-matrix))
+  (savehist-autosave))
 
 
 (defun org-drill-cram (&optional scope drill-match)
@@ -2787,7 +2867,6 @@ values as `org-drill-scope'."
     (add-to-list 'org-font-lock-extra-keywords
                  (first org-drill-cloze-keywords))))
 
-(add-hook 'org-font-lock-set-keywords-hook 'org-drill-add-cloze-fontification)
 
 ;; Can't add to org-mode-hook, because local variables won't have been loaded
 ;; yet.

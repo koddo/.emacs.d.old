@@ -41,41 +41,66 @@
 
 (require 'org)
 
+;; customisable notmuch open functions
+(defcustom org-notmuch-open-function
+  'org-notmuch-follow-link
+  "Function used to follow notmuch links.
+
+Should accept a notmuch search string as the sole argument."
+  :group 'org-notmuch
+  :version "24.4"
+  :package-version '(Org . "8.0")
+  :type 'function)
+
+(defcustom org-notmuch-search-open-function
+  'org-notmuch-search-follow-link
+  "Function used to follow notmuch-search links.
+
+Should accept a notmuch search string as the sole argument."
+  :group 'org-notmuch
+  :version "24.4"
+  :package-version '(Org . "8.0")
+  :type 'function)
+
+
+
 ;; Install the link type
-(org-add-link-type "notmuch" 'org-notmuch-open)
-(add-hook 'org-store-link-functions 'org-notmuch-store-link)
+(org-link-set-parameters "notmuch"
+			 :follow #'org-notmuch-open
+			 :store #'org-notmuch-store-link)
 
 (defun org-notmuch-store-link ()
   "Store a link to a notmuch search or message."
   (when (eq major-mode 'notmuch-show-mode)
-    (let* ((message-id (notmuch-show-get-prop :id))
+    (let* ((message-id (notmuch-show-get-message-id t))
 	   (subject (notmuch-show-get-subject))
 	   (to (notmuch-show-get-to))
 	   (from (notmuch-show-get-from))
+	   (date (org-trim (notmuch-show-get-date)))
 	   desc link)
-      (org-store-link-props :type "notmuch" :from from :to to
+      (org-store-link-props :type "notmuch" :from from :to to :date date
        			    :subject subject :message-id message-id)
       (setq desc (org-email-link-description))
-      (setq link (concat "notmuch:"  "id:" message-id))
+      (setq link (concat "notmuch:id:" message-id))
       (org-add-link-props :link link :description desc)
       link)))
 
 (defun org-notmuch-open (path)
   "Follow a notmuch message link specified by PATH."
-  (org-notmuch-follow-link path))
+  (funcall org-notmuch-open-function path))
 
 (defun org-notmuch-follow-link (search)
   "Follow a notmuch link to SEARCH.
 
 Can link to more than one message, if so all matching messages are shown."
   (require 'notmuch)
-  (notmuch-show (org-link-unescape search)))
-
+  (notmuch-show search))
 
 
 
-(org-add-link-type "notmuch-search" 'org-notmuch-search-open)
-(add-hook 'org-store-link-functions 'org-notmuch-search-store-link)
+(org-link-set-parameters "notmuch-search"
+			 :follow #'org-notmuch-search-open
+			 :store #'org-notmuch-search-store-link)
 
 (defun org-notmuch-search-store-link ()
   "Store a link to a notmuch search or message."
@@ -90,13 +115,20 @@ Can link to more than one message, if so all matching messages are shown."
 
 (defun org-notmuch-search-open (path)
   "Follow a notmuch message link specified by PATH."
-  (message path)
-  (org-notmuch-search-follow-link path))
+  (message "%s" path)
+  (funcall org-notmuch-search-open-function path))
 
 (defun org-notmuch-search-follow-link (search)
   "Follow a notmuch link by displaying SEARCH in notmuch-search mode."
   (require 'notmuch)
   (notmuch-search (org-link-unescape search)))
+
+
+
+(defun org-notmuch-tree-follow-link (search)
+  "Follow a notmuch link by displaying SEARCH in notmuch-tree mode."
+  (require 'notmuch)
+  (notmuch-tree (org-link-unescape search)))
 
 (provide 'org-notmuch)
 

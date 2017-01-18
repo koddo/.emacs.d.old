@@ -1,6 +1,6 @@
 ;;; test-ob-exp.el
 
-;; Copyright (c) 2010-2014 Eric Schulte
+;; Copyright (c) 2010-2015 Eric Schulte
 ;; Authors: Eric Schulte
 
 ;; This file is not part of GNU Emacs.
@@ -20,20 +20,21 @@
 
 ;;; Comments:
 
-;; Template test file for Org-mode tests
+;; Template test file for Org tests
 
 ;;; Code:
 
 (defmacro org-test-with-expanded-babel-code (&rest body)
   "Execute BODY while in a buffer with all Babel code evaluated.
 Current buffer is a copy of the original buffer."
-  `(let ((string (buffer-string))
-	 (buf (current-buffer)))
+  `(let ((string (org-with-wide-buffer (buffer-string)))
+	 (narrowing (list (point-min) (point-max)))
+	 (org-export-babel-evaluate t))
      (with-temp-buffer
        (org-mode)
        (insert string)
-       (let ((org-current-export-file buf))
-	 (org-babel-exp-process-buffer))
+       (apply #'narrow-to-region narrowing)
+       (org-babel-exp-process-buffer)
        (goto-char (point-min))
        (progn ,@body))))
 
@@ -48,7 +49,7 @@ Current buffer is a copy of the original buffer."
       (org-export-to-file 'html html-file))
     ;; should create a .html file
     (should (file-exists-p html-file))
-    ;; should not create a file with "::" appended to it's name
+    ;; should not create a file with "::" appended to its name
     (should-not (file-exists-p (concat org-test-no-heading-file "::")))
     (when (file-exists-p html-file) (delete-file html-file))))
 
@@ -67,7 +68,7 @@ Current buffer is a copy of the original buffer."
     (when (get-buffer name) (kill-buffer name))))
 
 (ert-deftest test-ob-exp/org-babel-exp-src-blocks/w-no-headers2 ()
-  "Testing export without any headlines in the org-mode file."
+  "Testing export without any headlines in the Org file."
   (let ((html-file (concat (file-name-sans-extension
 			    org-test-link-in-heading-file)
 			   ".html")))
@@ -77,7 +78,7 @@ Current buffer is a copy of the original buffer."
       (org-export-to-file 'html html-file))
     ;; should create a .html file
     (should (file-exists-p html-file))
-    ;; should not create a file with "::" appended to it's name
+    ;; should not create a file with "::" appended to its name
     (should-not (file-exists-p (concat org-test-link-in-heading-file "::")))
     (when (file-exists-p html-file) (delete-file html-file))))
 
@@ -93,7 +94,8 @@ Current buffer is a copy of the original buffer."
   (message \"expanded1\")" ";; noweb-no-start
   <<noweb-example1>>" ";; noweb-2-yes-start
   (message \"expanded2\")
-  (message \"expanded2\")" ";; noweb-tangle-start
+  (message \"expanded2\")"
+  ";; noweb-tangle-start
 <<noweb-example1>>
 <<noweb-example2>>")
     (org-test-at-id "eb1f6498-5bd9-45e0-9c56-50717053e7b7"
@@ -181,22 +183,112 @@ a table."
 (ert-deftest ob-exp/evaluate-all-executables-in-order ()
   (should
    (equal '(5 4 3 2 1)
-	  (let (*evaluation-collector*)
+	  (let ((org-export-babel-evaluate t) *evaluation-collector*)
 	    (org-test-at-id "96cc7073-97ec-4556-87cf-1f9bffafd317"
 	      (org-narrow-to-subtree)
 	      (buffer-string)
-	      (fboundp 'org-export-execute-babel-code)
 	      (org-test-with-expanded-babel-code *evaluation-collector*))))))
 
 (ert-deftest ob-exp/exports-inline ()
   (should
    (string-match
-    (regexp-quote "Here is one in the middle =1= of a line.
-Here is one at the end of a line. =2=
-=3= Here is one at the beginning of a line.")
+    (regexp-quote "Here is one in the middle {{{results(=1=)}}} of a line.
+Here is one at the end of a line. {{{results(=2=)}}}
+{{{results(=3=)}}} Here is one at the beginning of a line.")
     (org-test-at-id "54cb8dc3-298c-4883-a933-029b3c9d4b18"
       (org-narrow-to-subtree)
-      (org-test-with-expanded-babel-code (buffer-string))))))
+      (let ((org-babel-inline-result-wrap "=%s="))
+	(org-test-with-expanded-babel-code (buffer-string)))))))
+
+(ert-deftest ob-exp/exports-inline-code ()
+  (let ((org-babel-inline-result-wrap "=%s=")
+	(org-export-babel-evaluate t))
+    (should
+     (string-match "\\`src_emacs-lisp\\(?:\\[]\\)?{(\\+ 1 1)}$"
+		   (org-test-with-temp-text
+		       "src_emacs-lisp[:exports code]{(+ 1 1)}"
+		     (org-babel-exp-process-buffer)
+		     (buffer-string))))
+    (should
+     (string-match "\\`src_emacs-lisp\\(?:\\[]\\)?{(\\+ 1 1)}$"
+		   (org-test-with-temp-text
+		       "src_emacs-lisp[ :exports code ]{(+ 1 1)}"
+		     (org-babel-exp-process-buffer)
+		     (buffer-string))))
+    (should
+     (string-match "\\`src_emacs-lisp\\(?:\\[]\\)?{(\\+ 1 1)} {{{results(=2=)}}}$"
+		   (org-test-with-temp-text
+		       "src_emacs-lisp[:exports both]{(+ 1 1)}"
+		     (org-babel-exp-process-buffer)
+		     (buffer-string))))
+    (should
+     (string-match "\\`{{{results(=2=)}}}$"
+		   (org-test-with-temp-text
+		       "src_emacs-lisp[:exports results :results scalar]{(+ 1 1)}"
+		     (org-babel-exp-process-buffer)
+		     (buffer-string))))
+    (should
+     (let ((text "foosrc_emacs-lisp[:exports code]{(+ 1 1)}"))
+       (string-match (regexp-quote text)
+		     (org-test-with-temp-text
+			 text
+		       (org-babel-exp-process-buffer)
+		       (buffer-string)))))
+    (should
+     (let ((text "src_emacs lisp{(+ 1 1)}"))
+       (string-match (regexp-quote text)
+		     (org-test-with-temp-text
+			 text
+		       (org-babel-exp-process-buffer)
+		       (buffer-string)))))
+    (should
+     (string-match
+      (replace-regexp-in-string
+       "\\\\\\[]{" "\\(?:\\[]\\)?{" ;accept both src_sh[]{...} or src_sh{...}
+       (regexp-quote "Here is one in the middle src_sh[]{echo 1} of a line.
+Here is one at the end of a line. src_sh[]{echo 2}
+src_sh[]{echo 3} Here is one at the beginning of a line.
+Here is one that is also evaluated: src_sh[]{echo 4} {{{results(=4=)}}}")
+       nil t)
+      (org-test-at-id "cd54fc88-1b6b-45b6-8511-4d8fa7fc8076"
+	(org-narrow-to-subtree)
+	(org-test-with-expanded-babel-code (buffer-string)))))))
+
+(ert-deftest ob-exp/exports-inline-code-double-eval ()
+  "Based on default header arguments for inline code blocks (:exports
+results), the resulting code block `src_emacs-lisp{2}' should also be
+evaluated."
+  (let ((org-babel-inline-result-wrap "=%s=")
+	(org-export-babel-evaluate t))
+    (should
+     (string-match "\\`{{{results(src_emacs-lisp\\[\\]{2})}}}$"
+		   (org-test-with-temp-text
+		       "src_emacs-lisp[:exports results :results code]{(+ 1 1)}"
+		     (org-babel-exp-process-buffer)
+		     (buffer-string))))))
+
+(ert-deftest ob-exp/exports-inline-code-eval-code-once ()
+  "Ibid above, except that the resulting inline code block should not
+be evaluated."
+  (let ((org-export-babel-evaluate t))
+    (should
+     (string-match "{{{results(src_emacs-lisp\\(?:\\[[: a-zA-Z]+]\\)?{2})}}}$"
+		   (org-test-with-temp-text
+		       (concat "src_emacs-lisp[:exports results :results code "
+			       ":results_switches \":exports code\"]{(+ 1 1)}")
+		     (org-babel-exp-process-buffer)
+		     (buffer-string))))))
+
+(ert-deftest ob-exp/exports-inline-code-double-eval-exports-both ()
+  (let ((org-export-babel-evaluate t))
+    (should
+     (string-match (concat "\\`src_emacs-lisp\\(?:\\[]\\)?{(\\+ 1 1)} "
+			   "{{{results(src_emacs-lisp\\[ :exports code\\]{2})}}}$")
+		   (org-test-with-temp-text
+		       (concat "src_emacs-lisp[:exports both :results code "
+			       ":results_switches \":exports code\"]{(+ 1 1)}")
+		     (org-babel-exp-process-buffer)
+		     (buffer-string))))))
 
 (ert-deftest ob-exp/export-call-line-information ()
   (org-test-at-id "bec63a04-491e-4caa-97f5-108f3020365c"
@@ -226,31 +318,31 @@ Here is one at the end of a line. =2=
 	   (sub1 "a:1, b:2, c:5, d:0, e:6")
 	   (func sub0))
       ;; entry "section"
-      (should (string-match (concat "_shell sect call\n: shell " sect "\n")
+      (should (string-match (concat "_shell-sect-call\n: shell " sect "\n")
 			    result))
-      (should (string-match (concat "_elisp sect call\n: elisp " sect "\n")
+      (should (string-match (concat "_elisp-sect-call\n: elisp " sect "\n")
 			    result))
-      (should (string-match (concat "\n- sect inline =shell " sect "=\n")
+      (should (string-match (concat "\n- sect inline shell " sect "\n")
 			    result))
-      (should (string-match (concat "\n- sect inline =elisp " sect "=\n")
+      (should (string-match (concat "\n- sect inline elisp " sect "\n")
 			    result))
-      ;; entry "subsection", call without arguments
-      (should (string-match (concat "_shell sub0 call\n: shell " sub0 "\n")
+            ;; entry "subsection", call without arguments
+      (should (string-match (concat "_shell-sub0-call\n: shell " sub0 "\n")
 			    result))
-      (should (string-match (concat "_elisp sub0 call\n: elisp " sub0 "\n")
+      (should (string-match (concat "_elisp-sub0-call\n: elisp " sub0 "\n")
 			    result))
-      (should (string-match (concat "\n- sub0 inline =shell " sub0 "=\n")
+      (should (string-match (concat "\n- sub0 inline shell " sub0 "\n")
 			    result))
-      (should (string-match (concat "\n- sub0 inline =elisp " sub0 "=\n")
+      (should (string-match (concat "\n- sub0 inline elisp " sub0 "\n")
 			    result))
       ;; entry "subsection", call with arguments
-      (should (string-match (concat "_shell sub1 call\n: shell " sub1 "\n")
+      (should (string-match (concat "_shell-sub1-call\n: shell " sub1 "\n")
 			    result))
-      (should (string-match (concat "_elisp sub1 call\n: elisp " sub1 "\n")
+      (should (string-match (concat "_elisp-sub1-call\n: elisp " sub1 "\n")
 			    result))
-      (should (string-match (concat "\n- sub1 inline =shell " sub1 "=\n")
+      (should (string-match (concat "\n- sub1 inline shell " sub1 "\n")
 			    result))
-      (should (string-match (concat "\n- sub1 inline =elisp " sub1 "=\n")
+      (should (string-match (concat "\n- sub1 inline elisp " sub1 "\n")
 			    result))
       ;; entry "function definition"
       (should (string-match (concat "_location_shell\n: shell " func "\n")
@@ -259,8 +351,9 @@ Here is one at the end of a line. =2=
 			    result)))))
 
 (ert-deftest ob-exp/export-from-a-temp-buffer ()
-  (org-test-with-temp-text
-      "
+  (let ((org-export-babel-evaluate t))
+    (org-test-with-temp-text
+	"
 #+Title: exporting from a temporary buffer
 
 #+name: foo
@@ -277,31 +370,32 @@ Here is one at the end of a line. =2=
   (list foo <<bar>>)
 #+END_SRC
 "
-    (let* ((ascii (org-export-as 'ascii)))
-      (should (string-match
-	       (regexp-quote " :foo  :bar \n")
-			     ascii)))))
+      (let* ((ascii (org-export-as 'ascii)))
+	(should (string-match
+		 (regexp-quote " :foo  :bar \n")
+		 ascii))))))
 
 (ert-deftest ob-export/export-with-results-before-block ()
   "Test export when results are inserted before source block."
-  (should
-   (equal
-    "#+RESULTS: src1
+  (let ((org-export-babel-evaluate t))
+    (should
+     (equal
+      "#+RESULTS: src1
 : 2
 
 #+NAME: src1
 #+BEGIN_SRC emacs-lisp
 \(+ 1 1)
 #+END_SRC"
-    (org-test-with-temp-text
-	"#+RESULTS: src1
+      (org-test-with-temp-text
+	  "#+RESULTS: src1
 
 #+NAME: src1
 #+BEGIN_SRC emacs-lisp :exports both
 \(+ 1 1)
 #+END_SRC"
-      (org-export-execute-babel-code)
-      (buffer-string)))))
+	(org-babel-exp-process-buffer)
+	(org-trim (org-no-properties (buffer-string))))))))
 
 (ert-deftest ob-export/export-src-block-with-switches ()
   "Test exporting a source block with switches."
@@ -310,7 +404,7 @@ Here is one at the end of a line. =2=
     "\\`#\\+BEGIN_SRC emacs-lisp -n -r$"
     (org-test-with-temp-text
 	"#+BEGIN_SRC emacs-lisp -n -r\n\(+ 1 1)\n#+END_SRC"
-      (org-export-execute-babel-code)
+      (org-babel-exp-process-buffer)
       (buffer-string)))))
 
 (ert-deftest ob-export/export-src-block-with-flags ()
@@ -320,7 +414,7 @@ Here is one at the end of a line. =2=
     "\\`#\\+BEGIN_SRC emacs-lisp -some-flag$"
     (org-test-with-temp-text
 	"#+BEGIN_SRC emacs-lisp :flags -some-flag\n\(+ 1 1)\n#+END_SRC"
-      (org-export-execute-babel-code)
+      (org-babel-exp-process-buffer)
       (buffer-string)))))
 
 (ert-deftest ob-export/export-and-indentation ()
@@ -333,7 +427,7 @@ Here is one at the end of a line. =2=
       (let ((indent-tabs-mode t)
 	    (tab-width 1)
 	    (org-src-preserve-indentation nil))
-	(org-export-execute-babel-code)
+	(org-babel-exp-process-buffer)
 	(buffer-string)))))
   ;; Preserve indentation with "-i" flag.
   (should
@@ -342,7 +436,7 @@ Here is one at the end of a line. =2=
     (org-test-with-temp-text "#+BEGIN_SRC emacs-lisp -i\n t\n#+END_SRC"
       (let ((indent-tabs-mode t)
 	    (tab-width 1))
-	(org-export-execute-babel-code)
+	(org-babel-exp-process-buffer)
 	(buffer-string)))))
   ;; Preserve indentation with a non-nil
   ;; `org-src-preserve-indentation'.
@@ -353,8 +447,143 @@ Here is one at the end of a line. =2=
       (let ((indent-tabs-mode t)
 	    (tab-width 1)
 	    (org-src-preserve-indentation t))
-	(org-export-execute-babel-code)
+	(org-babel-exp-process-buffer)
 	(buffer-string))))))
+
+(ert-deftest ob-export/export-under-commented-headline ()
+  "Test evaluation of code blocks under COMMENT headings."
+  (let ((org-export-babel-evaluate t)
+	(org-babel-inline-result-wrap "=%s="))
+    ;; Do not eval block in a commented headline.
+    (should
+     (string-match
+      ": 2"
+      (org-test-with-temp-text "* Headline
+#+BEGIN_SRC emacs-lisp :exports results
+\(+ 1 1)
+#+END_SRC"
+	(org-babel-exp-process-buffer)
+	(buffer-string))))
+    (should-not
+     (string-match
+      ": 2"
+      (org-test-with-temp-text "* COMMENT Headline
+#+BEGIN_SRC emacs-lisp :exports results
+\(+ 1 1)
+#+END_SRC"
+	(org-babel-exp-process-buffer)
+	(buffer-string))))
+    ;; Do not eval inline blocks either.
+    (should
+     (string-match
+      "=2="
+      (org-test-with-temp-text "* Headline
+src_emacs-lisp{(+ 1 1)}"
+	(org-babel-exp-process-buffer)
+	(buffer-string))))
+    (should-not
+     (string-match
+      "=2="
+      (org-test-with-temp-text "* COMMENT Headline
+src_emacs-lisp{(+ 1 1)}"
+	(org-babel-exp-process-buffer)
+	(buffer-string))))
+    ;; Also check parent headlines.
+    (should-not
+     (string-match
+      ": 2"
+      (org-test-with-temp-text "
+* COMMENT Headline
+** Children
+#+BEGIN_SRC emacs-lisp :exports results
+\(+ 1 1)
+#+END_SRC"
+	(org-babel-exp-process-buffer)
+	(buffer-string))))))
+
+(ert-deftest ob-export/reference-in-post-header ()
+  "Test references in :post header during export."
+  (should
+   (org-test-with-temp-text "
+#+NAME: foo
+#+BEGIN_SRC emacs-lisp :exports none :var bar=\"baz\"
+  (concat \"bar\" bar)
+#+END_SRC
+
+#+NAME: nofun
+#+BEGIN_SRC emacs-lisp :exports results :post foo(\"nofun\")
+#+END_SRC"
+     (org-babel-exp-process-buffer) t)))
+
+(ert-deftest ob-export/babel-evaluate ()
+  "Test `org-export-babel-evaluate' effect."
+  ;; When nil, no Babel code is executed.
+  (should-not
+   (string-match-p
+    "2"
+    (org-test-with-temp-text
+	"#+BEGIN_SRC emacs-lisp :exports results\n(+ 1 1)\n#+END_SRC"
+      (let ((org-export-babel-evaluate nil)) (org-babel-exp-process-buffer))
+      (buffer-string))))
+  (should-not
+   (string-match-p
+    "2"
+    (org-test-with-temp-text
+	"src_emacs-lisp{(+ 1 1)}"
+      (let ((org-export-babel-evaluate nil)) (org-babel-exp-process-buffer))
+      (buffer-string))))
+  ;; When non-nil, all Babel code types are executed.
+  (should
+   (string-match-p
+    "2"
+    (org-test-with-temp-text
+	"#+BEGIN_SRC emacs-lisp :exports results\n(+ 1 1)\n#+END_SRC"
+      (let ((org-export-babel-evaluate t)) (org-babel-exp-process-buffer))
+      (buffer-string))))
+  (should
+   (string-match-p
+    "2"
+    (org-test-with-temp-text
+	"src_emacs-lisp{(+ 1 1)}"
+      (let ((org-export-babel-evaluate t)) (org-babel-exp-process-buffer))
+      (buffer-string))))
+  ;; When set to `inline-only' limit evaluation to inline code.
+  (should-not
+   (string-match-p
+    "2"
+    (org-test-with-temp-text
+	"#+BEGIN_SRC emacs-lisp :exports results\n(+ 1 1)\n#+END_SRC"
+      (let ((org-export-babel-evaluate 'inline-only))
+	(org-babel-exp-process-buffer))
+      (buffer-string))))
+  (should
+   (string-match-p
+    "2"
+    (org-test-with-temp-text
+	"src_emacs-lisp{(+ 1 1)}"
+      (let ((org-export-babel-evaluate 'inline-only))
+	(org-babel-exp-process-buffer))
+      (buffer-string)))))
+
+(ert-deftest ob-export/body-with-coderef ()
+  "Test exporting a code block with coderefs."
+  (should
+   (equal "#+BEGIN_SRC emacs-lisp\n0 (ref:foo)\n#+END_SRC"
+	  (org-test-with-temp-text
+	      "#+BEGIN_SRC emacs-lisp :exports code\n0 (ref:foo)\n#+END_SRC"
+	    (let ((org-export-babel-evaluate t)
+		  (org-coderef-label-format "(ref:foo)"))
+	      (org-babel-exp-process-buffer))
+	    (buffer-string))))
+  (should
+   (equal
+    "#+BEGIN_SRC emacs-lisp -l \"r:%s\"\n1 r:foo\n#+END_SRC"
+    (org-test-with-temp-text
+	"#+BEGIN_SRC emacs-lisp -l \"r:%s\" -lisp :exports code\n1 r:foo\n#+END_SRC"
+      (let ((org-export-babel-evaluate t))
+	(org-babel-exp-process-buffer))
+      (buffer-string)))))
+
 
 (provide 'test-ob-exp)
 
