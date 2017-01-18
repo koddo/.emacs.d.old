@@ -1,6 +1,6 @@
 ;;; ob-tcl.el --- Org-babel functions for tcl evaluation
 
-;; Copyright (C) 2009-2014  Free Software Foundation, Inc.
+;; Copyright (C) 2009-2017  Free Software Foundation, Inc.
 
 ;; Authors: Dan Davison
 ;;	 Eric Schulte
@@ -47,22 +47,22 @@
 (defun org-babel-execute:tcl (body params)
   "Execute a block of Tcl code with Babel.
 This function is called by `org-babel-execute-src-block'."
-  (let* ((session (cdr (assoc :session params)))
-         (result-params (cdr (assoc :result-params params)))
-         (result-type (cdr (assoc :result-type params)))
+  (let* ((session (cdr (assq :session params)))
+         (result-params (cdr (assq :result-params params)))
+         (result-type (cdr (assq :result-type params)))
          (full-body (org-babel-expand-body:generic
 		     body params (org-babel-variable-assignments:tcl params)))
 	(session (org-babel-tcl-initiate-session session)))
     (org-babel-reassemble-table
      (org-babel-tcl-evaluate session full-body result-type)
      (org-babel-pick-name
-      (cdr (assoc :colname-names params)) (cdr (assoc :colnames params)))
+      (cdr (assq :colname-names params)) (cdr (assq :colnames params)))
      (org-babel-pick-name
-      (cdr (assoc :rowname-names params)) (cdr (assoc :rownames params))))))
+      (cdr (assq :rowname-names params)) (cdr (assq :rownames params))))))
 
 (defun org-babel-prep-session:tcl (session params)
   "Prepare SESSION according to the header arguments in PARAMS."
-  (error "Sessions are not supported for Tcl."))
+  (error "Sessions are not supported for Tcl"))
 
 (defun org-babel-variable-assignments:tcl (params)
   "Return list of tcl statements assigning the block's variables."
@@ -71,7 +71,7 @@ This function is called by `org-babel-execute-src-block'."
      (format "set %s %s"
 	     (car pair)
 	     (org-babel-tcl-var-to-tcl (cdr pair))))
-   (mapcar #'cdr (org-babel-get-header params :var))))
+   (org-babel--get-vars params)))
 
 ;; helper functions
 
@@ -111,7 +111,7 @@ close $o
 If RESULT-TYPE equals 'output then return a list of the outputs
 of the statements in BODY, if RESULT-TYPE equals 'value then
 return the value of the last statement in BODY, as elisp."
-  (when session (error "Sessions are not supported for Tcl."))
+  (when session (error "Sessions are not supported for Tcl"))
   (case result-type
     (output (org-babel-eval org-babel-tcl-command body))
     (value (let ((tmp-file (org-babel-temp-file "tcl-")))

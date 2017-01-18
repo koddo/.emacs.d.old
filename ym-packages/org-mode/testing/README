@@ -24,7 +24,7 @@ Also note that many of the current tests uses babel evaluation...
         -l lisp/org-id.el -l testing/org-test.el \
         --eval "(progn (org-reload) (setq org-confirm-babel-evaluate nil) \
         (org-babel-do-load-languages 'org-babel-load-languages \
-        '((emacs-lisp . t) (sh . t) (org . t))))" \
+        '((emacs-lisp . t) (shell . t) (org . t))))" \
         -f org-test-run-batch-tests
 #+END_SRC
 
@@ -35,6 +35,16 @@ The options in the above command are explained below.
 | -l      | loads Org-mode and the org mode test suite defined in testing/org-test.el    |
 | --eval  | reloads Org-mode and allows evaluation of code blocks by the tests           |
 | -f      | actually runs the tests using the `org-test-run-batch-tests' function        |
+
+* Trigger testing with 'make test'
+
+Target ~test~ can be used to trigger a test run.
+
+#+BEGIN_SRC sh :dir (expand-file-name "..")
+make test
+#+END_SRC
+
+See ../mk/default.mk for details.
 
 * Interactive testing from within Emacs
 
@@ -47,49 +57,61 @@ load and run the test suite with the following commands.
      (require 'org-test)
    #+END_SRC
 
-2) Disable babel evaluation confirmation
+2) Load required Babel languages
    #+BEGIN_SRC emacs-lisp
-     (setq org-confirm-babel-evaluate)
+     (org-babel-do-load-languages
+      'org-babel-load-languages
+      (and
+       (mapc (lambda (lang) (add-to-list 'org-babel-load-languages (cons lang t)))
+             '(emacs-lisp shell org))
+       org-babel-load-languages))
    #+END_SRC
 
-3) Then run the test suite,
+3) Then run the test suite.  Babel evaluation confirmation is disabled
+   and ~C-c C-c~ is enabled while running the tests.
    #+BEGIN_SRC emacs-lisp
-     (org-test-run-all-tests)
+     (let (org-babel-no-eval-on-ctrl-c-ctrl-c
+           org-confirm-babel-evaluate)
+       (org-test-run-all-tests))
    #+END_SRC
 
-   or when a test fails run it interactively and investigate the
-   problem in the ERT results buffer.
+   When a test fails, run it interactively and investigate the problem
+   in the ERT results buffer.
 
-   How to run one test:
-   Use this as a demo example of a failing test
+   To run one test: Use this as a demo example of a failing test
    #+BEGIN_SRC emacs-lisp
      (ert-deftest test-org/org-link-escape-ascii-character-demo-of-fail ()
-       (should (string= "%5B"  ;; expected is right
+       (should (string= "%5B"  ; Expecting %5B is correct.
                         (org-link-escape "[")))
-       (should (string= "%5C"  ;; expected is wrong, "%5D" would be right
+       (should (string= "%5C"  ; Expecting %5C is wrong, %5D correct.
                         (org-link-escape "]"))))
    #+END_SRC
-   or evaluate the ert-deftest form of the test you want to run.  Then
-   "M-x ert RET test-org/org-link-escape-ascii-character-demo-of-fail RET"
-   When not visible yet switch to the ERT results buffer named
-   "\*ert\*".  When a test failed the ERT results buffer shows the
-   details of the first "should" that failed.  See
-   (info "(ert)Running Tests Interactively") on how to re-run, start
-   the debugger etc.
+   or evaluate the ~ert-deftest form~ of the test you want to run.
+   Then ~M-x ert RET
+   test-org/org-link-escape-ascii-character-demo-of-fail RET~.  When
+   not visible yet switch to the ERT results buffer named ~*ert*~.
+   When a test failed the ERT results buffer shows the details of the
+   first ~should~ that failed.  See ~(info "(ert)Running Tests
+   Interactively")~ on how to re-run, start the debugger etc.
 
-   How to run all tests of a single test file:
-   "M-x ert-delete-all-tests RET", confirm.  Open the file
-   ./lisp/test-*.el, "M-x eval-buffer RET", "M-x ert RET t RET"
+   To run several tests: ~M-x ert RET "<your regexp here>" RET~.
 
-   Consider to set pp-escape-newlines nil before running the test when
-   looking at "should" in the ERT results buffer.  Especially when
-   using "l" to look at passed test results and possibly missing an
-   appropriate setting of pp-escape-newlines made only temporarily for
-   the running time of the test as e. g. tests using
-   org-test-table-target-expect-tblfm do.
+   To run all tests of a single test file: ~M-x ert-delete-all-tests
+   RET~ and confirm.  ~M-x load-file RET testing/lisp/<file>.el RET
+   M-x ert RET t RET~.
+
+   Consider to set
+   #+BEGIN_SRC emacs-lisp
+     (setq pp-escape-newlines nil)
+   #+END_SRC
+   before running the test when looking at ~should~ in the ERT results
+   buffer.  Especially when using ~l~ to look at passed test results
+   and possibly missing an appropriate setting of ~pp-escape-newlines~
+   made only temporarily for the running time of the test as
+   e. g. tests using ~org-test-table-target-expect-tblfm~ do.
 
 * Troubleshooting
 
-- If the value of the =org-babel-no-eval-on-ctrl-c-ctrl-c= is non-nil
-  then it will result in some test failure, as there are tests which
-  rely on this behavior.
+- If the variable ~org-babel-no-eval-on-ctrl-c-ctrl-c~ is non-nil then
+  it will result in some test failure, as there are tests which rely
+  on this behavior.

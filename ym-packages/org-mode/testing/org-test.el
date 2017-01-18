@@ -1,6 +1,6 @@
-;;;; org-test.el --- Tests for Org-mode
+;;;; org-test.el --- Tests for Org
 
-;; Copyright (c) 2010-2014 Sebastian Rose, Eric Schulte
+;; Copyright (c) 2010-2015 Sebastian Rose, Eric Schulte
 ;; Authors:
 ;;     Sebastian Rose, Hannover, Germany, sebastian_rose gmx de
 ;;     Eric Schulte, Santa Fe, New Mexico, USA, schulte.eric gmail com
@@ -52,37 +52,15 @@
       (require 'org-id)
       (require 'ox)
       (org-babel-do-load-languages
-       'org-babel-load-languages '((sh . t) (org . t))))
+       'org-babel-load-languages '((shell . t) (org . t))))
 
-    (let* ((load-path (cons
-		       org-test-dir
-		       (cons
-			(expand-file-name "jump" org-test-dir)
-			load-path))))
-      (require 'cl)
-      (when (= emacs-major-version 22)
-	(defvar special-mode-map
-	  (let ((map (make-sparse-keymap)))
-	    (suppress-keymap map)
-	    (define-key map "q" 'quit-window)
-	    (define-key map " " 'scroll-up)
-	    (define-key map "\C-?" 'scroll-down)
-	    (define-key map "?" 'describe-mode)
-	    (define-key map "h" 'describe-mode)
-	    (define-key map ">" 'end-of-buffer)
-	    (define-key map "<" 'beginning-of-buffer)
-	    (define-key map "g" 'revert-buffer)
-	    (define-key map "z" 'kill-this-buffer)
-	    map))
-
-	(put 'special-mode 'mode-class 'special)
-	(define-derived-mode special-mode nil "Special"
-	  "Parent major mode from which special major modes should inherit."
-	  (setq buffer-read-only t)))
+    (let ((load-path (cons org-test-dir
+			   (cons (expand-file-name "jump" org-test-dir)
+				 load-path))))
+      (require 'cl-lib)
       (require 'ert)
       (require 'ert-x)
-      (when (file-exists-p
-	     (expand-file-name "jump/jump.el" org-test-dir))
+      (when (file-exists-p (expand-file-name "jump/jump.el" org-test-dir))
 	(require 'jump)
 	(require 'which-func)))))
 
@@ -134,7 +112,7 @@ executable."
 
 (defun org-test-buffer (&optional file)
   "TODO:  Setup and return a buffer to work with.
-If file is non-nil insert it's contents in there.")
+If file is non-nil insert its contents in there.")
 
 (defun org-test-compare-with-file (&optional file)
   "TODO:  Compare the contents of the test buffer with FILE.
@@ -164,7 +142,7 @@ currently executed.")
 (def-edebug-spec org-test-at-id (form body))
 
 (defmacro org-test-in-example-file (file &rest body)
-  "Execute body in the Org-mode example file."
+  "Execute body in the Org example file."
   (declare (indent 1))
   `(let* ((my-file (or ,file org-test-file))
 	  (visited-p (get-file-buffer my-file))
@@ -200,12 +178,13 @@ files."
 (def-edebug-spec org-test-at-marker (form form body))
 
 (defmacro org-test-with-temp-text (text &rest body)
-  "Run body in a temporary buffer with Org-mode as the active
+  "Run body in a temporary buffer with Org mode as the active
 mode holding TEXT.  If the string \"<point>\" appears in TEXT
 then remove it and place the point there before running BODY,
 otherwise place the point at the beginning of the inserted text."
   (declare (indent 1))
-  `(let ((inside-text (if (stringp ,text) ,text (eval ,text))))
+  `(let ((inside-text (if (stringp ,text) ,text (eval ,text)))
+	 (org-mode-hook nil))
      (with-temp-buffer
        (org-mode)
        (let ((point (string-match "<point>" inside-text)))
@@ -219,7 +198,7 @@ otherwise place the point at the beginning of the inserted text."
 (def-edebug-spec org-test-with-temp-text (form body))
 
 (defmacro org-test-with-temp-text-in-file (text &rest body)
-  "Run body in a temporary file buffer with Org-mode as the active mode."
+  "Run body in a temporary file buffer with Org mode as the active mode."
   (declare (indent 1))
   (let ((results (gensym)))
     `(let ((file (make-temp-file "org-test"))
@@ -254,6 +233,7 @@ or temporarily substitute the `org-test-with-temp-text' of this
 function with `org-test-with-temp-text-in-file'.  Also consider
 setting `pp-escape-newlines' to nil manually."
   (require 'pp)
+  (require 'ert)
   (let ((back pp-escape-newlines) (current-tblfm))
     (unless tblfm
       (should-not laps)
@@ -297,7 +277,7 @@ setting `pp-escape-newlines' to nil manually."
      ("testing/lisp/test-\\1.el" . "lisp/\\1.el")
      ("testing/lisp/\\1.el" . "lisp/\\1.el/test.*.el"))
     (concat org-base-dir "/")
-    "Jump between org-mode files and their tests."
+    "Jump between Org files and their tests."
     (lambda (path)
       (let* ((full-path (expand-file-name path org-base-dir))
 	     (file-name (file-name-nondirectory path))
@@ -311,7 +291,7 @@ setting `pp-escape-newlines' to nil manually."
 	 ";; Released under the GNU General Public License version 3\n"
 	 ";; see: http://www.gnu.org/licenses/gpl-3.0.html\n\n"
 	 ";;;; Comments:\n\n"
-	 ";; Template test file for Org-mode tests\n\n"
+	 ";; Template test file for Org tests\n\n"
 	 "\n"
 	 ";;; Code:\n"
 	 "(let ((load-path (cons (expand-file-name\n"
@@ -342,7 +322,7 @@ setting `pp-escape-newlines' to nil manually."
 
 
 (defun org-test-string-exact-match (regex string &optional start)
-  "case sensative string-match"
+  "Case sensitive string-match"
   (let ((case-fold-search nil)
         (case-replace nil))
     (if(and (equal regex "")
@@ -354,9 +334,9 @@ setting `pp-escape-newlines' to nil manually."
 
 ;;; Load and Run tests
 (defun org-test-load ()
-  "Load up the org-mode test suite."
+  "Load up the Org test suite."
   (interactive)
-  (flet ((rld (base)
+  (cl-flet ((rld (base)
 	      ;; Recursively load all files, if files throw errors
 	      ;; then silently ignore the error and continue to the
 	      ;; next file.  This allows files to error out if
@@ -394,7 +374,7 @@ setting `pp-escape-newlines' to nil manually."
 	       "/")))
 
 (defvar org-test-buffers nil
-  "Hold buffers open for running Org-mode tests.")
+  "Hold buffers open for running Org tests.")
 
 (defun org-test-touch-all-examples ()
   (dolist (file (directory-files
@@ -421,10 +401,11 @@ Load all test files first."
   (let ((org-id-track-globally t)
 	(org-test-selector
 	 (if org-test-selector org-test-selector "\\(org\\|ob\\)"))
-	org-confirm-babel-evaluate vc-handled-backends)
+	org-confirm-babel-evaluate org-startup-folded vc-handled-backends)
     (org-test-touch-all-examples)
     (org-test-update-id-locations)
     (org-test-load)
+    (message "selected tests: %s" org-test-selector)
     (ert-run-tests-batch-and-exit org-test-selector)))
 
 (defun org-test-run-all-tests ()
@@ -432,6 +413,7 @@ Load all test files first."
 Load all test files first."
   (interactive)
   (org-test-touch-all-examples)
+  (org-test-update-id-locations)
   (org-test-load)
   (ert "\\(org\\|ob\\)")
   (org-test-kill-all-examples))

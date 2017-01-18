@@ -69,7 +69,7 @@
 
 ;; org link functions
 ;; bare git link
-(org-add-link-type "gitbare" 'org-gitbare-open)
+(org-link-set-parameters "gitbare" :follow #'org-gitbare-open)
 
 (defun org-gitbare-open (str)
   (let* ((strlist (org-git-split-string str))
@@ -92,16 +92,18 @@
     (setq buffer-read-only t)))
 
 ;; user friendly link
-(org-add-link-type "git" 'org-git-open)
+(org-link-set-parameters "git" :follow #'org-git-open :store #'org-git-store-link)
 
 (defun org-git-open (str)
   (let* ((strlist (org-git-split-string str))
          (filepath (first strlist))
          (commit (second strlist))
+         (line (third strlist))
          (dirlist (org-git-find-gitdir (file-truename filepath)))
          (gitdir (first dirlist))
          (relpath (second dirlist)))
-    (org-git-open-file-internal gitdir (concat commit ":" relpath))))
+    (org-git-open-file-internal gitdir (concat commit ":" relpath))
+    (when line (goto-line (string-to-int line)))))
 
 
 ;; Utility functions (file names etc)
@@ -133,24 +135,25 @@
 
 
 (eval-and-compile
-  (if (featurep 'xemacs)
-      (defalias 'org-git-gitrepos-p 'org-git-find-gitdir)
-    (defalias 'org-git-gitrepos-p 'org-git-find-gitdir
-      "Return non-nil if path is in git repository")))
+  (defalias 'org-git-gitrepos-p 'org-git-find-gitdir
+    "Return non-nil if path is in git repository"))
 
 ;; splitting the link string
 
 ;; Both link open functions are called with a string of
-;; consisting of two parts separated by a double colon (::).
+;; consisting of three parts separated by a double colon (::).
 (defun org-git-split-string (str)
-  "Given a string of the form \"str1::str2\", return a list of
-  two substrings \'(\"str1\" \"str2\"). If the double colon is mising, take str2 to be the empty string."
+  "Given a string of the form \"str1::str2::str3\", return a list of
+  three substrings \'(\"str1\" \"str2\" \"str3\"). If there are less
+than two double colons, str2 and/or str3 may be set the empty string."
   (let ((strlist (split-string str "::")))
     (cond ((= 1 (length strlist))
-           (list (car strlist) ""))
+           (list (car strlist) "" ""))
           ((= 2 (length strlist))
+           (append strlist (list "")))
+          ((= 3 (length strlist))
            strlist)
-          (t (error "org-git-split-string: only one :: allowed: %s" str)))))
+          (t (error "org-git-split-string: only one or two :: allowed: %s" str)))))
 
 ;; finding the file name part of a commit
 (defun org-git-link-filename (str)
@@ -168,24 +171,24 @@
   (concat branch "@{" timestring "}"))
 
 
-(defun org-git-create-git-link (file)
+(defun org-git-create-git-link (file &optional line)
   "Create git link part to file at specific time"
   (interactive "FFile: ")
   (let* ((gitdir (first (org-git-find-gitdir (file-truename file))))
          (branchname (org-git-get-current-branch gitdir))
          (timestring (format-time-string "%Y-%m-%d" (current-time))))
-    (concat "git:" file "::" (org-git-create-searchstring branchname timestring))))
+    (concat "git:" file "::" (org-git-create-searchstring branchname timestring)
+	    (if line (format "::%s" line) ""))))
 
 (defun org-git-store-link ()
   "Store git link to current file."
   (when (buffer-file-name)
-    (let ((file (abbreviate-file-name (buffer-file-name))))
+    (let ((file (abbreviate-file-name (buffer-file-name)))
+	  (line (line-number-at-pos)))
       (when (org-git-gitrepos-p file)
 	(org-store-link-props
 	 :type "git"
-	 :link (org-git-create-git-link file))))))
-
-(add-hook 'org-store-link-functions 'org-git-store-link)
+	 :link (org-git-create-git-link file line))))))
 
 (defun org-git-insert-link-interactively (file searchstring &optional description)
   (interactive "FFile: \nsSearch string: \nsDescription: ")

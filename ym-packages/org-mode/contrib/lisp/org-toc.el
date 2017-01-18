@@ -1,6 +1,6 @@
 ;;; org-toc.el --- Table of contents for Org-mode buffer
 
-;; Copyright 2007-2014 Free Software Foundation, Inc.
+;; Copyright 2007-2017 Free Software Foundation, Inc.
 ;;
 ;; Author: Bastien Guerry <bzg@gnu.org>
 ;; Keywords: Org table of contents
@@ -197,7 +197,7 @@ specified, then make `org-toc-recenter' use this value."
       (setq ov (make-overlay beg end)))
     ;; change the folding status of this headline
     (cond ((or (null status) (eq status 'folded))
-	   (show-children)
+	   (org-show-children)
 	   (message "CHILDREN")
 	   (overlay-put ov 'status 'children))
 	  ((eq status 'children)
@@ -338,7 +338,7 @@ If DELETE is non-nil, delete other windows when in the Org buffer."
   (interactive)
   (condition-case nil
       (outline-forward-same-level 1)
-    (error (message "No next headline at this level.")))
+    (error (message "No next headline at this level")))
   (if org-toc-info-mode (org-toc-info))
   (if org-toc-follow-mode (org-toc-goto)))
 
@@ -347,7 +347,7 @@ If DELETE is non-nil, delete other windows when in the Org buffer."
   (interactive)
   (condition-case nil
       (outline-backward-same-level 1)
-    (error (message "No previous headline at this level.")))
+    (error (message "No previous headline at this level")))
   (if org-toc-info-mode (org-toc-info))
   (if org-toc-follow-mode (org-toc-goto)))
 
@@ -441,7 +441,7 @@ current table of contents to it."
 	    (setq ov (make-overlay (match-beginning 0)
 				   (match-end 0))))
 	  (cond ((eq (cdr hlcfg0) 'children)
-		 (show-children)
+		 (org-show-children)
 		 (message "CHILDREN")
 		 (overlay-put ov 'status 'children))
 		((eq (cdr hlcfg0) 'branches)

@@ -1,6 +1,6 @@
-;;; org-gnus.el --- Support for links to Gnus groups and messages from within Org-mode
+;;; org-gnus.el --- Support for Links to Gnus Groups and Messages -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2004-2014 Free Software Foundation, Inc.
+;; Copyright (C) 2004-2017 Free Software Foundation, Inc.
 
 ;; Author: Carsten Dominik <carsten at orgmode dot org>
 ;;         Tassilo Horn <tassilo at member dot fsf dot org>
@@ -25,8 +25,8 @@
 ;;
 ;;; Commentary:
 
-;; This file implements links to Gnus groups and messages from within Org-mode.
-;; Org-mode loads this module by default - if this is not what you want,
+;; This file implements links to Gnus groups and messages from within Org.
+;; Org mode loads this module by default - if this is not what you want,
 ;; configure the variable `org-modules'.
 
 ;;; Code:
@@ -36,19 +36,20 @@
 (eval-when-compile (require 'gnus-sum))
 
 ;; Declare external functions and variables
+
 (declare-function message-fetch-field "message" (header &optional not-all))
 (declare-function message-narrow-to-head-1 "message" nil)
-(declare-function nnimap-group-overview-filename "nnimap" (group server))
-;; The following line suppresses a compiler warning stemming from gnus-sum.el
 (declare-function gnus-summary-last-subject "gnus-sum" nil)
+(declare-function nnvirtual-map-article "nnvirtual" (article))
+
 ;; Customization variables
 
-(org-defvaralias 'org-usenet-links-prefer-google 'org-gnus-prefer-web-links)
+(defvaralias 'org-usenet-links-prefer-google 'org-gnus-prefer-web-links)
 
 (defcustom org-gnus-prefer-web-links nil
   "If non-nil, `org-store-link' creates web links to Google groups or Gmane.
-When nil, Gnus will be used for such links.
-Using a prefix arg to the command \\[org-store-link] (`org-store-link')
+\\<org-mode-map>When nil, Gnus will be used for such links.
+Using a prefix argument to the command `\\[org-store-link]' (`org-store-link')
 negates this setting for the duration of the command."
   :group 'org-link-store
   :type 'boolean)
@@ -60,7 +61,7 @@ Normally, this translation is done by querying the IMAP server,
 which is usually very fast.  Unfortunately, some (maybe badly
 configured) IMAP servers don't support this operation quickly.
 So if following a link to a Gnus article takes ages, try setting
-this variable to `t'."
+this variable to t."
   :group 'org-link-store
   :version "24.1"
   :type 'boolean)
@@ -73,8 +74,7 @@ this variable to `t'."
   :type 'boolean)
 
 ;; Install the link type
-(org-add-link-type "gnus" 'org-gnus-open)
-(add-hook 'org-store-link-functions 'org-gnus-store-link)
+(org-link-set-parameters "gnus" :follow #'org-gnus-open :store #'org-gnus-store-link)
 
 ;; Implementation
 
@@ -83,8 +83,12 @@ this variable to `t'."
 MESSAGE-ID is the message-id header field that identifies the
 message.  If the uid is not cached, return nil."
   (with-temp-buffer
-    (let ((nov (nnimap-group-overview-filename group server)))
-      (when (file-exists-p nov)
+    (let ((nov (and (fboundp 'nnimap-group-overview-filename)
+		    ;; nnimap-group-overview-filename was removed from
+		    ;; Gnus in September 2010, and therefore should
+		    ;; only be present in Emacs 23.1.
+		    (nnimap-group-overview-filename group server))))
+      (when (and nov (file-exists-p nov))
 	(mm-insert-file-contents nov)
 	(set-buffer-modified-p nil)
 	(goto-char (point-min))
@@ -103,7 +107,7 @@ Otherwise create a link to the group inside Gnus.
 If `org-store-link' was called with a prefix arg the meaning of
 `org-gnus-prefer-web-links' is reversed."
   (let ((unprefixed-group (replace-regexp-in-string "^[^:]+:" "" group)))
-    (if (and (string-match "^nntp" group) ;; Only for nntp groups
+    (if (and (string-prefix-p "nntp" group) ;; Only for nntp groups
 	     (org-xor current-prefix-arg
 		      org-gnus-prefer-web-links))
 	(concat (if (string-match "gmane" unprefixed-group)
@@ -155,21 +159,17 @@ If `org-store-link' was called with a prefix arg the meaning of
 	   (header (with-current-buffer gnus-summary-buffer
 		     (gnus-summary-article-header)))
 	   (from (mail-header-from header))
-	   (message-id (org-remove-angle-brackets (mail-header-id header)))
+	   (message-id (org-unbracket-string "<" ">" (mail-header-id header)))
 	   (date (org-trim (mail-header-date header)))
-	   (date-ts (and date
-			 (ignore-errors
-			   (format-time-string
-			    (org-time-stamp-format t)
-			    (date-to-time date)))))
-	   (date-ts-ia (and date
-			    (ignore-errors
-			      (format-time-string
-			       (org-time-stamp-format t t)
-			       (date-to-time date)))))
 	   (subject (copy-sequence (mail-header-subject header)))
 	   (to (cdr (assq 'To (mail-header-extra header))))
 	   newsgroups x-no-archive desc link)
+      (cl-case  (car (gnus-find-method-for-group gnus-newsgroup-name))
+	(nnvirtual
+	 (setq group (car (nnvirtual-map-article
+			   (gnus-summary-article-number)))))
+	(nnir
+	 (setq group (nnir-article-group (gnus-summary-article-number)))))
       ;; Remove text properties of subject string to avoid Emacs bug
       ;; #3506
       (set-text-properties 0 (length subject) nil subject)
@@ -182,11 +182,8 @@ If `org-store-link' was called with a prefix arg the meaning of
 	(setq to (or to (gnus-fetch-original-field "To"))
 	      newsgroups (gnus-fetch-original-field "Newsgroups")
 	      x-no-archive (gnus-fetch-original-field "x-no-archive")))
-      (org-store-link-props :type "gnus" :from from :subject subject
+      (org-store-link-props :type "gnus" :from from :date date :subject subject
 			    :message-id message-id :group group :to to)
-      (when date
-	(org-add-link-props :date date :date-timestamp date-ts
-			    :date-timestamp-inactive date-ts-ia))
       (setq desc (org-email-link-description)
 	    link (org-gnus-article-link
 		  group	newsgroups message-id x-no-archive))
@@ -205,7 +202,7 @@ If `org-store-link' was called with a prefix arg the meaning of
         (let ((gcc (car (last
                          (message-unquote-tokens
                           (message-tokenize-header (mail-fetch-field "gcc" nil t) " ,")))))
-              (id (org-remove-angle-brackets (mail-fetch-field "Message-ID")))
+              (id (org-unbracket-string "<" ">" (mail-fetch-field "Message-ID")))
               (to (mail-fetch-field "To"))
               (from (mail-fetch-field "From"))
               (subject (mail-fetch-field "Subject"))
@@ -249,10 +246,8 @@ If `org-store-link' was called with a prefix arg the meaning of
   (require 'gnus)
   (funcall (cdr (assq 'gnus org-link-frame-setup)))
   (if gnus-other-frame-object (select-frame gnus-other-frame-object))
-  (when group
-    (setq group (org-no-properties group)))
-  (when article
-    (setq article (org-no-properties article)))
+  (setq group (org-no-properties group))
+  (setq article (org-no-properties article))
   (cond ((and group article)
 	 (gnus-activate-group group)
 	 (condition-case nil
@@ -291,7 +286,7 @@ If `org-store-link' was called with a prefix arg the meaning of
 	(group (gnus-group-jump-to-group group))))
 
 (defun org-gnus-no-new-news ()
-  "Like `M-x gnus' but doesn't check for new news."
+  "Like `\\[gnus]' but doesn't check for new news."
   (if (not (gnus-alive-p)) (if org-gnus-no-server (gnus-no-server) (gnus))))
 
 (provide 'org-gnus)

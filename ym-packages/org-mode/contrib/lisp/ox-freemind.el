@@ -1,6 +1,6 @@
 ;;; ox-freemind.el --- Freemind Mindmap Back-End for Org Export Engine
 
-;; Copyright (C) 2013, 2014  Free Software Foundation, Inc.
+;; Copyright (C) 2013-2017  Free Software Foundation, Inc.
 
 ;; Author: Jambunathan K <kjambunathan at gmail dot com>
 ;; Keywords: outlines, hypermedia, calendar, wp
@@ -43,7 +43,6 @@
 ;;; Define Back-End
 
 (org-export-define-derived-backend 'freemind 'html
-  :export-block "FREEMIND"
   :menu-entry
   '(?f "Export to Freemind Mindmap"
        ((?f "As Freemind Mindmap file" org-freemind-export-to-freemind)
@@ -312,7 +311,7 @@ will result in following node:
 		   (org-element-property :title element))
 		  (org-data
 		   (plist-get info :title))
-		  (t (error "Shouldn't come here."))))
+		  (t (error "Shouldn't come here"))))
 	 (element-contents (org-element-contents element))
 	 (section (assq 'section element-contents))
 	 (section-contents
