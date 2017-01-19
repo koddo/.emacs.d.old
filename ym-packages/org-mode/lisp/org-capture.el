@@ -1,6 +1,6 @@
 ;;; org-capture.el --- Fast note taking in Org       -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2010-2017 Free Software Foundation, Inc.
+;; Copyright (C) 2010-2016 Free Software Foundation, Inc.
 
 ;; Author: Carsten Dominik <carsten at orgmode dot org>
 ;; Keywords: outlines, hypermedia, calendar, wp
@@ -749,7 +749,8 @@ captured item after finalizing."
       ;; Store this place as the last one where we stored something
       ;; Do the marking in the base buffer, so that it makes sense after
       ;; the indirect buffer has been killed.
-      (org-capture-store-last-position)
+      (when org-capture-bookmark
+	(org-capture-bookmark-last-stored-position))
 
       ;; Run the hook
       (run-hooks 'org-capture-before-finalize-hook))
@@ -889,14 +890,14 @@ Store them in the capture property list."
 
        ((eq (car target) 'file+headline)
 	(set-buffer (org-capture-target-buffer (nth 1 target)))
-	(unless (derived-mode-p 'org-mode)
-	  (error
-	   "Target buffer \"%s\" for file+headline should be in Org mode"
-	   (current-buffer)))
 	(org-capture-put-target-region-and-position)
 	(widen)
 	(let ((hd (nth 2 target)))
 	  (goto-char (point-min))
+	  (unless (derived-mode-p 'org-mode)
+	    (error
+	     "Target buffer \"%s\" for file+headline should be in Org mode"
+	     (current-buffer)))
 	  (if (re-search-forward
 	       (format org-complex-heading-regexp-format (regexp-quote hd))
 	       nil t)
@@ -931,10 +932,6 @@ Store them in the capture property list."
        ((memq (car target) '(file+datetree file+datetree+prompt file+weektree file+weektree+prompt))
 	(require 'org-datetree)
 	(set-buffer (org-capture-target-buffer (nth 1 target)))
-	(unless (derived-mode-p 'org-mode)
-	  (error "Target buffer \"%s\" for %s should be in Org mode"
-		 (current-buffer)
-		 (car target)))
 	(org-capture-put-target-region-and-position)
 	(widen)
 	;; Make a date/week tree entry, with the current date (or
@@ -1304,8 +1301,8 @@ Of course, if exact position has been required, just put it there."
 			   (org-table-current-dline))))
    (t (error "This should not happen"))))
 
-(defun org-capture-store-last-position ()
-  "Store the last-captured position."
+(defun org-capture-bookmark-last-stored-position ()
+  "Bookmark the last-captured position."
   (let* ((where (org-capture-get :position-for-last-stored 'local))
 	 (pos (cond
 	       ((markerp where)
@@ -1318,11 +1315,14 @@ Of course, if exact position has been required, just put it there."
 		      (point-at-bol))
 		  (point))))))
     (with-current-buffer (buffer-base-buffer (current-buffer))
-      (org-with-point-at pos
-	(when org-capture-bookmark
-	  (let ((bookmark (plist-get org-bookmark-names-plist :last-capture)))
-	    (when bookmark (with-demoted-errors (bookmark-set bookmark)))))
-	(move-marker org-capture-last-stored-marker (point))))))
+      (org-with-wide-buffer
+       (goto-char pos)
+       (let ((bookmark-name (plist-get org-bookmark-names-plist
+				       :last-capture)))
+	 (when bookmark-name
+	   (with-demoted-errors
+	       (bookmark-set bookmark-name))))
+       (move-marker org-capture-last-stored-marker (point))))))
 
 (defun org-capture-narrow (beg end)
   "Narrow, unless configuration says not to narrow."

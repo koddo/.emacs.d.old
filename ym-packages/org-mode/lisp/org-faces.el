@@ -1,6 +1,6 @@
 ;;; org-faces.el --- Face definitions -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2004-2017 Free Software Foundation, Inc.
+;; Copyright (C) 2004-2016 Free Software Foundation, Inc.
 
 ;; Author: Carsten Dominik <carsten at orgmode dot org>
 ;; Keywords: outlines, hypermedia, calendar, wp
@@ -558,11 +558,7 @@ month and 365.24 days for a year)."
   :group 'org-faces)
 
 (defface org-agenda-filter-category '((t :inherit mode-line))
-  "Face for categories in the mode-line when filtering the agenda."
-  :group 'org-faces)
-
-(defface org-agenda-filter-effort '((t :inherit mode-line))
-  "Face for effort in the mode-line when filtering the agenda."
+  "Face for categories(s) in the mode-line when filtering the agenda."
   :group 'org-faces)
 
 (defface org-time-grid	   ;Copied from `font-lock-variable-name-face'
