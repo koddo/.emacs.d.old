@@ -1,6 +1,6 @@
 ;;; org-element.el --- Parser for Org Syntax         -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2012-2017 Free Software Foundation, Inc.
+;; Copyright (C) 2012-2016 Free Software Foundation, Inc.
 
 ;; Author: Nicolas Goaziou <n.goaziou at gmail dot com>
 ;; Keywords: outlines, hypermedia, calendar, wp
@@ -4677,51 +4677,47 @@ indentation removed from its contents."
 	    ;; the beginnings of the contents or right after a line
 	    ;; break.
 	    (lambda (blob first-flag min-ind)
-	      (dolist (datum (org-element-contents blob) min-ind)
-		(when first-flag
-		  (setq first-flag nil)
-		  (cond
-		   ;; Objects cannot start with spaces: in this
-		   ;; case, indentation is 0.
-		   ((not (stringp datum)) (throw :zero 0))
-		   ((not (string-match
-			  "\\`\\([ \t]+\\)\\([^ \t\n]\\|\n\\|\\'\\)" datum))
-		    (throw :zero 0))
-		   ((equal (match-string 2 datum) "\n")
-		    (put-text-property
-		     (match-beginning 1) (match-end 1) 'org-ind 'empty datum))
-		   (t
-		    (let ((i (string-width (match-string 1 datum))))
+	      (catch 'zero
+		(dolist (datum (org-element-contents blob) min-ind)
+		  (when first-flag
+		    (setq first-flag nil)
+		    (cond
+		     ;; Objects cannot start with spaces: in this
+		     ;; case, indentation is 0.
+		     ((not (stringp datum)) (throw 'zero 0))
+		     ((not (string-match
+			    "\\`\\([ \t]+\\)\\([^ \t\n]\\|\n\\|\\'\\)" datum))
+		      (throw 'zero 0))
+		     ((equal (match-string 2 datum) "\n")
 		      (put-text-property
-		       (match-beginning 1) (match-end 1) 'org-ind i datum)
-		      (setq min-ind (min i min-ind))))))
-		(cond
-		 ((stringp datum)
-		  (let ((s 0))
-		    (while (string-match
-			    "\n\\([ \t]*\\)\\([^ \t\n]\\|\n\\|\\'\\)" datum s)
-		      (setq s (match-end 1))
-		      (cond
-		       ((equal (match-string 1 datum) "")
-			(unless (member (match-string 2 datum) '("" "\n"))
-			  (throw :zero 0)))
-		       ((equal (match-string 2 datum) "\n")
-			(put-text-property (match-beginning 1) (match-end 1)
-					   'org-ind 'empty datum))
-		       (t
-			(let ((i (string-width (match-string 1 datum))))
-			  (put-text-property (match-beginning 1) (match-end 1)
-					     'org-ind i datum)
-			  (setq min-ind (min i min-ind))))))))
-		 ((eq (org-element-type datum) 'line-break)
-		  (setq first-flag t))
-		 ((memq (org-element-type datum) org-element-recursive-objects)
-		  (setq min-ind
-			(funcall find-min-ind datum first-flag min-ind)))))))
-	   (min-ind
-	    (catch :zero
-	      (funcall find-min-ind
-		       element (not ignore-first) most-positive-fixnum))))
+		       (match-beginning 1) (match-end 1) 'org-ind 'empty datum))
+		     (t
+		      (let ((i (string-width (match-string 1 datum))))
+			(put-text-property
+			 (match-beginning 1) (match-end 1) 'org-ind i datum)
+			(setq min-ind (min i min-ind))))))
+		  (cond
+		   ((stringp datum)
+		    (let ((s 0))
+		      (while (string-match
+			      "\n\\([ \t]+\\)\\([^ \t\n]\\|\n\\|\\'\\)" datum s)
+			(setq s (match-end 1))
+			(if (equal (match-string 2 datum) "\n")
+			    (put-text-property
+			     (match-beginning 1) (match-end 1)
+			     'org-ind 'empty
+			     datum)
+			  (let ((i (string-width (match-string 1 datum))))
+			    (put-text-property
+			     (match-beginning 1) (match-end 1) 'org-ind i datum)
+			    (setq min-ind (min i min-ind)))))))
+		   ((eq (org-element-type datum) 'line-break)
+		    (setq first-flag t))
+		   ((memq (org-element-type datum) org-element-recursive-objects)
+		    (setq min-ind
+			  (funcall find-min-ind datum first-flag min-ind))))))))
+	   (min-ind (funcall find-min-ind
+			     element (not ignore-first) most-positive-fixnum)))
     (if (or (zerop min-ind) (= min-ind most-positive-fixnum)) element
       ;; Build ELEMENT back, replacing each string with the same
       ;; string minus common indentation.

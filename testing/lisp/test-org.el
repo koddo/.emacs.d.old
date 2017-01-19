@@ -1313,14 +1313,6 @@
 
 (ert-deftest test-org/clone-with-time-shift ()
   "Test `org-clone-subtree-with-time-shift'."
-  ;; Raise an error before first heading.
-  (should-error
-   (org-test-with-temp-text ""
-     (org-clone-subtree-with-time-shift 1)))
-  ;; Raise an error on invalid number of clones.
-  (should-error
-   (org-test-with-temp-text "* Clone me"
-     (org-clone-subtree-with-time-shift -1)))
   ;; Clone non-repeating once.
   (should
    (equal "\
@@ -1364,33 +1356,7 @@
 	    (org-clone-subtree-with-time-shift 0 "+2d")
 	    (replace-regexp-in-string
 	     "\\( [.A-Za-z]+\\)\\( \\+[0-9][hdmwy]\\)?>" "" (buffer-string)
-	     nil nil 1))))
-  ;; Clone with blank SHIFT argument.
-  (should
-   (string-prefix-p
-    "* H <2012-03-29"
-    (org-test-with-temp-text "* H <2012-03-29 Thu><point>"
-      (org-clone-subtree-with-time-shift 1 "")
-      (buffer-substring-no-properties (line-beginning-position 2)
-				      (line-end-position 2)))))
-  ;; Find time stamps before point.  If SHIFT is not specified, ask
-  ;; for a time shift.
-  (should
-   (string-prefix-p
-    "* H <2012-03-30"
-    (org-test-with-temp-text "* H <2012-03-29 Thu><point>"
-      (org-clone-subtree-with-time-shift 1 "+1d")
-      (buffer-substring-no-properties (line-beginning-position 2)
-				      (line-end-position 2)))))
-  (should
-   (string-prefix-p
-    "* H <2014-03-05"
-    (org-test-with-temp-text "* H <2014-03-04 Tue><point>"
-      (cl-letf (((symbol-function 'read-from-minibuffer)
-		 (lambda (&rest args) "+1d")))
-	(org-clone-subtree-with-time-shift 1))
-      (buffer-substring-no-properties (line-beginning-position 2)
-				      (line-end-position 2))))))
+	     nil nil 1)))))
 
 
 ;;; Fixed-Width Areas
@@ -2168,17 +2134,9 @@ Foo Bar
    (org-test-with-temp-text "[[*Test]]\n* COMMENT Test"
      (org-open-at-point)
      (looking-at "\\* COMMENT Test")))
-  (should
-   (org-test-with-temp-text "[[*Test]]\n* TODO COMMENT Test"
-     (org-open-at-point)
-     (looking-at "\\* TODO COMMENT Test")))
   ;; Correctly un-hexify fuzzy links.
   (should
    (org-test-with-temp-text "* With space\n[[*With%20space][With space<point>]]"
-     (org-open-at-point)
-     (bobp)))
-  (should
-   (org-test-with-temp-text "* [1]\n[[*%5B1%5D<point>]]"
      (org-open-at-point)
      (bobp))))
 
@@ -3290,18 +3248,21 @@ Outside."
    :type 'user-error)
   ;; Error when trying to swap nested elements.
   (should-error
-   (org-test-with-temp-text "#+BEGIN_CENTER\n<point>Test.\n#+END_CENTER"
+   (org-test-with-temp-text "#+BEGIN_CENTER\nTest.\n#+END_CENTER"
+     (forward-line)
      (org-drag-element-backward))
    :type 'user-error)
   ;; Error when trying to swap an headline element and a non-headline
   ;; element.
   (should-error
-   (org-test-with-temp-text "Test.\n<point>* Head 1"
+   (org-test-with-temp-text "Test.\n* Head 1"
+     (forward-line)
      (org-drag-element-backward))
-   :type 'error)
+   :type 'user-error)
   ;; Error when called before first element.
   (should-error
-   (org-test-with-temp-text "\n<point>"
+   (org-test-with-temp-text "\n"
+     (forward-line)
      (org-drag-element-backward))
    :type 'user-error)
   ;; Preserve visibility of elements and their contents.
@@ -3319,14 +3280,7 @@ Text.
 	    (search-backward "- item 1")
 	    (org-drag-element-backward)
 	    (mapcar (lambda (ov) (cons (overlay-start ov) (overlay-end ov)))
-		    (overlays-in (point-min) (point-max))))))
-  ;; Pathological case: handle call with point in blank lines right
-  ;; after a headline.
-  (should
-   (equal "* H2\n* H1\nText\n\n"
-	  (org-test-with-temp-text "* H1\nText\n* H2\n\n<point>"
-	    (org-drag-element-backward)
-	    (buffer-string)))))
+		    (overlays-in (point-min) (point-max)))))))
 
 (ert-deftest test-org/drag-element-forward ()
   "Test `org-drag-element-forward' specifications."
@@ -5181,24 +5135,6 @@ Paragraph<point>"
      (org-hide-block-toggle-maybe)))
   (should-not
    (org-test-with-temp-text "Paragraph" (org-hide-block-toggle-maybe))))
-
-(ert-deftest test-org/set-tags ()
-  "Test `org-set-tags' specifications."
-  ;; Tags set via fast-tag-selection should be visible afterwards
-  (should
-   (let ((org-tag-alist '(("NEXT" . ?n)))
-	 (org-fast-tag-selection-single-key t))
-     (cl-letf (((symbol-function 'read-char-exclusive) (lambda () ?n))
-	       ((symbol-function 'window-width) (lambda (&rest args) 100)))
-       (org-test-with-temp-text "<point>* Headline\nAnd its content\n* And another headline\n\nWith some content"
-	 ;; Show only headlines
-	 (org-content)
-	 ;; Set NEXT tag on current entry
-	 (org-set-tags nil nil)
-	 ;; Move point to that NEXT tag
-	 (search-forward "NEXT") (backward-word)
-	 ;; And it should be visible (i.e. no overlays)
-	 (not (overlays-at (point))))))))
 
 (ert-deftest test-org/show-set-visibility ()
   "Test `org-show-set-visibility' specifications."

@@ -1,7 +1,7 @@
 ;;; org.el --- Outline-based notes management and organizer -*- lexical-binding: t; -*-
 
 ;; Carstens outline-mode for keeping track of everything.
-;; Copyright (C) 2004-2017 Free Software Foundation, Inc.
+;; Copyright (C) 2004-2016 Free Software Foundation, Inc.
 ;;
 ;; Author: Carsten Dominik <carsten at orgmode dot org>
 ;; Maintainer: Carsten Dominik <carsten at orgmode dot org>
@@ -8976,79 +8976,77 @@ subtree has a repeater.  Setting N to 0, then, can be used to
 remove the repeater from a subtree and create a shifted clone
 with the original repeater."
   (interactive "nNumber of clones to produce: ")
-  (unless (wholenump n) (user-error "Invalid number of replications %s" n))
-  (when (org-before-first-heading-p) (user-error "No subtree to clone"))
-  (let* ((beg (save-excursion (org-back-to-heading t) (point)))
-	 (end-of-tree (save-excursion (org-end-of-subtree t t) (point)))
-	 (shift
-	  (or shift
-	      (if (and (not (equal current-prefix-arg '(4)))
-		       (save-excursion
-			 (goto-char beg)
-			 (re-search-forward org-ts-regexp-both end-of-tree t)))
-		  (read-from-minibuffer
-		   "Date shift per clone (e.g. +1w, empty to copy unchanged): ")
-		"")))			;No time shift
-	 (doshift
-	  (and (org-string-nw-p shift)
-	       (or (string-match "\\`[ \t]*\\+?\\([0-9]+\\)\\([dwmy]\\)[ \t]*\\'"
-				 shift)
-		   (user-error "Invalid shift specification %s" shift)))))
-    (goto-char end-of-tree)
-    (unless (bolp) (insert "\n"))
-    (let* ((end (point))
-	   (template (buffer-substring beg end))
-	   (shift-n (and doshift (string-to-number (match-string 1 shift))))
-	   (shift-what (pcase (and doshift (match-string 2 shift))
-			 (`nil nil)
-			 ("d" 'day)
-			 ("w" (setq shift-n (* 7 shift-n)) 'day)
-			 ("m" 'month)
-			 ("y" 'year)
-			 (_ (error "Unsupported time unit"))))
-	   (nmin 1)
-	   (nmax n)
-	   (n-no-remove -1)
-	   (idprop (org-entry-get nil "ID")))
-      (when (and doshift
-		 (string-match-p "<[^<>\n]+ [.+]?\\+[0-9]+[hdwmy][^<>\n]*>"
-				 template))
-	(delete-region beg end)
-	(setq end beg)
-	(setq nmin 0)
-	(setq nmax (1+ nmax))
-	(setq n-no-remove nmax))
-      (goto-char end)
-      (cl-loop for n from nmin to nmax do
-	       (insert
-		;; Prepare clone.
-		(with-temp-buffer
-		  (insert template)
-		  (org-mode)
-		  (goto-char (point-min))
-		  (org-show-subtree)
-		  (and idprop (if org-clone-delete-id
-				  (org-entry-delete nil "ID")
-				(org-id-get-create t)))
-		  (unless (= n 0)
-		    (while (re-search-forward org-clock-line-re nil t)
-		      (delete-region (line-beginning-position)
-				     (line-beginning-position 2)))
-		    (goto-char (point-min))
-		    (while (re-search-forward org-drawer-regexp nil t)
-		      (org-remove-empty-drawer-at (point))))
-		  (goto-char (point-min))
-		  (when doshift
-		    (while (re-search-forward org-ts-regexp-both nil t)
-		      (org-timestamp-change (* n shift-n) shift-what))
-		    (unless (= n n-no-remove)
-		      (goto-char (point-min))
-		      (while (re-search-forward org-ts-regexp nil t)
-			(save-excursion
-			  (goto-char (match-beginning 0))
-			  (when (looking-at "<[^<>\n]+\\( +[.+]?\\+[0-9]+[hdwmy]\\)")
-			    (delete-region (match-beginning 1) (match-end 1)))))))
-		  (buffer-string)))))
+  (let ((shift
+	 (or shift
+	     (if (and (not (equal current-prefix-arg '(4)))
+		      (save-excursion
+			(re-search-forward org-ts-regexp-both
+					   (save-excursion
+					     (org-end-of-subtree t)
+					     (point)) t)))
+		 (read-from-minibuffer
+		  "Date shift per clone (e.g. +1w, empty to copy unchanged): ")
+	       ""))) ;; No time shift
+	(n-no-remove -1)
+	(drawer-re org-drawer-regexp)
+	(org-clock-re (format "^[ \t]*%s.*$" org-clock-string))
+	beg end template task idprop
+	shift-n shift-what doshift nmin nmax)
+    (unless (wholenump n)
+      (user-error "Invalid number of replications %s" n))
+    (when (and (setq doshift (and (stringp shift) (string-match "\\S-" shift)))
+	       (not (string-match "\\`[ \t]*\\+?\\([0-9]+\\)\\([hdwmy]\\)[ \t]*\\'"
+				  shift)))
+      (user-error "Invalid shift specification %s" shift))
+    (when doshift
+      (setq shift-n (string-to-number (match-string 1 shift))
+	    shift-what (cdr (assoc (match-string 2 shift)
+				   '(("d" . day) ("w" . week)
+				     ("m" . month) ("y" . year))))))
+    (when (eq shift-what 'week) (setq shift-n (* 7 shift-n) shift-what 'day))
+    (setq nmin 1 nmax n)
+    (org-back-to-heading t)
+    (setq beg (point))
+    (setq idprop (org-entry-get nil "ID"))
+    (org-end-of-subtree t t)
+    (or (bolp) (insert "\n"))
+    (setq end (point))
+    (setq template (buffer-substring beg end))
+    (when (and doshift
+	       (string-match "<[^<>\n]+ [.+]?\\+[0-9]+[hdwmy][^<>\n]*>" template))
+      (delete-region beg end)
+      (setq end beg)
+      (setq nmin 0 nmax (1+ nmax) n-no-remove nmax))
+    (goto-char end)
+    (cl-loop for n from nmin to nmax do
+	     ;; prepare clone
+	     (with-temp-buffer
+	       (insert template)
+	       (org-mode)
+	       (goto-char (point-min))
+	       (org-show-subtree)
+	       (and idprop (if org-clone-delete-id
+			       (org-entry-delete nil "ID")
+			     (org-id-get-create t)))
+	       (unless (= n 0)
+		 (while (re-search-forward org-clock-re nil t)
+		   (kill-whole-line))
+		 (goto-char (point-min))
+		 (while (re-search-forward drawer-re nil t)
+		   (org-remove-empty-drawer-at (point))))
+	       (goto-char (point-min))
+	       (when doshift
+		 (while (re-search-forward org-ts-regexp-both nil t)
+		   (org-timestamp-change (* n shift-n) shift-what))
+		 (unless (= n n-no-remove)
+		   (goto-char (point-min))
+		   (while (re-search-forward org-ts-regexp nil t)
+		     (save-excursion
+		       (goto-char (match-beginning 0))
+		       (when (looking-at "<[^<>\n]+\\( +[.+]?\\+[0-9]+[hdwmy]\\)")
+			 (delete-region (match-beginning 1) (match-end 1)))))))
+	       (setq task (buffer-string)))
+	     (insert task))
     (goto-char beg)))
 
 ;;; Outline Sorting
@@ -11236,10 +11234,13 @@ of matched result, which is either `dedicated' or `fuzzy'."
      ;; statistics cookies and tags.
      ((and (derived-mode-p 'org-mode)
 	   (let ((title-re
-		  (format "%s.*\\(?:%s[ \t]\\)?.*%s"
+		  (format "%s[ \t]*\\(?:%s[ \t]+\\)?.*%s"
 			  org-outline-regexp-bol
 			  org-comment-string
-			  (mapconcat #'regexp-quote words ".+")))
+			  (mapconcat
+			   (lambda (w) (format "\\<%s\\>" (regexp-quote w)))
+			   words
+			   ".+")))
 		 (cookie-re "\\[[0-9]*\\(?:%\\|/[0-9]*\\)\\]")
 		 (comment-re (format "\\`%s[ \t]+" org-comment-string)))
 	     (goto-char (point-min))
@@ -15191,10 +15192,7 @@ When JUST-ALIGN is non-nil, only align tags."
 	      ;; white spaces.
 	      (end-of-line)
 	      (if (not (equal tags ""))
-		  ;; When text is being inserted on an invisible
-		  ;; region boundary, it can be inadvertently sucked
-		  ;; into invisibility.
-		  (outline-flag-region (point) (progn (insert " " tags) (point)) nil)
+		  (insert " " tags)
 		(skip-chars-backward " \t")
 		(delete-region (point) (line-end-position)))))
 	  ;; Align tags, if any.  Fix tags column if `org-indent-mode'
@@ -24689,34 +24687,29 @@ Move to the previous element at the same level, when possible."
 (defun org-drag-element-backward ()
   "Move backward element at point."
   (interactive)
-  (let ((elem (or (org-element-at-point)
-		  (user-error "No element at point"))))
-    (if (eq (org-element-type elem) 'headline)
-	;; Preserve point when moving a whole tree, even if point was
-	;; on blank lines below the headline.
-	(let ((offset (skip-chars-backward " \t\n")))
-	  (unwind-protect (org-move-subtree-up)
-	    (forward-char (- offset))))
-      (let ((prev-elem
-	     (save-excursion
-	       (goto-char (org-element-property :begin elem))
-	       (skip-chars-backward " \r\t\n")
-	       (unless (bobp)
-		 (let* ((beg (org-element-property :begin elem))
-			(prev (org-element-at-point))
-			(up prev))
-		   (while (and (setq up (org-element-property :parent up))
-			       (<= (org-element-property :end up) beg))
-		     (setq prev up))
-		   prev)))))
-	;; Error out if no previous element or previous element is
-	;; a parent of the current one.
-	(if (or (not prev-elem) (org-element-nested-p elem prev-elem))
-	    (user-error "Cannot drag element backward")
-	  (let ((pos (point)))
-	    (org-element-swap-A-B prev-elem elem)
-	    (goto-char (+ (org-element-property :begin prev-elem)
-			  (- pos (org-element-property :begin elem))))))))))
+  (if (org-with-limited-levels (org-at-heading-p)) (org-move-subtree-up)
+    (let* ((elem (or (org-element-at-point)
+		     (user-error "No element at point")))
+	   (prev-elem
+	    (save-excursion
+	      (goto-char (org-element-property :begin elem))
+	      (skip-chars-backward " \r\t\n")
+	      (unless (bobp)
+		(let* ((beg (org-element-property :begin elem))
+		       (prev (org-element-at-point))
+		       (up prev))
+		  (while (and (setq up (org-element-property :parent up))
+			      (<= (org-element-property :end up) beg))
+		    (setq prev up))
+		  prev)))))
+      ;; Error out if no previous element or previous element is
+      ;; a parent of the current one.
+      (if (or (not prev-elem) (org-element-nested-p elem prev-elem))
+	  (user-error "Cannot drag element backward")
+	(let ((pos (point)))
+	  (org-element-swap-A-B prev-elem elem)
+	  (goto-char (+ (org-element-property :begin prev-elem)
+			(- pos (org-element-property :begin elem)))))))))
 
 (defun org-drag-element-forward ()
   "Move forward element at point."

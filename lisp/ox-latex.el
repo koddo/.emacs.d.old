@@ -1,6 +1,6 @@
 ;;; ox-latex.el --- LaTeX Back-End for Org Export Engine -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2011-2017 Free Software Foundation, Inc.
+;; Copyright (C) 2011-2016 Free Software Foundation, Inc.
 
 ;; Author: Nicolas Goaziou <n.goaziou at gmail dot com>
 ;; Keywords: outlines, hypermedia, calendar, wp
@@ -2000,7 +2000,7 @@ holding contextual information."
 		    (concat headline-label pre-blanks contents))))))))
 
 (defun org-latex-format-headline-default-function
-    (todo _todo-type priority text tags _info)
+    (todo _todo-type priority text tags info)
   "Default format function for a headline.
 See `org-latex-format-headline-function' for details."
   (concat
@@ -2009,7 +2009,8 @@ See `org-latex-format-headline-function' for details."
    text
    (and tags
 	(format "\\hfill{}\\textsc{%s}"
-		(mapconcat #'org-latex--protect-text tags ":")))))
+		(mapconcat (lambda (tag) (org-latex-plain-text tag info))
+			   tags ":")))))
 
 
 ;;;; Horizontal Rule
@@ -2091,7 +2092,7 @@ holding contextual information."
 	     todo todo-type priority title tags contents info)))
 
 (defun org-latex-format-inlinetask-default-function
-    (todo _todo-type priority title tags contents _info)
+  (todo _todo-type priority title tags contents info)
   "Default format function for a inlinetasks.
 See `org-latex-format-inlinetask-function' for details."
   (let ((full-title
@@ -2100,7 +2101,9 @@ See `org-latex-format-inlinetask-function' for details."
 		 title
 		 (when tags
 		   (format "\\hfill{}\\textsc{:%s:}"
-			   (mapconcat #'org-latex--protect-text tags ":"))))))
+			   (mapconcat
+			    (lambda (tag) (org-latex-plain-text tag info))
+			    tags ":"))))))
     (concat "\\begin{center}\n"
 	    "\\fbox{\n"
 	    "\\begin{minipage}[c]{.6\\textwidth}\n"

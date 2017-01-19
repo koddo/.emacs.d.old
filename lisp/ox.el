@@ -1,6 +1,6 @@
 ;;; ox.el --- Export Framework for Org Mode          -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2012-2017 Free Software Foundation, Inc.
+;; Copyright (C) 2012-2016 Free Software Foundation, Inc.
 
 ;; Author: Nicolas Goaziou <n.goaziou at gmail dot com>
 ;; Keywords: outlines, hypermedia, calendar, wp
@@ -1782,23 +1782,12 @@ INFO is a plist holding export options."
 	(funcall walk-data data nil)
 	selected-trees))))
 
-(defun org-export--skip-p (datum options selected)
-  "Non-nil when element or object DATUM should be skipped during export.
+(defun org-export--skip-p (blob options selected)
+  "Non-nil when element or object BLOB should be skipped during export.
 OPTIONS is the plist holding export options.  SELECTED, when
 non-nil, is a list of headlines or inlinetasks belonging to
 a tree with a select tag."
-  (cl-case (org-element-type datum)
-    ((comment comment-block)
-     ;; Skip all comments and comment blocks.  Make to keep maximum
-     ;; number of blank lines around the comment so as to preserve
-     ;; local structure of the document upon interpreting it back into
-     ;; Org syntax.
-     (let* ((previous (org-export-get-previous-element datum options))
-	    (before (or (org-element-property :post-blank previous) 0))
-	    (after (or (org-element-property :post-blank datum) 0)))
-       (when previous
-	 (org-element-put-property previous :post-blank (max before after 1))))
-     t)
+  (cl-case (org-element-type blob)
     (clock (not (plist-get options :with-clocks)))
     (drawer
      (let ((with-drawers-p (plist-get options :with-drawers)))
@@ -1808,7 +1797,7 @@ a tree with a select tag."
 		;; every drawer whose name belong to that list.
 		;; Otherwise, ignore drawers whose name isn't in that
 		;; list.
-		(let ((name (org-element-property :drawer-name datum)))
+		(let ((name (org-element-property :drawer-name blob)))
 		  (if (eq (car with-drawers-p) 'not)
 		      (member-ignore-case name (cdr with-drawers-p))
 		    (not (member-ignore-case name with-drawers-p))))))))
@@ -1817,23 +1806,23 @@ a tree with a select tag."
      (not (plist-get options :with-footnotes)))
     ((headline inlinetask)
      (let ((with-tasks (plist-get options :with-tasks))
-	   (todo (org-element-property :todo-keyword datum))
-	   (todo-type (org-element-property :todo-type datum))
+	   (todo (org-element-property :todo-keyword blob))
+	   (todo-type (org-element-property :todo-type blob))
 	   (archived (plist-get options :with-archived-trees))
-	   (tags (org-export-get-tags datum options nil t)))
+	   (tags (org-export-get-tags blob options nil t)))
        (or
-	(and (eq (org-element-type datum) 'inlinetask)
+	(and (eq (org-element-type blob) 'inlinetask)
 	     (not (plist-get options :with-inlinetasks)))
 	;; Ignore subtrees with an exclude tag.
 	(cl-loop for k in (plist-get options :exclude-tags)
 		 thereis (member k tags))
 	;; When a select tag is present in the buffer, ignore any tree
 	;; without it.
-	(and selected (not (memq datum selected)))
+	(and selected (not (memq blob selected)))
 	;; Ignore commented sub-trees.
-	(org-element-property :commentedp datum)
+	(org-element-property :commentedp blob)
 	;; Ignore archived subtrees if `:with-archived-trees' is nil.
-	(and (not archived) (org-element-property :archivedp datum))
+	(and (not archived) (org-element-property :archivedp blob))
 	;; Ignore tasks, if specified by `:with-tasks' property.
 	(and todo
 	     (or (not with-tasks)
@@ -1845,7 +1834,7 @@ a tree with a select tag."
      (let ((properties-set (plist-get options :with-properties)))
        (cond ((null properties-set) t)
 	     ((consp properties-set)
-	      (not (member-ignore-case (org-element-property :key datum)
+	      (not (member-ignore-case (org-element-property :key blob)
 				       properties-set))))))
     (planning (not (plist-get options :with-planning)))
     (property-drawer (not (plist-get options :with-properties)))
@@ -1853,14 +1842,14 @@ a tree with a select tag."
     (table (not (plist-get options :with-tables)))
     (table-cell
      (and (org-export-table-has-special-column-p
-	   (org-export-get-parent-table datum))
-	  (org-export-first-sibling-p datum options)))
-    (table-row (org-export-table-row-is-special-p datum options))
+	   (org-export-get-parent-table blob))
+	  (org-export-first-sibling-p blob options)))
+    (table-row (org-export-table-row-is-special-p blob options))
     (timestamp
      ;; `:with-timestamps' only applies to isolated timestamps
      ;; objects, i.e. timestamp objects in a paragraph containing only
      ;; timestamps and whitespaces.
-     (when (let ((parent (org-export-get-parent-element datum)))
+     (when (let ((parent (org-export-get-parent-element blob)))
 	     (and (memq (org-element-type parent) '(paragraph verse-block))
 		  (not (org-element-map parent
 			   (cons 'plain-text
@@ -1871,9 +1860,9 @@ a tree with a select tag."
        (cl-case (plist-get options :with-timestamps)
 	 ((nil) t)
 	 (active
-	  (not (memq (org-element-property :type datum) '(active active-range))))
+	  (not (memq (org-element-property :type blob) '(active active-range))))
 	 (inactive
-	  (not (memq (org-element-property :type datum)
+	  (not (memq (org-element-property :type blob)
 		     '(inactive inactive-range)))))))))
 
 
@@ -2658,18 +2647,49 @@ The function assumes BUFFER's major mode is `org-mode'."
 			   'invisible (quote ,invis-prop))
 			 ov-set)))))))))
 
-(defun org-export--delete-comment-trees ()
-  "Delete commented trees and commented inlinetasks in the buffer.
-Narrowing, if any, is ignored."
+(defun org-export--delete-comments ()
+  "Delete commented areas in the buffer.
+Commented areas are comments, comment blocks, commented trees and
+inlinetasks.  Trailing blank lines after a comment or a comment
+block are removed, as long as it doesn't alter the structure of
+the document.  Narrowing, if any, is ignored."
   (org-with-wide-buffer
    (goto-char (point-min))
    (let* ((case-fold-search t)
-	  (regexp (concat org-outline-regexp-bol ".*" org-comment-string)))
+	  (comment-re "^[ \t]*#\\(?: \\|$\\|\\+end_comment\\)")
+	  (regexp (concat org-outline-regexp-bol ".*" org-comment-string "\\|"
+			  comment-re)))
      (while (re-search-forward regexp nil t)
        (let ((element (org-element-at-point)))
-	 (when (org-element-property :commentedp element)
-	   (delete-region (org-element-property :begin element)
-			  (org-element-property :end element))))))))
+	 (pcase (org-element-type element)
+	   ((or `headline `inlinetask)
+	    (when (org-element-property :commentedp element)
+	      (delete-region (org-element-property :begin element)
+			     (org-element-property :end element))))
+	   ((or `comment `comment-block)
+	    (let* ((parent (org-element-property :parent element))
+		   (start (org-element-property :begin element))
+		   (end (org-element-property :end element))
+		   ;; We remove trailing blank lines.  Doing so could
+		   ;; modify the structure of the document.  Therefore
+		   ;; we ensure that any comment between elements is
+		   ;; replaced with one empty line, so as to keep them
+		   ;; separated.
+		   (add-blank?
+		    (save-excursion
+		      (goto-char start)
+		      (not (or (bobp)
+			       (eq (org-element-property :contents-begin parent)
+				   start)
+			       (eq (org-element-property :contents-end parent)
+				   end)
+			       (progn
+				 (forward-line -1)
+				 (or (looking-at-p "^[ \t]*$")
+				     (org-with-limited-levels
+				      (org-at-heading-p)))))))))
+	      (delete-region start end)
+	      (when add-blank? (insert "\n"))))))))))
 
 (defun org-export--prune-tree (data info)
   "Prune non exportable elements from DATA.
@@ -3024,7 +3044,7 @@ Return code as a string."
 			     (org-export-backend-name backend))
 	 ;; Include files, delete comments and expand macros.
 	 (org-export-expand-include-keyword)
-	 (org-export--delete-comment-trees)
+	 (org-export--delete-comments)
 	 (org-macro-initialize-templates)
 	 (org-macro-replace-all org-macro-templates nil parsed-keywords)
 	 ;; Refresh buffer properties and radio targets after
@@ -4267,7 +4287,8 @@ significant."
 		 (and (org-export-match-search-cell-p datum search-cells)
 		      datum)))))
 	(unless matches
-	  (signal 'org-link-broken (list (org-element-property :path link))))
+	  (signal 'org-link-broken
+		  (list (org-element-property :raw-path link))))
 	(puthash
 	 search-cells
 	 ;; There can be multiple matches for un-typed searches, i.e.,

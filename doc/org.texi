@@ -259,7 +259,7 @@
 @copying
 This manual is for Org version @value{VERSION}.
 
-Copyright @copyright{} 2004--2017 Free Software Foundation, Inc.
+Copyright @copyright{} 2004--2016 Free Software Foundation, Inc.
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -7647,12 +7647,11 @@ added.
 @node Internal archiving
 @subsection Internal archiving
 
-@cindex archive tag
-If you want to just switch off---for agenda views---certain subtrees without
-moving them to a different file, you can use the archive tag.
+If you want to just switch off (for agenda views) certain subtrees without
+moving them to a different file, you can use the @code{ARCHIVE tag}.
 
-A headline that is marked with the @samp{:ARCHIVE:} tag (@pxref{Tags}) stays
-at its location in the outline tree, but behaves in the following way:
+A headline that is marked with the ARCHIVE tag (@pxref{Tags}) stays at
+its location in the outline tree, but behaves in the following way:
 @itemize @minus
 @item
 @vindex org-cycle-open-archived-trees
@@ -7750,15 +7749,6 @@ The extracted information is displayed in a special @emph{agenda
 buffer}.  This buffer is read-only, but provides commands to visit the
 corresponding locations in the original Org files, and even to
 edit these files remotely.
-
-@vindex org-agenda-skip-comment-trees
-@vindex org-agenda-skip-archived-trees
-@cindex commented entries, in agenda views
-@cindex archived entries, in agenda views
-By default, the report ignores commented (@pxref{Comment lines}) and archived
-(@pxref{Internal archiving}) entries.  You can override this by setting
-@code{org-agenda-skip-comment-trees} and
-@code{org-agenda-skip-archived-trees} to @code{nil}.
 
 @vindex org-agenda-window-setup
 @vindex org-agenda-restore-windows-after-quit
@@ -8647,10 +8637,8 @@ selected.
 Filter the current agenda view with respect to the category of the item at
 point.  Pressing @code{<} another time will remove this filter.  When called
 with a prefix argument exclude the category of the item at point from the
-agenda.
-
-You can add a filter preset in custom agenda commands through the option
-@code{org-agenda-category-filter-preset}.  @xref{Setting options}.
+agenda.  You can add a filter preset through the option
+@code{org-agenda-category-filter-preset} (see below.)
 
 @orgcmd{^,org-agenda-filter-by-top-headline}
 Filter the current agenda view and only display the siblings and the parent
@@ -8663,10 +8651,8 @@ Filter the agenda view by a regular expression: only show agenda entries
 matching the regular expression the user entered.  When called with a prefix
 argument, it will filter @emph{out} entries matching the regexp.  With two
 universal prefix arguments, it will remove all the regexp filters, which can
-be accumulated.
-
-You can add a filter preset in custom agenda commands through the option
-@code{org-agenda-regexp-filter-preset}.  @xref{Setting options}.
+be accumulated.  You can add a filter preset through the option
+@code{org-agenda-category-filter-preset} (see below.)
 
 @orgcmd{_,org-agenda-filter-by-effort}
 @vindex org-agenda-effort-filter-preset
@@ -8684,13 +8670,6 @@ The filter will then restrict to entries with effort smaller-or-equal, equal,
 or larger-or-equal than the selected value.  For application of the operator,
 entries without a defined effort will be treated according to the value of
 @code{org-sort-agenda-noeffort-is-high}.
-
-When called with a prefix argument, it will remove entries matching the
-condition.  With two universal prefix arguments, it will clear effort
-filters, which can be accumulated.
-
-You can add a filter preset in custom agenda commands through the option
-@code{org-agenda-effort-filter-preset}.  @xref{Setting options}.
 
 @orgcmd{|,org-agenda-filter-remove-all}
 Remove all filters in the current agenda view.
@@ -8942,25 +8921,32 @@ file or subtree (@pxref{Agenda files}).
 
 @tsubheading{Secondary filtering and query editing}
 
-For a detailed description of these commands, @pxref{Filtering/limiting
+For a detailed description of these commands, see @pxref{Filtering/limiting
 agenda items}.
 
 @orgcmd{/,org-agenda-filter-by-tag}
+@vindex org-agenda-tag-filter-preset
 Filter the agenda view with respect to a tag and/or effort estimates.
 
 @orgcmd{<,org-agenda-filter-by-category}
+@vindex org-agenda-category-filter-preset
+
 Filter the current agenda view with respect to the category of the item at
-point.
+point.  Pressing @code{<} another time will remove this filter.
 
 @orgcmd{^,org-agenda-filter-by-top-headline}
 Filter the current agenda view and only display the siblings and the parent
 headline of the one at point.
 
 @orgcmd{=,org-agenda-filter-by-regexp}
-Filter the agenda view by a regular expression.
+@vindex org-agenda-regexp-filter-preset
 
-@orgcmd{_,org-agenda-filter-by-effort}
-Filter the agenda view with respect to effort estimates.
+Filter the agenda view by a regular expression: only show agenda entries
+matching the regular expression the user entered.  When called with a prefix
+argument, it will filter @emph{out} entries matching the regexp.  With two
+universal prefix arguments, it will remove all the regexp filters, which can
+be accumulated.  You can add a filter preset through the option
+@code{org-agenda-category-filter-preset} (see below.)
 
 @orgcmd{|,org-agenda-filter-remove-all}
 Remove all filters in the current agenda view.
@@ -9666,12 +9652,11 @@ This causes the following issues:
 Org needs to make a decision which @code{COLUMNS} format to use.  Since the
 entries in the agenda are collected from different files, and different files
 may have different @code{COLUMNS} formats, this is a non-trivial problem.
-Org first checks if the variable @code{org-agenda-overriding-columns-format}
-is currently set, and if so, takes the format from there.  Otherwise it takes
+Org first checks if the variable @code{org-agenda-overriding-columns-format} is
+currently set, and if so, takes the format from there.  Otherwise it takes
 the format associated with the first item in the agenda, or, if that item
-does not have a specific format---defined in a property, or in its file---it
+does not have a specific format (defined in a property, or in its file), it
 uses @code{org-columns-default-format}.
-
 @item
 @cindex property, special, CLOCKSUM
 If any of the columns has a summary type defined (@pxref{Column attributes}),
@@ -9680,12 +9665,11 @@ make sure that the computations of this property are up to date.  This is
 also true for the special @code{CLOCKSUM} property.  Org will then sum the
 values displayed in the agenda.  In the daily/weekly agenda, the sums will
 cover a single day; in all other views they cover the entire block.  It is
-vital to realize that the agenda may show the same entry @emph{twice}---for
-example as scheduled and as a deadline---and it may show two entries from the
-same hierarchy---for example a @emph{parent} and its @emph{child}.  In these
+vital to realize that the agenda may show the same entry @emph{twice} (for
+example as scheduled and as a deadline), and it may show two entries from the
+same hierarchy (for example a @emph{parent} and its @emph{child}).  In these
 cases, the summation in the agenda will lead to incorrect results because
 some values will count double.
-
 @item
 When the column view in the agenda shows the @code{CLOCKSUM}, that is always
 the entire clocked time for this item.  So even in the daily/weekly agenda,
@@ -9699,10 +9683,10 @@ the agenda).
 @item
 @cindex property, special, CLOCKSUM_T
 When the column view in the agenda shows the @code{CLOCKSUM_T}, that is
-always today's clocked time for this item.  So even in the weekly agenda, the
-clocksum listed in column view only originates from today.  This lets you
-compare the time you spent on a task for today, with the time already
-spent ---via @code{CLOCKSUM}---and with the planned total effort for it.
+always today's clocked time for this item.  So even in the weekly agenda,
+the clocksum listed in column view only originates from today.  This lets
+you compare the time you spent on a task for today, with the time already
+spent (via @code{CLOCKSUM}) and with the planned total effort for it.
 @end enumerate
 
 
@@ -10874,18 +10858,17 @@ Macro expansion takes place during the very beginning of the export process.
 
 @node Comment lines
 @section Comment lines
-@cindex exporting, not
-
 @cindex comment lines
+@cindex exporting, not
+@cindex #+BEGIN_COMMENT
+
 Lines starting with zero or more whitespace characters followed by one
 @samp{#} and a whitespace are treated as comments and, as such, are not
 exported.
 
-@cindex #+BEGIN_COMMENT
 Likewise, regions surrounded by @samp{#+BEGIN_COMMENT}
 ... @samp{#+END_COMMENT} are not exported.
 
-@cindex comment trees
 Finally, a @samp{COMMENT} keyword at the beginning of an entry, but after any
 other keyword or priority cookie, comments out the entire subtree.  In this
 case, the subtree is not exported and no code block within it is executed
@@ -16722,7 +16705,7 @@ Active key bindings in code blocks:
 
 Active key bindings in Org mode buffer:
 
-@multitable @columnfractions 0.5 0.5
+@multitable @columnfractions 0.45 0.55
 @kindex C-c C-v p
 @kindex C-c C-v C-p
 @item @kbd{C-c C-v p} @ @ @r{or} @ @ @kbd{C-c C-v C-p} @tab @code{org-babel-previous-src-block}
