@@ -113,14 +113,14 @@ To suppress popup, you can pass a function `ein:do-nothing' as CALLBACK."
 
 (defun ein:notebooklist-url (url-or-port version &optional path)
   (let ((base-path (cond ((= version 2) "api/notebooks")
-                         ((= version 3) "api/contents"))))
+                         ((>= version 3) "api/contents"))))
     (if path
         (ein:url url-or-port base-path (or path ""))
       (ein:url url-or-port base-path))))
 
 (defun ein:notebooklist-new-url (url-or-port version &optional path)
   (let ((base-path (cond ((= version 2) "api/notebooks")
-                         ((= version 3) "api/contents"))))
+                         ((>= version 3) "api/contents"))))
     (ein:log 'info "New notebook. Port: %s, Path: %s" url-or-port path)
     (if (and path (not (string= path "")))
         (ein:url url-or-port base-path path)
@@ -163,7 +163,8 @@ To suppress popup, you can pass a function `ein:do-nothing' as CALLBACK."
              (pop-to-buffer
               (funcall #'ein:notebooklist-url-retrieve-callback content))))))
     (ein:content-query-contents path url-or-port nil success))
-  (ein:notebooklist-get-buffer url-or-port))
+  ;(ein:notebooklist-get-buffer url-or-port)
+  )
 
 (defun* ein:notebooklist-url-retrieve-callback (content)
   "Called via `ein:notebooklist-open'."
@@ -474,7 +475,10 @@ Notebook list data is passed via the buffer local variable
     (erase-buffer))
   (remove-overlays)
   ;; Create notebook list
-  (widget-insert (format "IPython %s Notebook list\n\n" (ein:$notebooklist-api-version ein:%notebooklist%)))
+  (widget-insert
+   (if (< (ein:$notebooklist-api-version ein:%notebooklist%) 4)
+       (format "IPython v%s Notebook list\n\n" (ein:$notebooklist-api-version ein:%notebooklist%))
+     (format "Jupyter v%s Notebook list\n\n" (ein:$notebooklist-api-version ein:%notebooklist%))))
   (let ((breadcrumbs (generate-breadcrumbs (ein:$notebooklist-path ein:%notebooklist%))))
     (dolist (p breadcrumbs)
       (lexical-let ((name (car p))
@@ -509,14 +513,16 @@ Notebook list data is passed via the buffer local variable
      "Open In Browser")
     (widget-insert "\n\nCreate New Notebooks Using Kernel: \n")
     (let* ((radio-widget (widget-create 'radio-button-choice
-					:value (first kernels)
-					:notify (lambda (widget &rest ignore)
-						  (setq default-kernel
-							(ein:get-kernelspec (ein:$notebooklist-url-or-port ein:%notebooklist%) (widget-value widget)))
-						  (message "New notebooks will be started using the %s kernel."
-							   (widget-value widget))))))
+                                        ;; :value (car (first kernels))
+                                        ;; :format (format  "%s\n" (cdr (first kernels)))
+                                        :notify (lambda (widget &rest ignore)
+                                                  (setq default-kernel
+                                                        (ein:get-kernelspec (ein:$notebooklist-url-or-port ein:%notebooklist%) (widget-value widget)))
+                                                  (message "New notebooks will be started using the %s kernel."
+                                                           (widget-value widget))))))
       (dolist (k kernels)
-	(widget-radio-add-item radio-widget (list 'item :value k)))))
+        (widget-radio-add-item radio-widget (list 'item :value (car k)
+                                                  :format (format "%s\n" (cdr k)))))))
   (widget-insert "\n")
   (let ((api-version (ein:$notebooklist-api-version ein:%notebooklist%))
         (sessions (make-hash-table :test 'equal)))
@@ -727,6 +733,7 @@ FIMXE: document how to use `ein:notebooklist-find-file-callback'
 
 ;;; Login
 
+;;;###autoload
 (defun ein:notebooklist-login (url-or-port password)
   "Login to IPython notebook server."
   (interactive (list (ein:notebooklist-ask-url-or-port)

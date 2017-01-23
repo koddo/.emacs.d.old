@@ -90,6 +90,13 @@
 ;; - value means that the value of the last statement in the
 ;;   source code block will be returned
 ;;
+
+(defcustom ein:org-execute-timeout 30
+  "Query timeout, in seconds, for executing ein source blocks in
+  org files."
+  :type 'number
+  :group 'ein)
+
 (defun org-babel-execute:ein (body params)
   "Execute a block of python code with org-babel by way of
 emacs-ipython-notebook's facilities for communicating with
@@ -109,9 +116,14 @@ jupyter kernels.
     (ein:shared-output-eval-string full-body nil nil session-kernel)
     (let ((cell (ein:shared-output-get-cell)))
       (ein:wait-until #'(lambda ()
-                          (not (null (slot-value cell 'outputs))))
-                      nil nil)
-      (org-babel-ein-process-outputs (slot-value cell 'outputs) processed-params))))
+                          (null (slot-value cell 'running)))
+                      nil ein:org-execute-timeout)
+      (if (and (slot-boundp cell 'traceback)
+               (slot-value cell 'traceback))
+          (ansi-color-apply (apply #'concat (mapcar #'(lambda (s)
+                                                        (format "%s\n" s))
+                                                    (slot-value cell 'traceback))))
+        (org-babel-ein-process-outputs (slot-value cell 'outputs) processed-params)))))
 
 ;; This function should be used to assign any variables in params in
 ;; the context of the session environment.
@@ -141,7 +153,7 @@ jupyter kernels.
          (let* ((url-or-port (ein:org-babel-clean-url (car (split-string session "/"))))
                 (path (ein:join-str "/" (rest (split-string session "/")))))
            (values url-or-port path)))
-        (t (values (ein:org-babel-clean session) nil))))
+        (t (values (ein:org-babel-clean-url session) nil))))
 
 (defcustom ein:org-babel-default-session-name "ein_babel_session.ipynb"
   "Default name for org babel sessions running ein environments.

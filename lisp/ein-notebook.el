@@ -168,7 +168,7 @@ Current buffer for these functions is set to the notebook buffer.")
 (defvar ein:base-kernel-url "/api/")
 (defvar ein:create-session-url "/api/sessions")
 ;; Currently there is no way to know this setting.  Maybe I should ask IPython
-;; developers for an API to get this from notebook server.  
+;; developers for an API to get this from notebook server.
 ;;
 ;; 10April2014 (JMM) - The most recent documentation for the RESTful interface
 ;; is at:
@@ -336,9 +336,9 @@ will be updated with kernel's cwd."
                                     (ein:$notebook-notebook-path notebook)))
 
 (defun ein:notebook-url-from-url-and-id (url-or-port api-version path)
-  (cond ((= 2 api-version)
+  (cond ((= api-version 2)
          (ein:url url-or-port "api/notebooks" path))
-        ((= 3 api-version)
+        ((>= api-version 3)
          (ein:url url-or-port "api/contents" path))))
 
 (defun ein:notebook-pop-to-current-buffer (&rest -ignore-)
@@ -514,6 +514,12 @@ of minor mode."
 `ein:$kernelspec-name' : string
   Name used to identify the kernel (like python2, or python3).
 
+`ein:$kernelspec-display-name' : string
+  Name used to display kernel to user.
+
+`ein:$kernelspec-language' : string
+  Programming language supported by kernel, like 'python'.
+
 `ein:$kernelspec-resources' : plist
   Resources, if any, used by the kernel.
 
@@ -521,6 +527,7 @@ of minor mode."
   How to start the kernel from the command line. Not used by ein (yet).
 "
   name
+  display-name
   resources
   spec
   language)
@@ -546,7 +553,8 @@ of minor mode."
   (let ((kernelspecs (gethash url-or-port ein:available-kernelspecs)))
     (if kernelspecs
         (loop for (key spec) on (ein:plist-exclude kernelspecs '(:default)) by 'cddr
-              collecting (ein:$kernelspec-name spec)))))
+              collecting (cons (ein:$kernelspec-name spec)
+                               (ein:$kernelspec-display-name spec))))))
 
 (defun ein:query-kernelspecs (url-or-port)
   "Query jupyter server for the list of available
@@ -563,14 +571,18 @@ on server url/port."
    :error (apply-partially #'ein:query-kernelspecs-error)))
 
 (defun* ein:query-kernelspecs-success (url-or-port &key data &allow-other-keys)
-  (let ((ks (list :default  (plist-get data :default)))
+  (let ((ks (list :default (plist-get data :default)))
         (specs (ein:plist-iter (plist-get data :kernelspecs))))
     (setf (gethash url-or-port ein:available-kernelspecs)
           (ein:flatten (dolist (spec specs ks)
                          (let ((name (car spec))
                                (info (cdr spec)))
                            (push (list name (make-ein:$kernelspec :name (plist-get info :name)
+                                                                  :display-name (plist-get (plist-get info :spec)
+                                                                                           :display_name)
                                                                   :resources (plist-get info :resources)
+                                                                  :language (plist-get (plist-get info :spec)
+                                                                                       :language)
                                                                   :spec (plist-get info :spec)))
                                  ks)))))))
 
@@ -601,12 +613,14 @@ notebook buffer then the user will be prompted to select an opened notebook."
 ;;; notebook, which will automatically create and associate a kernel with the notebook.
 (defun ein:notebook-start-kernel (notebook)
   (let* ((base-url (concat ein:base-kernel-url "kernels"))
+         (kernelspec (ein:$notebook-kernelspec notebook))
          (kernel (ein:kernel-new (ein:$notebook-url-or-port notebook)
                                  base-url
                                  (ein:$notebook-events notebook)
                                  (ein:$notebook-api-version notebook))))
     (setf (ein:$notebook-kernel notebook) kernel)
-    (ein:pytools-setup-hooks kernel notebook)
+    (when (and kernelspec (string-equal (ein:$kernelspec-language kernelspec) "python"))
+      (ein:pytools-setup-hooks kernel notebook))
     (ein:kernel-start kernel notebook)))
 
 (defun ein:notebook-restart-kernel (notebook)
@@ -835,6 +849,9 @@ This is equivalent to do ``C-c`` in the console program."
       (ein:notebook-save-notebook notebook retry callback cbargs)))
 
 (defun ein:notebook-save-notebook (notebook retry &optional callback cbargs)
+  (condition-case err
+      (run-hooks 'before-save-hook)
+    (error (warn "Error running save hooks: '%s'. I will still try to save the notebook." (error-message-string err))))
   (let ((content (ein:content-from-notebook notebook)))
     (ein:events-trigger (ein:$notebook-events notebook)
                         'notebook_saving.Notebook)
@@ -915,6 +932,22 @@ NAME is any non-empty string that does not contain '/' or '\\'."
         (old-name (ein:$notebook-notebook-name ein:%notebook%)))
     (ein:log 'info "Renaming notebook at URL %s" (ein:notebook-url ein:%notebook%))
     (ein:content-rename content path #'ein:notebook-rename-success (list ein:%notebook% content))))
+
+(defun ein:notebook-save-to-command (path)
+  "Make a copy of the notebook and save it to a new path specified by NAME.
+NAME is any non-empty string that does not contain '/' or '\\'.
+"
+  (interactive
+   (list (read-string "Save copy to: " (ein:$notebook-notebook-path ein:%notebook%))))
+  (unless (and (string-match ".ipynb" path) (= (match-end 0) (length path)))
+    (setq path (format "%s.ipynb" path)))
+  (let* ((content (ein:content-from-notebook ein:%notebook%))
+         (name (substring path (or (cl-position ?/ path :from-end t) 0))))
+    (setf (ein:$content-path content) path
+          (ein:$content-name content) name)
+    (ein:content-save content #'ein:notebook-open
+                      (list (ein:$notebook-url-or-port ein:%notebook%)
+                            path))))
 
 ;; (defun* ein:notebook-rename-error (old new notebook &key symbol-status response
 ;;                                        error-thrown
@@ -1465,6 +1498,7 @@ This hook is run regardless the actual major mode used."
       ("File"
        ,@(ein:generate-menu
           '(("Save notebook" ein:notebook-save-notebook-command)
+            ("Copy and rename notebook" ein:notebook-save-to-command)
             ("Rename notebook" ein:notebook-rename-command)
             ("Close notebook without saving"
              ein:notebook-close)
@@ -1490,7 +1524,8 @@ This hook is run regardless the actual major mode used."
             )))
       ("Cell/Code"
        ,@(ein:generate-menu
-          '(("Execute cell" ein:worksheet-execute-cell
+          '(("Edit cell contents in dedicated buffer" ein:edit-cell-contents)
+            ("Execute cell" ein:worksheet-execute-cell
              :active (ein:worksheet-at-codecell-p))
             ("Execute cell and go to next"
              ein:worksheet-execute-cell-and-goto-next
@@ -1592,6 +1627,7 @@ This hook is run regardless the actual major mode used."
   (ein:aif ein:anything-kernel-history-search-key
       (define-key ein:notebook-mode-map it 'anything-ein-kernel-history))
   (ein:notebook-minor-mode +1)
+  (setq indent-tabs-mode nil) ;; Being T causes problems with Python code.
   (run-hooks 'ein:notebook-mode-hook))
 
 (add-hook 'ein:notebook-mode-hook 'ein:worksheet-imenu-setup)

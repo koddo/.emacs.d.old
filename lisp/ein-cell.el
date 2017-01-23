@@ -165,8 +165,8 @@ See also: https://github.com/tkf/emacs-ipython-notebook/issues/94"
     (if ein:slice-image
         (destructuring-bind (&optional rows cols)
             (when (listp ein:slice-image) ein:slice-image)
-          (insert-sliced-image img nil nil (or rows 20) cols))
-      (insert-image img))))
+          (insert-sliced-image img "." nil (or rows 20) cols))
+      (insert-image img "."))))
 
 
 ;;; Cell classes
@@ -736,7 +736,8 @@ PROP is a name of cell element.  Default is `:input'.
 \(fn cell relpos prop)"
   (unless relpos (setq relpos 0))
   (unless prop (setq prop :input))
-  (ewoc-goto-node (oref cell :ewoc) (ein:cell-element-get cell prop))
+  (let ((goal-column nil))
+    (ewoc-goto-node (oref cell :ewoc) (ein:cell-element-get cell prop)))
   (let ((offset (case prop
                   ((:input :before-output) 1)
                   (:after-input -1)
@@ -751,7 +752,8 @@ PROP is a name of cell element.  Default is `:input'.
 \(fn cell inputline prop)"
   (unless inputline (setq inputline 1))
   (unless prop (setq prop :input))
-  (ewoc-goto-node (oref cell :ewoc) (ein:cell-element-get cell prop))
+  (let ((goal-column nil))
+    (ewoc-goto-node (oref cell :ewoc) (ein:cell-element-get cell prop)))
   (let ((offset (case prop
                   ((:input :before-output) 1)
                   (:after-input -1)
@@ -1092,7 +1094,7 @@ prettified text thus be used instead of HTML type."
                               ((and (equal otype "execute_result")
                                     (or (equal prop :text)
                                         (equal prop :html)
-					(equal prop :latex))) 
+					(equal prop :latex)))
                                (ein:log 'debug "Fixing execute_result (%s?)." otype)
                                (let ((new-prop (cdr (ein:output-property-p prop))))
                                  (push (list new-prop (list value)) new-output)
@@ -1249,10 +1251,12 @@ prettified text thus be used instead of HTML type."
 
 (defmethod ein:cell--handle-clear-output ((cell ein:codecell) content
                                           -metadata-not-used-)
+  ;; Jupyter messaging spec 5.0 no longer has stdout, stderr, or other fields for clear_output
   (ein:cell-clear-output cell
-                         (plist-get content :stdout)
-                         (plist-get content :stderr)
-                         (plist-get content :other))
+                         t ;;(plist-get content :stdout)
+                         t ;;(plist-get content :stderr)
+                         t ;;(plist-get content :other)
+                         )
   (ein:events-trigger (oref cell :events) 'maybe_reset_undo.Worksheet cell))
 
 

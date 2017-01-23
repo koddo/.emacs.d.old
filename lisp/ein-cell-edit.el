@@ -29,6 +29,7 @@
 (defvar ein:src--cell nil)
 (defvar ein:src--ws nil)
 (defvar ein:src--allow-write-back t)
+(defvar ein:src--overlay nil)
 
 (defvar ein:edit-cell-mode-map
   (let ((map (make-sparse-keymap)))
@@ -36,6 +37,7 @@
     (define-key map "\C-c\C-k" 'ein:edit-cell-abort)
     (define-key map "\C-c\C-c" 'ein:edit-cell-save-and-execute)
     (define-key map "\C-x\C-s" 'ein:edit-cell-save)
+    (define-key map "\C-c\C-x" 'ein:edit-cell-view-traceback)
     map))
 
 (define-minor-mode ein:edit-cell-mode
@@ -75,9 +77,9 @@ or abort with \\[ein:edit-cell-abort]"))
   )
 
 (defun ein:cell-configure-edit-buffer ()
-  (when (org-bound-and-true-p org-src--from-org-mode)
-    (org-add-hook 'kill-buffer-hook #'org-src--remove-overlay nil 'local)
-    (if (org-bound-and-true-p org-src--allow-write-back)
+  (when (bound-and-true-p org-src--from-org-mode)
+    (add-hook 'kill-buffer-hook #'org-src--remove-overlay nil 'local)
+    (if (bound-and-true-p org-src--allow-write-back)
         (progn
           (setq buffer-offer-save t)
           (setq buffer-file-name
@@ -85,6 +87,15 @@ or abort with \\[ein:edit-cell-abort]"))
                         "[" (buffer-name) "]"))
           (setq write-contents-functions '(ein:edit-cell-save)))
       (setq buffer-read-only t))))
+
+(defun ein:edit-cell-view-traceback ()
+  "Jump to traceback, if there is one, for current edit."
+  (interactive)
+  (let ((buf (current-buffer))
+        (cell ein:src--cell))
+    (with-current-buffer (ein:worksheet--get-buffer ein:src--ws)
+      (ein:cell-goto cell)
+      (ein:tb-show))))
 
 (defun ein:edit-cell-save-and-execute ()
   "Save, then execute the countents of the EIN source edit buffer
@@ -101,9 +112,17 @@ and place results (if any) in output of original notebook cell."
 cell."
   (interactive)
   (set-buffer-modified-p nil)
-  (let ((edited-code (buffer-string)))
+  (let* ((edited-code (buffer-string))
+         (overlay ein:src--overlay)
+         (read-only (overlay-get overlay 'modification-hooks)))
+    (overlay-put overlay 'modification-hooks nil)
+    (overlay-put overlay 'insert-in-front-hooks nil)
+    (overlay-put overlay 'insert-behind-hooks nil)
     (setf (slot-value ein:src--cell 'input) edited-code)
-    (ein:worksheet-render ein:src--ws)))
+    (overlay-put overlay 'modification-hooks read-only)
+    (overlay-put overlay 'insert-in-front-hooks read-only)
+    (overlay-put overlay 'insert-behind-hooks read-only)))
+
 
 (defun ein:edit-cell-exit ()
   "Close the EIN source edit buffer, saving contents back to the
@@ -111,13 +130,16 @@ original notebook cell, unless being called via
 `ein:edit-cell-abort'."
   (interactive)
   (let ((edit-buffer (current-buffer))
-        (ws ein:src--ws))
+        (ws ein:src--ws)
+        (cell ein:src--cell))
+    (ein:remove-overlay)
     (when ein:src--allow-write-back
       (ein:edit-cell-save))
+    (ewoc-invalidate (oref ein:src--cell :ewoc)
+                     (ein:cell-element-get cell :input))
     (kill-buffer edit-buffer)
-    (switch-to-buffer-other-window (ein:worksheet-buffer ws))
-    ;; FIXME: put point at an appropriate location as org does?
-    ))
+    (switch-to-buffer-other-window (ein:worksheet--get-buffer ws))
+    (ein:cell-goto cell)))
 
 (defun ein:edit-cell-abort ()
   "Abort editing the current cell, contents will revert to
@@ -129,8 +151,45 @@ previous value."
   (concat "*EIN Src " bufname "[ " cell-type " ]*" ))
 
 (defun ein:get-mode-for-kernel (kernelspec)
-  (cond ((string-match-p "python" (ein:get-kernelspec-language kernelspec)) 'python)
-        (t 'python)))
+  (if (null kernelspec)
+      'python ;; FIXME
+    (cond ((string-match-p "python" (ein:get-kernelspec-language kernelspec)) 'python)
+          (t 'python))))
+
+(defun ein:edit-src-continue (e)
+  (interactive "e")
+  (mouse-set-point e)
+  (let ((buf (get-char-property (point) 'edit-buffer)))
+    (if buf (org-src-switch-to-buffer buf 'continue)
+      (user-error "No sub-editing buffer for area at point"))))
+
+(defun ein:make-source-overlay (beg end edit-buffer)
+  "Create overlay between BEG and END positions and return it.
+EDIT-BUFFER is the buffer currently editing area between BEG and
+END."
+  (let ((overlay (make-overlay beg end)))
+    (overlay-put overlay 'face 'secondary-selection)
+    (overlay-put overlay 'edit-buffer edit-buffer)
+    (overlay-put overlay 'help-echo
+		 "Click with mouse-1 to switch to buffer editing this segment")
+    (overlay-put overlay 'face 'secondary-selection)
+    (overlay-put overlay 'keymap
+		 (let ((map (make-sparse-keymap)))
+		   (define-key map [mouse-1] 'ein:edit-src-continue)
+		   map))
+    (let ((read-only
+           (list
+            (lambda (&rest _)
+              (user-error
+               "Cannot modify an area being edited in a dedicated buffer")))))
+      (overlay-put overlay 'modification-hooks read-only)
+      (overlay-put overlay 'insert-in-front-hooks read-only)
+      (overlay-put overlay 'insert-behind-hooks read-only))
+    overlay))
+
+(defun ein:remove-overlay ()
+  "Remove overlay from current source buffer."
+  (when (overlayp ein:src--overlay) (delete-overlay ein:src--overlay)))
 
 (defun ein:edit-cell-contents ()
   "Edit the contents of the current cell in a buffer using an
@@ -144,7 +203,10 @@ appropriate language major mode. Functionality is very similar to
          (contents (ein:cell-get-text cell))
          (type (slot-value cell 'cell-type))
          (name (ein:construct-cell-edit-buffer-name (buffer-name) type))
-         (buffer (generate-new-buffer-name name)))
+         (buffer (generate-new-buffer-name name))
+         (overlay (ein:make-source-overlay (ein:cell-input-pos-min cell)
+                                           (ein:cell-input-pos-max cell)
+                                           buffer)))
     (switch-to-buffer-other-window buffer)
     (insert contents)
     (remove-text-properties (point-min) (point-max)
@@ -159,6 +221,7 @@ appropriate language major mode. Functionality is very similar to
              (python (python-mode)))))
       (error (message "Language mode `%s' fails with: %S"
                       type (nth 1 e))))
+    (set (make-local-variable 'ein:src--overlay) overlay)
     (set (make-local-variable 'ein:src--cell) cell)
     (set (make-local-variable 'ein:src--ws) ws)
     (set (make-local-variable 'ein:src--allow-write-back) t)
