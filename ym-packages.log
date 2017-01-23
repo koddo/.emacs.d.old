@@ -110,3 +110,4 @@ pulled org-mode git://orgmode.org/org-mode.git release_9.0.3 -- 1fbc7a424..0077e
 pulled maxframe https://github.com/rmm5t/maxframe.el master -- 50dc78c7b..13bda6dd9
 pulled web-mode https://github.com/fxbois/web-mode master -- 3e74b741a..5c626c981
 pulled emacs-ipython-notebook https://github.com/millejoh/emacs-ipython-notebook v0.12.1 -- 8e3764044..b52ccbd46
+pulled emacs-request https://github.com/tkf/emacs-request master -- e2b031a4e..2d9b4cd49
