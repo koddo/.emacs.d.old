@@ -111,3 +111,4 @@ pulled maxframe https://github.com/rmm5t/maxframe.el master -- 50dc78c7b..13bda6
 pulled web-mode https://github.com/fxbois/web-mode master -- 3e74b741a..5c626c981
 pulled emacs-ipython-notebook https://github.com/millejoh/emacs-ipython-notebook v0.12.1 -- 8e3764044..b52ccbd46
 pulled emacs-request https://github.com/tkf/emacs-request master -- e2b031a4e..2d9b4cd49
+added reveal-in-osx-finder https://github.com/kaz-yos/reveal-in-osx-finder master -- 5710e5936
