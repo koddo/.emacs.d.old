@@ -108,3 +108,4 @@ removed ack-and-a-half   -- bdbbc8e
 pulled org-mode git://orgmode.org/org-mode.git maint -- c41bbc577..1fbc7a424
 pulled org-mode git://orgmode.org/org-mode.git release_9.0.3 -- 1fbc7a424..0077eb073
 pulled maxframe https://github.com/rmm5t/maxframe.el master -- 50dc78c7b..13bda6dd9
+pulled web-mode https://github.com/fxbois/web-mode master -- 3e74b741a..5c626c981
