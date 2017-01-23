@@ -316,7 +316,7 @@ See: https://github.com/ipython/ipython/pull/3307"
                             :early t)))
     (cond ((= api-version 2)
            (ein:start-channels-multiple-websocket kernel))
-          ((= api-version 3)
+          ((>= api-version 3)
            (ein:start-channels-single-websocket kernel)))
     ;; switch from early-close to late-close message after 1s
     (run-at-time
@@ -706,9 +706,8 @@ Example::
                         (msg (ein:kernel--get-msg kernel "input_reply" content)))
                    (ein:websocket-send-stdin-channel kernel msg)
                    (setf (ein:$kernel-stdin-activep kernel) nil))
-               (cond ((or (string-match "ipdb>" (plist-get content :prompt))
-                          (string-match "(Pdb)" (plist-get content :prompt)))
-                      (ein:run-ipdb-session kernel (plist-get content :prompt))))))))))
+               (cond ((string-match "ipdb>" (plist-get content :prompt)) (ein:run-ipdb-session kernel "ipdb> "))
+                     ((string-match "(Pdb)" (plist-get content :prompt)) (ein:run-ipdb-session kernel "(Pdb) ")))))))))
 
 (defun ein:kernel--handle-shell-reply (kernel packet)
   (ein:log 'debug "KERNEL--HANDLE-SHELL-REPLY")
@@ -737,10 +736,9 @@ Example::
 (defun ein:kernel--handle-payload (kernel callbacks payload)
   (loop with events = (ein:$kernel-events kernel)
         for p in payload
-        for text = (if (= (ein:$kernel-api-version kernel) 2)
-                       (plist-get p :text)
-                     (plist-get (plist-get p :data)
-                                :text/plain))
+        for text = (or (plist-get p :text)
+                       (plist-get (plist-get p :data)
+                                  :text/plain))
         for source = (plist-get p :source)
         if (member source '("IPython.kernel.zmq.page.page"
                             "IPython.zmq.page.page"
@@ -752,7 +750,8 @@ Example::
         (member
          source
          '("IPython.kernel.zmq.zmqshell.ZMQInteractiveShell.set_next_input"
-           "IPython.zmq.zmqshell.ZMQInteractiveShell.set_next_input"))
+           "IPython.zmq.zmqshell.ZMQInteractiveShell.set_next_input"
+           "set_next_input"))
         do (let ((cb (plist-get callbacks :set_next_input)))
              (when cb (ein:funcall-packed cb text)))))
 
