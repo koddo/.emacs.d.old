@@ -1,12 +1,7 @@
-(add-to-list 'org-modules 'org-habit)
-(add-to-list 'org-modules 'org-id)
-(add-to-list 'org-modules 'org-inlinetask)
-
+(setq org-modules '(org-habit org-id org-inlinetask))        ; (add-to-list 'org-modules 'org-habit)
 (require 'org)
 (require 'org-id)
-;; (require 'org-inlinetask)
 ;;         -- (require 'org-special-blocks)
-;; (require 'org-habit)
 ;; (require 'org-table)
 ;; (require 'org-colview)
 ;; (require 'org-datetree)
@@ -45,7 +40,6 @@
 (setq org-src-fontify-natively t)
 (setq org-deadline-warning-days 100000)
 (setq org-agenda-skip-scheduled-if-deadline-is-shown 'not-today)
-;;;;;(add-to-list 'org-show-entry-below '(agenda . t))
 ;; -------------------------------------------------------------------
 (setq org-directory "~/workspace")
 (setq ym-org-agenda-file "~/workspace/.org.agenda.org.gpg")
