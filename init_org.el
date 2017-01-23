@@ -1,36 +1,34 @@
-(require 'org)
-(require 'org-inlinetask)
-;; (require 'org-habit)
-(require 'org-id)
-(require 'org-table)
-(require 'org-colview)
-(require 'org-datetree)
-(require 'org-archive)
 (add-to-list 'org-modules 'org-habit)
-;; (add-to-list 'org-modules 'org-table)
-;; (add-to-list 'org-modules 'org-id)
-;; (add-to-list 'org-modules 'org-colview)
-;; (add-to-list 'org-modules 'org-datetree)
-;; (add-to-list 'org-modules 'org-archive)
-;; (add-to-list 'org-modules 'org-inlinetask)
-;; (require 'org-special-blocks)
+(add-to-list 'org-modules 'org-id)
+(add-to-list 'org-modules 'org-inlinetask)
+
+(require 'org)
+(require 'org-id)
+;; (require 'org-inlinetask)
+;;         -- (require 'org-special-blocks)
+;; (require 'org-habit)
+;; (require 'org-table)
+;; (require 'org-colview)
+;; (require 'org-datetree)
+;; (require 'org-archive)
+
 
 (setq org-log-repeat nil)
 
 
 ;; -------------------------------------------------------------------
-(setq org-habit-show-habits-only-for-today nil)
 (setq org-habit-show-all-today t)
 (setq org-habit-show-habits t)
+(setq org-habit-show-habits-only-for-today t)
 (setq org-habit-graph-column 55)
 (setq org-habit-preceding-days 35)
 (setq org-habit-following-days 2)
-(setq ym-timer-list-to-show-habits   ; (dolist (x ym-timer-list-to-show-habits) (cancel-timer x))
-      (list
-       (run-at-time "07:00pm" (* 60 60 24)
-                   (lambda () (setq org-habit-show-habits t)))
-       (run-at-time "07:00am" (* 60 60 24)
-                   (lambda () (setq org-habit-show-habits t)))))
+;; (setq ym-timer-list-to-show-habits   ; (dolist (x ym-timer-list-to-show-habits) (cancel-timer x))
+;;       (list
+;;        (run-at-time "07:00pm" (* 60 60 24)
+;;                    (lambda () (setq org-habit-show-habits t)))
+;;        (run-at-time "07:00am" (* 60 60 24)
+;;                    (lambda () (setq org-habit-show-habits t)))))
 (defun org-habit-get-priority (habit &optional moment) 1000)   ; this disables sorting by scheduled time, shows in the same order as in org file
 ;; -------------------------------------------------------------------
 (setq org-startup-with-inline-images t)

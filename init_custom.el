@@ -9,7 +9,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(org-agenda-clocking ((t (:underline "Red"))) t)
+ '(org-agenda-clocking ((t (:underline "Red"))))
  '(org-habit-alert-face ((t (:background "LightSteelBlue2"))))
  '(org-habit-alert-future-face ((t (:background "LightSteelBlue2"))))
  '(org-habit-clear-face ((t (:background "grey95"))))
@@ -18,6 +18,14 @@
  '(org-habit-overdue-future-face ((t (:background "grey95"))))
  '(org-habit-ready-face ((t (:background "LightSteelBlue2"))))
  '(org-habit-ready-future-face ((t (:background "LightSteelBlue2"))))
- '(org-mode-line-clock ((t (:weight bold))) t)
- '(org-mode-line-clock-overrun ((t (:weight bold :background "yellow"))) t)
- '(org-scheduled-previously ((t (:foreground "DarkGreen")))))
+ '(org-mode-line-clock ((t (:weight bold))))
+ '(org-mode-line-clock-overrun ((t (:weight bold :background "yellow"))))
+ '(org-scheduled-previously ((t (:foreground "DarkGreen"))))
+ '(outline-1 ((t (:foreground "Red"))))
+ '(outline-2 ((t (:foreground "Blue1"))))
+ '(outline-3 ((t (:foreground "grey40"))))
+ '(outline-4 ((t (:foreground "grey70"))))
+ '(outline-5 ((t (:foreground "grey70"))))
+ '(outline-6 ((t (:foreground "grey70"))))
+ '(outline-7 ((t (:foreground "grey70"))))
+ '(outline-8 ((t (:foreground "grey70")))))
