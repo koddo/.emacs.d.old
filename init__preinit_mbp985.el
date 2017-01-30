@@ -21,7 +21,7 @@
 (setq exec-path-from-shell-variables '("PATH" "MANPATH" "WORKON_HOME"))
 (exec-path-from-shell-initialize)   ; exec-path-from-shell-variables
 
-
+(require 'reveal-in-osx-finder)
 
 
 

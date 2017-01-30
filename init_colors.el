@@ -74,11 +74,10 @@
                                            'invisible t))
                                         (beginning-of-buffer)
                                         (flet ((line-matches-p (regex)
-                                                               (let ((case-fold-search nil))
-                                                                 (string-match-p regex
-                                                                                 (buffer-substring-no-properties
-                                                                                  (line-beginning-position)
-                                                                                  (line-end-position)))))
+                                                               (string-match-p regex
+                                                                               (buffer-substring-no-properties
+                                                                                (line-beginning-position)
+                                                                                (line-end-position))))
                                                (color-tag (cons-cell)
                                                           (let ((tag    (car cons-cell))
                                                                 (color  (cdr cons-cell)))
