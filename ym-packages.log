@@ -115,3 +115,4 @@ added reveal-in-osx-finder https://github.com/kaz-yos/reveal-in-osx-finder maste
 added org-trello https://github.com/org-trello/org-trello master -- dfb981502
 added emacs-deferred https://github.com/kiwanami/emacs-deferred master -- 966874963
 removed org-trello https://github.com/org-trello/org-trello master -- dfb981502
+removed emacs-deferred https://github.com/kiwanami/emacs-deferred  -- 966874963
