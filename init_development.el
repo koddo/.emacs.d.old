@@ -2,17 +2,19 @@
 ;; -------------------------------------------------------------------
 (ym-add-to-list-dired-omit-extensions '(".o" ".a"))
 ;; -------------------------------------------------------------------
-;; (org-babel-do-load-languages
-;;  'org-babel-load-languages
-;;  '((emacs-lisp . t)
-;;    (haskell . t)
-;;    (lisp . t)
-;;    (scheme . t)
-;;    (python . t)
-;;    (gnuplot . t)
-;;    (sh . t)
-;;    (sql . t)
-;;    ))
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '(
+   (http . t)
+   ;; (emacs-lisp . t)
+   ;; (haskell . t)
+   ;; (lisp . t)
+   ;; (scheme . t)
+   ;; (python . t)
+   ;; (gnuplot . t)
+   ;; (sh . t)
+   ;; (sql . t)
+   ))
 ;; -------------------------------------------------------------------
 ;; automatically indent pasted text if in programming-modes
 (defvar yank-indent-modes '(emacs-lisp-mode

@@ -40,6 +40,7 @@
 (setq org-src-fontify-natively t)
 (setq org-deadline-warning-days 100000)
 (setq org-agenda-skip-scheduled-if-deadline-is-shown 'not-today)
+(setq org-tag-persistent-alist '((("asdf"))))
 ;; -------------------------------------------------------------------
 (setq org-directory "~/workspace")
 (setq ym-org-agenda-file "~/workspace/.org.agenda.org.gpg")
