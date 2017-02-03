@@ -10,11 +10,13 @@
    ;; (haskell . t)
    ;; (lisp . t)
    ;; (scheme . t)
-   ;; (python . t)
+   (python . t)
    ;; (gnuplot . t)
    ;; (sh . t)
    ;; (sql . t)
    ))
+(setq org-src-tab-acts-natively t)
+(setq org-babel-min-lines-for-block-output 9999)   ;; this forces indenting results with colons, because I don't like how #+end_example is inserted at the beginning of line, not indented at all
 ;; -------------------------------------------------------------------
 ;; automatically indent pasted text if in programming-modes
 (defvar yank-indent-modes '(emacs-lisp-mode
@@ -292,8 +294,6 @@
 ;; (quickrun-add-command "shellscript"
 ;;                       '((:command . (lambda () sh-shell))
 ;;                         (:description . "Run Shellscript file")))
-;; -------------------------------------------------------------------
-(require 'restclient)
 ;; -------------------------------------------------------------------
 (require 'clojure-mode)
 (add-to-list 'auto-mode-alist '("\\.clj\\'" . clojure-mode))
