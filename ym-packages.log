@@ -113,3 +113,4 @@ pulled emacs-ipython-notebook https://github.com/millejoh/emacs-ipython-notebook
 pulled emacs-request https://github.com/tkf/emacs-request master -- e2b031a4e..2d9b4cd49
 added reveal-in-osx-finder https://github.com/kaz-yos/reveal-in-osx-finder master -- 5710e5936
 added org-trello https://github.com/org-trello/org-trello master -- dfb981502
+added emacs-deferred https://github.com/kiwanami/emacs-deferred master -- 966874963
