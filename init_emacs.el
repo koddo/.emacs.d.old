@@ -93,6 +93,7 @@
 (require 'ls-lisp) ;; ignore case when listing directory
 (setq ls-lisp-ignore-case t)
 (setq ls-lisp-use-insert-directory-program nil)
+(setq ls-lisp-use-string-collate nil)
 (setq delete-by-moving-to-trash t)
 (set-face-attribute 'diredp-symlink nil :foreground "Blue")   ; trash-directory is set in preinit.this_machine.el
 ;; -------------------------------------------------------------------
