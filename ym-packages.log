@@ -117,3 +117,4 @@ added emacs-deferred https://github.com/kiwanami/emacs-deferred master -- 966874
 removed org-trello https://github.com/org-trello/org-trello master -- dfb981502
 removed emacs-deferred https://github.com/kiwanami/emacs-deferred  -- 966874963
 added ob-http https://github.com/zweifisch/ob-http master -- 9155a413e
+removed restclient https://github.com/pashky/restclient.el master -- 7dadac687..10671d044
