@@ -297,7 +297,7 @@
 ;; -------------------------------------------------------------------
 (require 'clojure-mode)
 (add-to-list 'auto-mode-alist '("\\.clj\\'" . clojure-mode))
-(add-to-list 'auto-mode-alist '("\\.cljs\\'" . clojure-mode))
+(add-to-list 'auto-mode-alist '("\\.cljs\\'" . clojurescript-mode))
 (add-to-list 'auto-mode-alist '("\\.cljx\\'" . clojure-mode))
 (require 'queue)
 (require 'cider)
