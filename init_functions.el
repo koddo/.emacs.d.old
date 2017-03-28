@@ -126,3 +126,14 @@
 ;;  (split-window-horizontally)
 ;;  (other-window -1)
 ;; )
+
+;; -------------------------------------------------------------------
+(defun tmp-cider ()
+  (interactive)
+  (cider-connect "cljstest_figwheel.dev.dnsdock" 7888 (projectile-project-root))
+  (with-current-buffer (cider-current-repl-buffer)
+    (insert "(use 'figwheel-sidecar.repl-api) (cljs-repl)")
+    (funcall (key-binding (kbd "RET")))
+    (setq cider-repl-type "cljs")
+    ))
+
