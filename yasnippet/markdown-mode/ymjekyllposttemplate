@@ -8,6 +8,7 @@ title:  "$0"
 date:   `(format-time-string "%Y-%m-%d %H:%M:%S %z")`
 tags:   []
 comments: true
-disqus_identifier: `(shell-command "uuidgen" t)`
+disqus_identifier: `(first (process-lines "uuidgen"))`
+
 ---
 

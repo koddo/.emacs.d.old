@@ -130,7 +130,7 @@
 ;; -------------------------------------------------------------------
 (defun tmp-cider ()
   (interactive)
-  (cider-connect "cljstest_figwheel.dev.dnsdock" 7888 (projectile-project-root))
+  (cider-connect "superlearn_figwheel_1.lein.dev.dnsdock" 7888 (projectile-project-root))
   (with-current-buffer (cider-current-repl-buffer)
     (insert "(use 'figwheel-sidecar.repl-api) (cljs-repl)")
     (funcall (key-binding (kbd "RET")))
