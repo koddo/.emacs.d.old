@@ -184,6 +184,7 @@
 ;; (ym-define-key (kbd "M-/") ')
 (ym-define-key (kbd "M-,") 'pop-tag-mark)
 (ym-define-key (kbd "<C-f1>") 'ym-org-day-view)
+(ym-define-key (kbd "<C-M-f1>") 'ym-org-day-view-with-habits)
 (ym-define-key (kbd "<f1>") 'ym-org-working)
 (ym-define-key (kbd "S-<f1>") 'ym-org-week-view)
 (ym-define-key (kbd "M-<f1>") 'ym-org-todo-view)
@@ -296,6 +297,11 @@
   (org-agenda nil "1") ; see org-agenda-custom-commands
   (ym-org-day-view-aux-go-to-now-header)
   (delete-other-windows))
+(defun ym-org-day-view-with-habits ()
+  (interactive)
+  (let ((org-habit-show-habits t))
+   (ym-org-day-view))
+  )
 (defun ym-org-working ()
   (interactive)
   (org-agenda nil "0") ; see org-agenda-custom-commands
