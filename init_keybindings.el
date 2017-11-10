@@ -312,9 +312,9 @@
 (defun ym-org-todo-view ()
   (interactive)
   (org-agenda nil "3") ; see org-agenda-custom-commands
-  (search-forward-regexp (concat "^" ym-org-agenda-planning-header-non-scheduled "$"))
-  (forward-line)
-  (beginning-of-line)
+  ;; (search-forward-regexp (concat "^" ym-org-agenda-planning-header-non-scheduled "$"))
+  ;; (forward-line)
+  ;; (beginning-of-line)
   (delete-other-windows))
 (defun ym-org-todo-match-tags-view ()
   (interactive)
@@ -376,7 +376,7 @@
   (find-file ym-ledger-file)
   (delete-other-windows)
   (save-buffer)
-  (let ((command (if cmd cmd "-s balance Assets Liabilities Savings")))   ; -s --- show sub-accounts
+  (let ((command (if cmd cmd "--price-db ~/.org.finances.ledger.prices --subtotal balance Assets Liabilities Savings")))
     (shell-command-on-region
      (point-min)
      (point-max)

@@ -79,8 +79,18 @@
 ;; (setq org-agenda-time-grid '((daily today)
 ;;                              "----------------"
 ;;                              (800 1000 1200 1400 1600 1800 2000 2200 2350)))
+;; (defun ym-org-agenda-sort-habits (a b)
+;;   (let ((ha (get-text-property 0 'todo-state a))
+;;         (hb (get-text-property 0 'todo-state b)))
+;;     (when (and ha hb)
+;;         (cond ((string> ha hb) +1)
+;;               ((string< ha hb) -1)
+;;               ((string= ha hb) nil)))))
+;; (setq org-agenda-cmp-user-defined 'ym-org-agenda-sort-habits)
 (setq org-agenda-sorting-strategy
-      '((agenda habit-down time-up priority-down category-up todo-state-down)
+      '((agenda time-up habit-down
+                ;; user-defined-down
+                alpha-up priority-up category-keep)
         (todo todo-state-down priority-down category-up)
         (tags priority-down category-keep)
         (search category-keep)))
