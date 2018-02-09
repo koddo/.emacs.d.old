@@ -389,4 +389,20 @@
 
 
 
+;; https://demonastery.org/2013/04/emacs-narrow-to-region-indirect/
+;; https://emacs.stackexchange.com/questions/12180/why-use-indirect-buffers/12185#12185
+(defun narrow-to-region-indirect (start end)
+  "Restrict editing in this buffer to the current region, indirectly."
+  (interactive "r")
+  (deactivate-mark)
+  (let ((buf (clone-indirect-buffer nil nil)))
+    (with-current-buffer buf
+      (narrow-to-region start end)
+      (python-mode))
+    (switch-to-buffer buf)
+    (font-lock-fontify-buffer)   ; without this the colors get lost
+    ))
+
+
+
 

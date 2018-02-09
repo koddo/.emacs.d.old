@@ -13,7 +13,7 @@
 
 ;; -------------------------------------------------------------------
 (setq org-habit-show-all-today t)
-(setq org-habit-show-habits t)
+(setq org-habit-show-habits nil)
 (setq org-habit-show-habits-only-for-today t)
 (setq org-habit-graph-column 55)
 (setq org-habit-preceding-days 35)
