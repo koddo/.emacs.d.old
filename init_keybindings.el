@@ -187,6 +187,7 @@
 (ym-define-key (kbd "<C-M-f1>") 'ym-org-day-view-with-habits)
 (ym-define-key (kbd "<f1>") 'ym-org-working)
 (ym-define-key (kbd "S-<f1>") 'ym-org-week-view)
+(ym-define-key (kbd "C-S-<f1>") 'ym-org-show-everything-for-a-week)
 (ym-define-key (kbd "M-<f1>") 'ym-org-todo-view)
 (ym-define-key (kbd "S-M-<f1>") 'ym-org-todo-match-tags-view)
 (ym-define-key (kbd "C-S-M-<f1>") 'ym-org-todo-match-tags-view-with-done-tasks)
@@ -711,7 +712,12 @@ narrowed."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun ym-org-show-everything-for-a-week ()
+  (interactive)
+  (org-agenda-list nil (org-today))
+  (delete-other-windows))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 

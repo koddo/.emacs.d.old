@@ -226,9 +226,12 @@
                  (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp 'nottodo '("NEXT")))))
           ))
         ("2" "Weekly schedule"
-         ((agenda "" ((org-agenda-start-day "-3d")
-                      (org-agenda-span 11)
+         ((agenda "" (
+                      ;; (org-agenda-start-day "-3d")
+                      (org-agenda-span 'week)    ; unfortunately, when set to number, it hides all non-scheduled tasks
                       (org-agenda-show-log t)
+                      ;; (org-agenda-entry-types '(:deadline :scheduled :timestamp))
+                      ;; (org-agenda-repeating-timestamp-show-all nil)
                       ))
           ))
         ("3" "Planning"
