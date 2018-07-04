@@ -251,9 +251,10 @@
             (define-key org-agenda-mode-map (kbd "k") nil)
             (define-key org-agenda-mode-map (kbd "л") nil)
             (define-key org-agenda-mode-map (kbd "h") 'ym-org-agenda-hide-line-temporarily)
+            (define-key org-agenda-mode-map (kbd "H") 'ym-org-agenda-hide-chores-temporarily)
             (org-defkey org-agenda-mode-map "q" 'org-agenda-columns)
             ;; (define-key org-agenda-mode-map (kbd "H") 'ym-org-agenda-hide--lines-temporarily)
-            (define-key org-agenda-mode-map (kbd "р") 'ym-org-agenda-hide-line-temporarily)
+            ;; (define-key org-agenda-mode-map (kbd "р") 'ym-org-agenda-hide-line-temporarily)
             ))
 (define-key org-mode-map (kbd "C-c C-x C-t") 'ym-org-insert-inline-task)
 (define-key org-mode-map (kbd "RET")     (lambda () (interactive) (org-return) (indent-for-tab-command)))   ; org-return-indent behaves strangely
@@ -474,6 +475,21 @@
        ))
    'invisible t)
   (forward-line)
+  )
+(defun ym-org-agenda-hide-chores-temporarily (&optional do-not-leave-blank)
+  (interactive)
+  (save-excursion
+    (beginning-of-buffer)
+    (while (search-forward-regexp ":chore:" nil t) ; :hide:
+      (overlay-put
+       (make-overlay
+        (line-beginning-position)
+        (+ (line-end-position)
+           (if do-not-leave-blank 1 0)
+           ))
+       'invisible t)
+      )
+    )
   )
 ;; (defun ym-org-agenda-hide--lines-temporarily ()
 ;;   (interactive)

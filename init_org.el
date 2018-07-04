@@ -241,7 +241,12 @@
           (todo ""
                 ((org-agenda-overriding-header ym-org-agenda-planning-header-paused)
                  (org-agenda-skip-function '(org-agenda-skip-entry-if 'nottodo '("PAUSED" "WAITING")))))
-          (todo ""
+          (tags-todo "+top"
+                     ((org-agenda-overriding-header ym-org-agenda-planning-header-top)
+                      (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp 'nottodo '("NEXT")))
+                      ))
+          ;; (todo ""
+          (tags-todo "-top"
                 ((org-agenda-overriding-header ym-org-agenda-planning-header-next-actions)
                  (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp 'nottodo '("NEXT")))))
           ;; (tags-todo "-CANCELLED/!"
