@@ -88,7 +88,8 @@
 ;;               ((string= ha hb) nil)))))
 ;; (setq org-agenda-cmp-user-defined 'ym-org-agenda-sort-habits)
 (setq org-agenda-sorting-strategy
-      '((agenda time-up habit-down
+      '(
+        (agenda time-up habit-down
                 ;; user-defined-down
                 alpha-up priority-up category-keep)
         (todo todo-state-down priority-down category-up)
@@ -208,8 +209,7 @@
                       ))
           ))
         ("1" "Daily schedule"
-         ((agenda "" ((org-agenda-span 1)
-                      (org-agenda-show-log t)))
+         (
           (todo ""
                 ((org-agenda-overriding-header ym-org-agenda-planning-header-now)
                  (org-agenda-skip-function '(org-agenda-skip-entry-if 'nottodo '("WORKING")))))
@@ -217,9 +217,11 @@
                 ((org-agenda-overriding-header ym-org-agenda-planning-header-paused)
                  (org-agenda-skip-function '(org-agenda-skip-entry-if 'nottodo '("PAUSED" "WAITING")))))
           (tags-todo "+top"
-                ((org-agenda-overriding-header ym-org-agenda-planning-header-top)
-                 (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp 'nottodo '("NEXT")))
-                 ))
+                     ((org-agenda-overriding-header ym-org-agenda-planning-header-top)
+                      (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp 'nottodo '("NEXT")))
+                      ))
+          (agenda "" ((org-agenda-span 1)
+                      (org-agenda-show-log t)))
           (tags-todo "-top"
           ;; (todo ""
                 ((org-agenda-overriding-header ym-org-agenda-planning-header-next-actions)
