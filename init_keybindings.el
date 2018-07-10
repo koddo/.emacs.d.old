@@ -301,7 +301,8 @@
   (delete-other-windows)
   (goto-char (point-min))
   (forward-line)
-  (scroll-down)
+  (ignore-errors (scroll-up-line))    ; I don't know why, but going to the beginning of buffer followed by going down one lie doesn't scroll it properly, I get it scrolled one line below expected
+  (ignore-errors (scroll-down-line))  ; so I scroll up and then down here
   )
 (defun ym-org-day-view-with-habits ()
   (interactive)
