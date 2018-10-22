@@ -1,3 +1,153 @@
+var s = "xs";
+React.createClass({
+  render() {
+    return (
+      <ul class="cscdd" data-toto={ return 1 + "cdxs" }> cqsd
+        {
+          if (true) {
+            <BreadcrumbItem href="#/messages/{ this.props.scope.get('scopes') || this.props.scope.get('parent') }">
+              hello
+            </BreadcrumbItem>
+          }
+        }
+      </ul>
+    );
+  }
+});
+
+export default function Example() {
+  return (
+    <Menu>
+      <Menu.Item>
+        ← cursor here
+      </Menu.Item>
+    </Menu>
+  );
+}
+
+
+render() {
+  return (
+    <>
+      Some text.
+      <h2>A heading</h2>
+      More text.
+      <h2>Another heading</h2>
+      Even more text.
+    </>
+  );
+}
+
+return (
+  <ModalTrigger modal={<InviteForm auth={this.props.auth} />} />
+);
+
+return (
+  <li>
+    <ModalTrigger modal={ <InviteForm auth={this.props.auth} /> }>
+      <a href="#">Invite Representative</a>
+    </ModalTrigger>
+  </li>
+);
+
+return (
+  <div>
+    <div>xs</div>
+    <OtherComponent/>
+    <OtherComponent class="toto"
+                    {...props}
+                    id="fr" />
+  </div>;
+);
+
+const Demo = () => (
+  <ListItem
+    leftAvatar={
+      <Avatar
+        src=""
+      />
+    }
+  >
+  </ListItem>
+);
+
+import React, {Component} from 'react';
+class Confirm extends Component {
+  render() {
+    const project = this.props.project;
+    return (
+      <Route exac path='/' render={(matchProps) => (
+        <DefaultLayout>
+          <Home {...matchProps} />
+        </DefaultLayout>
+      )} />
+    )
+  },
+  render() {
+    const project = this.props.project;
+    return (
+      <Foo
+        someLongValue='x'
+        text={
+          <Text>
+            text
+          </Text>
+        }
+      />
+    )
+  }
+}
+
+import React, {Component} from 'react';
+class Confirm extends Component {
+  render() {
+    const project = this.props.project;
+    return (
+      <Route
+        exact
+        path="/"
+        render={ matchProps => (
+          <Home {...matchProps} />)
+        }
+      />
+    )
+  }
+};
+
+class Test extends Component {
+  render() {
+    return (
+      <Router>
+        <Switch>
+          <Route
+            exact
+            path="/"
+            render={matchProps => (
+              <DefaultLayout>
+                <Home {...matchProps} />
+              </DefaultLayout>
+            )} />
+          <Route
+            path="/settings"
+            render={matchProps => (
+              <DefaultLayout>
+                <Settings {...matchProps} />
+              </DefaultLayout>
+            )} />
+        </Switch>
+      </Router>
+    )
+  }
+};
+
+import React from 'react';
+
+const Front = props => {
+  return <div>
+    <span>hello</span>
+  </div>;
+};
+
 /** @jsx React.DOM **/
 var React = require('react/addons');
 var Component = require('./component');
@@ -19,6 +169,19 @@ export default class Header extends Component {
   }
 }
 
+import * as React from 'react';
+
+interface Props {
+  name: string
+}
+
+class MyThing extends React.Component<Props, {}> {
+  render() {
+    return <span>hi</span>;
+  }
+}
+
+export default MyThing as React.ComponentClass<Props>;
 
 export default React.createClass({
   getInitialState() {
@@ -39,15 +202,53 @@ export default React.createClass({
 
 function foo() {
   return <label>
-      First Name:
-      <Input name="name"
-             type="text"
-             validators={[
-               required('You must supply a first name!'),
-               (value) => value > 15 ? 'too long!': null
-             ]} />
+    First Name:
+    <Input name="name"
+           type="text"
+           validators={[
+             required('You must supply a first name!'),
+             (value) => value > 15 ? 'too long!': null
+           ]} />
   </label>;
 }
+
+import React, {Component} from 'react';
+class Confirm extends Component {
+  render() {
+    const project = this.props.project;
+    return (
+      <Switch>
+        <Route
+          path={'/home'}
+          render={ (props) => (
+            <Home {...props} />
+          )} />
+      </Switch>
+    )
+  }
+}
+
+// #870
+import React, {Component} from 'react';
+class Confirm extends Component {
+  render() {
+    const project = this.props.project;
+    return (
+      <form onSubmit="">
+        <fieldset>
+          {project.foo && (
+             <div>Foo</div>
+          )}
+          {project.bar && (
+             <p>Bar</p>
+          )}
+        </fieldset>
+      </form>
+    );
+  }
+}
+export default Confirm;
+
 
 var React = require('react')
 
@@ -203,3 +404,59 @@ function hello() {
   );
 
 }
+
+React.createClass({
+  render() {
+    return (
+      <ul class="cscdd" data-toto={ return 1 + "cdxs" }> cqsd
+        { (this.props.scope.get('type') !== "home") ?
+          <BreadcrumbItem href="#/messages/{this.props.scope.get('scope') || this.props.scope.get('parent')}">
+            {this.props.scope.get('scope') || this.props.scope.get('parent')}
+          </BreadcrumbItem> : null}
+      </ul>
+    );
+  }
+});
+
+
+React.createClass({
+  render() {
+    return (
+      <ul class="cscdd" data-toto={ return 1 + "cdxs" }> cqsd
+        { this.props.list.map(function(element) {
+            var x = 1;
+            return <li class="dxs" x="xs">{ "aa" + this.getModel().get('bb') }</li>
+          }) } cqsdc { return "cd"; }
+      </ul>
+    )
+  }
+});
+
+return (
+  <li>
+    <ModalTrigger test="xs" test="dccd" modal={ <InviteForm> }>
+      <a href="#">Invite Representative</a>
+    </ModalTrigger>
+  </li>
+);
+
+
+return (
+  <li>
+    <ModalTrigger modal={ <InviteForm auth={this.props.auth} /> }>
+      <a href="#">Invite Representative</a>
+    </ModalTrigger>
+  </li>
+);
+
+var MyClass = react.createClass({
+  render: function() {
+    return
+    <div>
+      <OtherComponent/>
+      <OtherComponent class="toto"
+                      {...props}
+                      id="fr" />
+    </div>;
+  }
+});
