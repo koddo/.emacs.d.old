@@ -8,6 +8,10 @@ let newList = list.skipWhile(f)
 a()
 b()
 
+function Switch() {
+  return whatever;
+}
+
 Relay.createContainer(Story, {
   initialVariables: {
     numCommentsToShow: 10,
@@ -36,6 +40,10 @@ var cs = {completed: this.props.todo.completed,
 const f = (x) =>
   x + 1;
 
+const tptp =  bar > baz ?
+                    value1 :
+                    value2;
+
 if (a)
   if (b)
     if (c)
@@ -44,6 +52,17 @@ console.log("la");
 
 var data = {
   password: this.password
+}
+
+if (true) {
+  var Button = styled.button`
+    border-radius: 3px;
+    padding: 0.25em 1em;
+    margin: 0 1em;
+    background: transparent;
+    color: palevioletred;
+    border: 2px solid palevioletred;
+  `;
 }
 
 VEOrganizer.prototype.unpatchVeToolbar = function() {
@@ -141,7 +160,7 @@ if (true) {
   var x = y,
       cd = 3;
   export const {x, y} = z,
-      a = 10;
+               a = 10;
 }
 
 var pathData = this.barData
@@ -209,7 +228,7 @@ foo() {
     hello();
 }
 
-function fieldIsValid( field, fieldSpec) {
+function fieldIsValid(field, fieldSpec) {
   // todo: add remote possibility
   var value = field.value;
   if ( value.length < fieldSpec.minNumberOfChar ||
