@@ -268,6 +268,8 @@
 ;; -------------------------------------------------------------------
 (require 'web-mode)
 (add-to-list 'auto-mode-alist '("\\.html?$" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.jinja$" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.dtl$" . web-mode))
 (setq web-mode-markup-indent-offset 4)
 (setq web-mode-code-indent-offset 4)
 ;; -------------------------------------------------------------------
