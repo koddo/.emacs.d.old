@@ -191,6 +191,7 @@
 (setq ym-org-agenda-planning-header-now "Now:")
 (setq ym-org-agenda-planning-header-paused "Paused:")
 (setq ym-org-agenda-planning-header-top "Top:")
+(setq ym-org-agenda-planning-header-regularly "Regularly:")
 (setq ym-org-agenda-planning-header-next-actions "Next actions:")
 (setq ym-org-agenda-planning-header-non-scheduled "Non-scheduled tasks:")
 (setq ym-org-agenda-planning-header-stuck-projects "Stuck projects:")
@@ -207,6 +208,10 @@
                      ((org-agenda-overriding-header ym-org-agenda-planning-header-top)
                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp 'nottodo '("NEXT")))
                       ))
+          (tags-todo "+top"
+                     ((org-agenda-overriding-header ym-org-agenda-planning-header-regularly)
+                      (org-agenda-skip-function '(org-agenda-skip-entry-if 'nottodo '("REGULARLY")))
+                      ))
           ))
         ("1" "Daily schedule"
          (
@@ -220,7 +225,10 @@
                      ((org-agenda-overriding-header ym-org-agenda-planning-header-top)
                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp 'nottodo '("NEXT")))
                       ))
-          (agenda "" ((org-agenda-span 1)
+          (tags-todo "+top"
+                     ((org-agenda-overriding-header ym-org-agenda-planning-header-regularly)
+                      (org-agenda-skip-function '(org-agenda-skip-entry-if 'nottodo '("REGULARLY")))
+                      ))          (agenda "" ((org-agenda-span 1)
                       (org-agenda-show-log t)))
           (tags-todo "-top"
           ;; (todo ""
@@ -246,6 +254,10 @@
           (tags-todo "+top"
                      ((org-agenda-overriding-header ym-org-agenda-planning-header-top)
                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp 'nottodo '("NEXT")))
+                      ))
+          (tags-todo "+top"
+                     ((org-agenda-overriding-header ym-org-agenda-planning-header-regularly)
+                      (org-agenda-skip-function '(org-agenda-skip-entry-if 'nottodo '("REGULARLY")))
                       ))
           ;; (todo ""
           (tags-todo "-top"
