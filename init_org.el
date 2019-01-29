@@ -205,12 +205,12 @@
                 ((org-agenda-overriding-header ym-org-agenda-planning-header-paused)
                  (org-agenda-skip-function '(org-agenda-skip-entry-if 'nottodo '("PAUSED" "WAITING")))))
           (tags-todo "+top"
-                     ((org-agenda-overriding-header ym-org-agenda-planning-header-top)
-                      (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp 'nottodo '("NEXT")))
-                      ))
-          (tags-todo "+top"
                      ((org-agenda-overriding-header ym-org-agenda-planning-header-regularly)
                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'nottodo '("REGULARLY")))
+                      ))
+          (tags-todo "+top"
+                     ((org-agenda-overriding-header ym-org-agenda-planning-header-top)
+                      (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp 'nottodo '("NEXT")))
                       ))
           ))
         ("1" "Daily schedule"
@@ -222,13 +222,14 @@
                 ((org-agenda-overriding-header ym-org-agenda-planning-header-paused)
                  (org-agenda-skip-function '(org-agenda-skip-entry-if 'nottodo '("PAUSED" "WAITING")))))
           (tags-todo "+top"
+                     ((org-agenda-overriding-header ym-org-agenda-planning-header-regularly)
+                      (org-agenda-skip-function '(org-agenda-skip-entry-if 'nottodo '("REGULARLY")))
+                      ))
+          (tags-todo "+top"
                      ((org-agenda-overriding-header ym-org-agenda-planning-header-top)
                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp 'nottodo '("NEXT")))
                       ))
-          (tags-todo "+top"
-                     ((org-agenda-overriding-header ym-org-agenda-planning-header-regularly)
-                      (org-agenda-skip-function '(org-agenda-skip-entry-if 'nottodo '("REGULARLY")))
-                      ))          (agenda "" ((org-agenda-span 1)
+          (agenda "" ((org-agenda-span 1)
                       (org-agenda-show-log t)))
           (tags-todo "-top"
           ;; (todo ""
@@ -252,12 +253,12 @@
                 ((org-agenda-overriding-header ym-org-agenda-planning-header-paused)
                  (org-agenda-skip-function '(org-agenda-skip-entry-if 'nottodo '("PAUSED" "WAITING")))))
           (tags-todo "+top"
-                     ((org-agenda-overriding-header ym-org-agenda-planning-header-top)
-                      (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp 'nottodo '("NEXT")))
-                      ))
-          (tags-todo "+top"
                      ((org-agenda-overriding-header ym-org-agenda-planning-header-regularly)
                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'nottodo '("REGULARLY")))
+                      ))
+          (tags-todo "+top"
+                     ((org-agenda-overriding-header ym-org-agenda-planning-header-top)
+                      (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp 'nottodo '("NEXT")))
                       ))
           ;; (todo ""
           (tags-todo "-top"

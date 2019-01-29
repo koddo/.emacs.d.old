@@ -151,3 +151,13 @@
 ;;               (forward-line))
 ;;           (delete-char 1))))))
 
+;; -------------------------------------------------------------------
+(defun m/asciidoc-latexmath-inline (start end)
+  (interactive "*r")
+  (replace-regexp "\\($+\\)\\([^$]+\\)\\($+\\)" "latexmath:[\\2]" nil start end)
+  )
+(defun m/asciidoc-latexmath-displaystyle (start end)
+  (interactive "*r")
+  (replace-regexp "\\($+\\)\\([^$]+\\)\\($+\\)" "[latexmath]\n++++\\2++++" nil start end))
+
+
