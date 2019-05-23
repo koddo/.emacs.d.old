@@ -102,8 +102,8 @@
 (setq org-agenda-todo-list-sublevels t)
 ;; -------------------------------------------------------------------
 (setq ym-org-todo-keywords-working '("WORKING(w!)" "WAITING(W!)" "PAUSED(p!)"))   ; STATES
-(setq ym-org-todo-keywords-undone `("REGULARLY(R!)" "NEXT(n!)" "TODO(t!)" ,@ym-org-todo-keywords-working))
-(setq ym-org-todo-keywords-done '("DONE(d!)" "CANCELLED(c@)" "REDIRECTED(r@)" "MERGED(m@)"))
+(setq ym-org-todo-keywords-undone `("REGULARLY(r!)" "NEXT(n!)" "TODO(t!)" ,@ym-org-todo-keywords-working))
+(setq ym-org-todo-keywords-done '("DONE(d!)" "CANCELLED(c@)" "REDIRECTED(R@)" "MERGED(m@)"))
 (setq ym-org-todo-state-string-in-log "State:     (")
 (setq org-todo-keywords
       `((sequence ,@ym-org-todo-keywords-undone "|" ,@ym-org-todo-keywords-done)))
@@ -278,6 +278,7 @@
           ))
         ))
 ;; -------------------------------------------------------------------
+(require 'ox)
 ;; (setq org-export-html-postamble nil)
 ;; (setq org-export-with-section-numbers nil)
 ;; (setq org-export-preserve-breaks t)

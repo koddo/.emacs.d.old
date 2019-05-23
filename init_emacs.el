@@ -50,6 +50,7 @@
 (require   'uniquify)  ; buffer names are uniquified with parts of directory name, for ex.: name|folder
 (setq       uniquify-buffer-name-style 'reverse)
 ;; -------------------------------------------------------------------
+(setq auto-save-interval 600)
 (setq backup-inhibited t)
 (setq make-backup-files nil)
 (setq auto-save-list-file-name nil)
