@@ -190,7 +190,7 @@
 (setq org-agenda-current-time-string "------------------------------- now -------------------------------")
 (setq ym-org-agenda-planning-header-now "Now:")
 (setq ym-org-agenda-planning-header-paused "Paused:")
-(setq ym-org-agenda-planning-header-top "Top:")
+(setq ym-org-agenda-planning-header-top "Pinned:")
 (setq ym-org-agenda-planning-header-regularly "Regularly:")
 (setq ym-org-agenda-planning-header-next-actions "Next actions:")
 (setq ym-org-agenda-planning-header-non-scheduled "Non-scheduled tasks:")
