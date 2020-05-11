@@ -1,7 +1,0 @@
-# -*- mode: snippet -*-
-# name: problem
-# key: problem
-# --
-#+begin_problem
-$0
-#+end_problem
