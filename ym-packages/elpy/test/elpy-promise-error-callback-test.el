@@ -1,5 +1,0 @@
-(ert-deftest elpy-promise-error-callback ()
-  (elpy-testcase ()
-    (let ((promise (elpy-promise "success" "error")))
-      (should (equal (elpy-promise-error-callback promise)
-                     "error")))))
