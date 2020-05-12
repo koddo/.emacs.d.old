@@ -1,5 +1,5 @@
 /straight/*
-!/straight/versions
+!/straight/versions/
 
 
 # see https://github.com/github/gitignore/blob/master/Global/Emacs.gitignore
