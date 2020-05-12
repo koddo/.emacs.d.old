@@ -14,14 +14,15 @@
 ;;(load "/opt/local/share/emacs/site-lisp/ledger.el")
 
 
-(defun open-file-with-os (filename)   ; TODO: why?
+(defun open-file-with-os (filename)   ; TODO: should be customized in 
   (shell-command (concat "open '" filename "'")))
 
-(require 'exec-path-from-shell)   ; TODO: move to init.el after checking it on linux
-(setq exec-path-from-shell-variables '("PATH" "MANPATH" "WORKON_HOME"))
-(exec-path-from-shell-initialize)   ; exec-path-from-shell-variables
+(use-package exec-path-from-shell
+  :config (progn
+            ;; (setq exec-path-from-shell-variables '("PATH" "MANPATH" "WORKON_HOME"))
+            (exec-path-from-shell-initialize)))
 
-(require 'reveal-in-osx-finder)
+(use-package reveal-in-osx-finder)
 
 
 
