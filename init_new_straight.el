@@ -36,7 +36,10 @@
 (setq straight-use-package-by-default t)   ; to avoid putting ":straight t" everywhere
 
 
-(use-package no-littering)
+(use-package no-littering
+  :init
+  (setq no-littering-etc-directory (expand-file-name "no-littering-etc/" user-emacs-directory))
+  (setq no-littering-var-directory (expand-file-name "no-littering-var/" user-emacs-directory)))
 
 
 
