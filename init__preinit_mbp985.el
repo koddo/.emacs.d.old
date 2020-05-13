@@ -5,7 +5,8 @@
 (setq mac-allow-anti-aliasing t)
 (setq mac-command-modifier 'control
       mac-option-modifier 'meta
-      mac-control-modifier 'super)
+      mac-control-modifier 'super
+      ns-function-modifier 'hyper)  ; make Fn key do Hyper
 (setq browse-url-generic-program (executable-find "open")
       browse-url-generic-args '("-a" "firefox"))
 (menu-bar-mode t)
