@@ -35,7 +35,6 @@
 (straight-use-package 'use-package)
 (setq straight-use-package-by-default t)   ; to avoid putting ":straight t" everywhere
 
-
 (use-package no-littering
   :init
   (setq no-littering-etc-directory (expand-file-name "no-littering-etc/" user-emacs-directory))
@@ -44,15 +43,14 @@
 
 
 
-
 (load-file (expand-file-name "init__preinit_this_machine.el" user-emacs-directory))
-;; (load-file (expand-file-name "init_keybindings.el" user-emacs-directory))
+(load-file (expand-file-name "init-emacs.el" user-emacs-directory))
+(load-file (expand-file-name "init-packages.el" user-emacs-directory))
+(load-file (expand-file-name "init-org.el" user-emacs-directory))
 
-;; taken from https://stackoverflow.com/questions/1792326/how-do-i-bind-a-command-to-c-i-without-changing-tab/2253044#2253044
-(keyboard-translate ?\C-i ?\H-i)
-(keyboard-translate ?\C-m ?\H-m)
-(keyboard-translate 27 16777307)    ; C-[ is 27 and H-[ is 16777307
-;; Rebind then accordantly: (global-set-key (kbd "H-i") (lambda () (interactive) (message "C-i hello")))
+(load-file (expand-file-name "init-keybindings.el" user-emacs-directory))
+(load-file (expand-file-name "init-russian-keyboard.el" user-emacs-directory))
+(load-file (expand-file-name "init-ym-keys-minor-mode.el" user-emacs-directory))
 
 
 
@@ -60,19 +58,3 @@
 (setq custom-file (expand-file-name "init_custom.el" user-emacs-directory))
 (load custom-file 'noerror)
 
-
-
-
-
-
-
-
-;; (load-file "~/.emacs.d/init_emacs.el")
-;; (load-file "~/.emacs.d/init_org.el")
-;; (load-file "~/.emacs.d/init_development.el")
-;; (load-file "~/.emacs.d/init_functions.el")
-;; (load-file "~/.emacs.d/init_colors.el")
-
-;; (dired "~/")
-;; (dired "~/Downloads")
-;; (dired "~/workspace")
