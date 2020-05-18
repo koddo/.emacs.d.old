@@ -177,9 +177,11 @@
 ;; -------------------------------------------------------------------
 
 (ym-define-key (kbd "s-z") #'undo)
-(ym-define-key (kbd "s-x") #'kill-region)
-(ym-define-key (kbd "s-c") #'kill-ring-save)
+(ym-define-key (kbd "s-x")  (lambda (beg end) (interactive "r") (prog1  (kill-region beg end)     (setq deactivate-mark nil))))
+(ym-define-key (kbd "s-c")  (lambda (beg end) (interactive "r") (prog1  (kill-ring-save beg end)  (setq deactivate-mark nil))))
 (ym-define-key (kbd "s-v") #'yank)
+
+
 
 ;; -------------------------------------------------------------------
 
