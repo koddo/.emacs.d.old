@@ -1,24 +1,6 @@
-(server-start)
-(require 'maxframe)
-(add-hook 'window-setup-hook 'maximize-frame t)
-
-;; -------------------------------------------------------------------
-(setq user-full-name "Alex Scherbanov")
-(setq user-mail-address "alex@egotv.ru")
-;; -------------------------------------------------------------------
-
-(require 'view)   ; for view-mode-map
-(tool-bar-mode -1)   ; menu-bar-mode moved to preinit
-(setq inhibit-startup-message t)
-(setq frame-title-format "emacs")
-(setq debug-on-error t)
-(setq initial-scratch-message nil)
-(setq visible-bell t)
 (setq-default truncate-lines t)
 (setq x-select-enable-clipboard t)
 (setq require-final-newline t)
-(setq calendar-week-start-day 1)     ;; week starts from Monday
-(add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)   ;; chmod u+x current file when saving if not set
 (setq next-line-add-newlines t)
 (setq vc-handled-backends nil)          ;; disable version control (vc) enabled by default, it slows down emacs, and i don't use it
 (setq split-width-threshold nil) ; for calendar. otherwise emacs splits windows horizontally
@@ -26,8 +8,6 @@
 (setq split-width-threshold 160)
 (put 'downcase-region 'disabled nil)
 (put   'upcase-region 'disabled nil)
-(  line-number-mode t)
-(column-number-mode t)
 (setq      comint-buffer-maximum-size 5000) ; truncate the shell buffer
 (add-hook 'comint-output-filter-functions 'comint-truncate-buffer) ; to a certain maximum number of lines
 (when (fboundp 'winner-mode)
@@ -40,8 +20,6 @@
 (add-hook 'ledger-mode-hook (lambda ()
                               (set (make-local-variable 'comment-start) "; ")
                               (set (make-local-variable 'comment-style) 'plain)))
-;; -------------------------------------------------------------------
-(require 'ledger-mode)
 ;; -------------------------------------------------------------------
 (require       'saveplace)   ; When you visit a file, point goes to the last place where it was when you previously visited the same file.
 (setq-default   save-place t)
@@ -146,11 +124,6 @@
     (smex-update)))
 (add-hook 'after-load-functions 'ym-smex-update-after-load-file)   ; see init_keybindings.el
 ;; -------------------------------------------------------------------
-(require 'diminish)   ; hide some minor modes from mode line
-(eval-after-load "whitespace" '(diminish 'global-whitespace-mode))
-(eval-after-load "autopair" '(diminish 'autopair-mode))
-(eval-after-load "yasnippet" '(diminish 'yas-minor-mode))
-;; -------------------------------------------------------------------
 (recentf-mode 1)
 (setq recentf-max-saved-items 200)
 ;; -------------------------------------------------------------------
@@ -195,27 +168,5 @@
     (when path
       (setq output (concat ".../" output)))
     output))
-;; -------------------------------------------------------------------
-;; (require 'ibuffer-vc)
-;; (setq ibuffer-formats
-;;       '((mark modified read-only vc-status-mini " "
-;;               (name 18 18 :left :elide)
-;;               " "
-;;               (size 9 -1 :right)
-;;               " "
-;;               (mode 16 16 :left :elide)
-;;               " "
-;;               (vc-status 16 16 :left)
-;;               " "
-;;               filename-and-process)))
-;; -------------------------------------------------------------------
-;; (require 'tree-mode)
-;; (require 'dirtree)   ; alternative to dired
-;; (require 'windata)
-;; -------------------------------------------------------------------
-(require 'ace-jump-mode)
-;; -------------------------------------------------------------------
-(require 'register-list)
-;; -------------------------------------------------------------------
 
 
