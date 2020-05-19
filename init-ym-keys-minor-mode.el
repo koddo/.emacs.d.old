@@ -144,9 +144,9 @@
 ;; super + ijkl to move around, instead of arrow keys
 ;; considering shift for marking regions for coping/pasting
 
-;; (defun ym-keys-ijkl-move (move-func shift-pressed) 
-;;   (interactive) 
-;;   (when (and 
+;; (defun ym-keys-ijkl-move (move-func shift-pressed)
+;;   (interactive)
+;;   (when (and
 ;;          (not mark-active)
 ;;          shift-pressed)
 ;;     (cua-set-mark))
@@ -169,6 +169,16 @@
 
 ;; -------------------------------------------------------------------
 
+;; mwim = move where I mean
+;; https://github.com/alezost/mwim.el
+(use-package mwim
+  :config
+  (ym-define-key (kbd "s-u") #'mwim-beginning-of-code-or-line)
+  (ym-define-key (kbd "s-o") #'mwim-end)
+  )
+
+;; -------------------------------------------------------------------
+
 ;; (ym-define-key (kbd "M-s-^") #'ym-undefined-key-message)   ; M-s-i
 ;; (ym-define-key (kbd "M-s-˚") #'ym-undefined-key-message)   ; M-s-k
 ;; (ym-define-key (kbd "M-s-∆") #'ym-undefined-key-message)   ; M-s-k
@@ -177,11 +187,23 @@
 ;; -------------------------------------------------------------------
 
 (ym-define-key (kbd "s-z") #'undo)
-(ym-define-key (kbd "s-x")  (lambda (beg end) (interactive "r") (prog1  (kill-region beg end)     (setq deactivate-mark nil))))
-(ym-define-key (kbd "s-c")  (lambda (beg end) (interactive "r") (prog1  (kill-ring-save beg end)  (setq deactivate-mark nil))))
+(ym-define-key (kbd "s-x")
+               (lambda (beg end)
+                 (interactive "r")
+                 (prog1
+                     (kill-region beg end)
+                   (setq deactivate-mark nil))))   ; leave the region highlighted after the cut
+(ym-define-key (kbd "s-c")
+               (lambda (beg end)
+                 (interactive "r")
+                 (prog1
+                     (kill-ring-save beg end)
+                   (setq deactivate-mark nil))))   ; leave the region highlighted after the copy
 (ym-define-key (kbd "s-v") #'yank)
 
-
+(transient-mark-mode 1)      ; no region when it is not highlighted
+(delete-selection-mode 1)    ; typed text replaces the selection if the selection is active
+(setq shift-select-mode 1)   ; shifted motion keys activate the mark momentarily
 
 ;; -------------------------------------------------------------------
 
@@ -212,14 +234,3 @@
 (ym-define-key (kbd "s-0") (lambda () (interactive) (text-scale-adjust 0)))
 
 ;; -------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-

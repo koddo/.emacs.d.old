@@ -30,4 +30,12 @@
 
 
 
+;; https://github.com/emacsorphanage/popwin
+(use-package popwin
+  :config
+  (popwin-mode 1))
+
+
+
+;; TODO: https://alhassy.github.io/org-special-block-extras/
 
