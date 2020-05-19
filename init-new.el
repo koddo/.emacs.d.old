@@ -44,10 +44,10 @@
 
 
 (load-file (expand-file-name "init__preinit_this_machine.el" user-emacs-directory))
+
 (load-file (expand-file-name "init-emacs.el" user-emacs-directory))
 (load-file (expand-file-name "init-packages.el" user-emacs-directory))
 (load-file (expand-file-name "init-org.el" user-emacs-directory))
-(load-file (expand-file-name "init-latex.el" user-emacs-directory))
 
 (load-file (expand-file-name "init-colors.el" user-emacs-directory))
 
