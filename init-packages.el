@@ -45,6 +45,9 @@
 ;; ido
 ;; flx-ido
 ;; smex
+(use-package ido)
+(use-package flx-ido)
+(use-package ido-grid-mode)
 
 
 
