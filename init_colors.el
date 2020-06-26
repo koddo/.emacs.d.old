@@ -1,9 +1,5 @@
 
 ;; -------------------------------------------------------------------
-(global-hl-line-mode 1)
-(setq ym-hl-line-color-normal-mode-color "LightSteelBlue1")
-(set-face-background 'hl-line ym-hl-line-color-normal-mode-color)
-;; -------------------------------------------------------------------
 ;;(set-face-background 'show-paren-match-face "#fcc")
 ;;(set-face-foreground 'show-paren-match-face "#f00")
 ;;(set-face-attribute 'show-paren-match-face nil :weight 'extra-bold)

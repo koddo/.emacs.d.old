@@ -4,7 +4,8 @@
   :mode (("\\.org$" . org-mode))
   :ensure org-plus-contrib
 
-  :init 
+  :init
+  ;; (require 'face-remap)
   (setq ym-org-latex-preview-scale 1.0)   ; depends on the font used in emacs or just on user preference
   (defun org-latex-preview-advice (orig-func &rest args)
     (let ((old-val (copy-tree org-format-latex-options)))     ; plist-put is maybe-destructive, weird. So, we have to restore old value ourselves
@@ -17,6 +18,8 @@
 
   :config
   (setq-default org-adapt-indentation nil)
+  (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)   ; usage: org-id, org-store-link, org-insert-link, org-id-update-id-locations
+
   )
 
 
@@ -74,7 +77,35 @@
    ;; org-drill-days-before-old 7
    )
   :config
-  (defun org-drill-entry-empty-p () nil)   ; https://emacs.stackexchange.com/questions/38440/make-org-drill-allow-reviewing-empty-cards/58568#58568
+  (defun org-drill-entry-empty-p () nil)   ; don't ignore "empty" cards -- https://emacs.stackexchange.com/questions/38440/make-org-drill-allow-reviewing-empty-cards/58568#58568
   )
 
 
+;; ob-ipython is abandoned, apparently and unfortunately
+(use-package jupyter
+  :config
+  ;; don't forget to run the following:
+  ;; $ pip install ipykernel && python -m ipykernel install --user
+  (setq org-babel-python-command "/Users/alex/.python_venv/default360/bin/python")
+  )
+
+(use-package ob-http)
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (python . t)
+   (http . t)
+   ;; (clojure . t)
+   ;; (haskell . t)
+   ;; (java . t)
+   ;; (javascript . t)
+   ;; (lisp . t)
+   ;; (R . t)
+   ;; (shell . t)
+   ;; (sql . t)
+   ;; (sqlite . t)
+   ;; (typescript . t)     ; (use-package ob-typescript)
+   ;; (mongo . t)     ; (use-package ob-mongo)
+   (jupyter . t)
+   ))

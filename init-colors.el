@@ -1,3 +1,12 @@
+
+
+(setq global-hl-line-sticky-flag nil)   ; only appear in one window
+(global-hl-line-mode)
+(blink-cursor-mode 0)
+
+
+
+
 ;; http://chriskempson.com/projects/base16/
 ;; https://github.com/belak/base16-emacs
 ;; https://github.com/belak/base16-emacs/blob/master/base16-theme.el
@@ -42,4 +51,9 @@
     ; (set-face-attribute 'org-level-7 nil :height 1.0 :foreground "#9096c5")
     ; (set-face-attribute 'org-level-8 nil :height 1.0 :foreground "#9096c5")
     )
+
+  (setq ym-hl-line-color-normal-mode-color "#e6eef7")   ; was LightSteelBlue1, e3ecf7
+  (set-face-background 'hl-line ym-hl-line-color-normal-mode-color)
+
   )
+

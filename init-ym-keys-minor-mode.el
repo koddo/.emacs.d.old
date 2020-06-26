@@ -70,7 +70,7 @@
   "`"
   ))
 
-;; we have to bind shift-meta-something to anything non-nil
+;; we have to bind shift-meta-something to any
 ;; otherwise these keybindings get translated to ones without shift
 ;; https://unix.stackexchange.com/questions/25649/is-it-possible-to-stop-emacs-from-down-translating-my-key-chords/25719#25719
 (mapcar
@@ -95,7 +95,7 @@
 (ym-define-key (kbd "<S-s-SPC>")  #'ym-undefined-key-message)
 (ym-define-key (kbd "<M-SPC>")    #'ym-undefined-key-message)
 (ym-define-key (kbd "<M-S-SPC>")  #'ym-undefined-key-message)
-(ym-define-key (kbd "<S-SPC>")    #'ym-undefined-key-message)
+;; (ym-define-key (kbd "<S-SPC>")    #'ym-undefined-key-message)
 
 (ym-define-key (kbd "<s-backspace>")    #'ym-undefined-key-message)
 (ym-define-key (kbd "<M-s-backspace>")  #'ym-undefined-key-message)
@@ -175,14 +175,22 @@
   :config
   (ym-define-key (kbd "s-u") #'mwim-beginning-of-code-or-line)
   (ym-define-key (kbd "s-o") #'mwim-end)
+  (defun ym-move-to-middle-of-line ()
+    (interactive)
+    (let* ((begin (mwim-code-beginning))
+	   (end (mwim-code-end))
+	   (middle (/ (+ end begin) 2)))
+      (goto-char middle)))
+  (ym-define-key (kbd "s-,") #'ym-move-to-middle-of-line)
   )
+
 
 ;; -------------------------------------------------------------------
 
-;; (ym-define-key (kbd "M-s-^") #'ym-undefined-key-message)   ; M-s-i
-;; (ym-define-key (kbd "M-s-˚") #'ym-undefined-key-message)   ; M-s-k
-;; (ym-define-key (kbd "M-s-∆") #'ym-undefined-key-message)   ; M-s-k
-;; (ym-define-key (kbd "M-s-¬") #'ym-undefined-key-message)   ; M-s-l
+(ym-define-key (kbd "M-s-^") #'ym-undefined-key-message)   ; M-s-i
+(ym-define-key (kbd "M-s-˚") #'ym-undefined-key-message)   ; M-s-k
+(ym-define-key (kbd "M-s-∆") #'backward-word)   ; M-s-k
+(ym-define-key (kbd "M-s-¬") #'forward-word)   ; M-s-l
 
 ;; -------------------------------------------------------------------
 
@@ -233,5 +241,37 @@
 (ym-define-key (kbd "s--") #'text-scale-decrease)
 (ym-define-key (kbd "s-=") #'text-scale-increase)
 (ym-define-key (kbd "s-0") (lambda () (interactive) (text-scale-adjust 0)))
+
+;; -------------------------------------------------------------------
+
+;; (require 'windmove)
+;; (global-set-key (kbd "<left>") 'windmove-left)
+;; (global-set-key (kbd "<right>") 'windmove-right)
+;; (global-set-key (kbd "<up>") 'windmove-up)
+;; (global-set-key (kbd "<down>") 'windmove-down)
+
+;; -------------------------------------------------------------------
+
+(ym-define-key (kbd "s-/") #'comment-or-uncomment-region)
+
+;; -------------------------------------------------------------------
+
+(use-package ace-window
+  :config
+  (global-set-key (kbd "M-o") 'ace-window)
+  )
+
+;; -------------------------------------------------------------------
+
+;; TODO:
+;; isearch
+;; remove mark when move
+;; switch marks
+
+(ym-define-key (kbd "s-f") #'isearch-forward)
+
+;; -------------------------------------------------------------------
+
+(ym-define-key (kbd "s-p") 'projectile-command-map)
 
 ;; -------------------------------------------------------------------

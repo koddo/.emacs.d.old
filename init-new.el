@@ -1,4 +1,4 @@
-;;; init_new_straight.el ---                         -*- lexical-binding: t; -*-
+;;; init-new.el ---                         -*- lexical-binding: t; -*-
 
 
 
@@ -54,6 +54,7 @@
 (load-file (expand-file-name "init-keybindings.el" user-emacs-directory))
 (load-file (expand-file-name "init-russian-keyboard.el" user-emacs-directory))
 (load-file (expand-file-name "init-ym-keys-minor-mode.el" user-emacs-directory))
+(load-file (expand-file-name "init-avy.el" user-emacs-directory))
 
 
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
@@ -61,4 +62,6 @@
 (load custom-file 'noerror)
 
 
-(find-file "~/drill/drill.org")
+;; (find-file "~/drill/drill.org")
+(find-file "~/workspace.new/Notes.org")
+
