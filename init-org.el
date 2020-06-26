@@ -109,3 +109,5 @@
    ;; (mongo . t)     ; (use-package ob-mongo)
    (jupyter . t)
    ))
+(setq org-src-tab-acts-natively t)
+(setq org-babel-min-lines-for-block-output 9999)   ;; this forces indenting results with colons, because I don't like how #+end_example is inserted at the beginning of line, not indented at all

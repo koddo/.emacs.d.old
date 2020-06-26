@@ -2,22 +2,6 @@
 ;; -------------------------------------------------------------------
 (ym-add-to-list-dired-omit-extensions '(".o" ".a"))
 ;; -------------------------------------------------------------------
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '(
-   (http . t)
-   ;; (emacs-lisp . t)
-   ;; (haskell . t)
-   ;; (lisp . t)
-   ;; (scheme . t)
-   (python . t)
-   ;; (gnuplot . t)
-   ;; (sh . t)
-   ;; (sql . t)
-   ))
-(setq org-src-tab-acts-natively t)
-(setq org-babel-min-lines-for-block-output 9999)   ;; this forces indenting results with colons, because I don't like how #+end_example is inserted at the beginning of line, not indented at all
-;; -------------------------------------------------------------------
 ;; automatically indent pasted text if in programming-modes
 (defvar yank-indent-modes '(emacs-lisp-mode
                             c-mode c++-mode
