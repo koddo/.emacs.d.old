@@ -5,7 +5,7 @@
   :ensure org-plus-contrib
 
   :init
-  ;; (require 'face-remap)
+  (require 'face-remap)
   (setq ym-org-latex-preview-scale 1.0)   ; depends on the font used in emacs or just on user preference
   (defun org-latex-preview-advice (orig-func &rest args)
     (let ((old-val (copy-tree org-format-latex-options)))     ; plist-put is maybe-destructive, weird. So, we have to restore old value ourselves
