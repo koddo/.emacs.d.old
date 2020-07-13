@@ -19,7 +19,7 @@
   :config
   (setq-default org-adapt-indentation nil)
   (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)   ; usage: org-id, org-store-link, org-insert-link, org-id-update-id-locations
-
+  (setq org-refile-targets '((org-agenda-files :maxlevel . 3)))
   )
 
 
@@ -60,6 +60,8 @@
   (setq
    org-drill-spaced-repetition-algorithm  'sm2
    org-drill-learn-fraction                0.4
+   ;; https://orgmode.org/worg/org-contrib/org-drill.html#text-org42a64b5
+   ;; 0.4 means 5 times in the first month, and 10 times in five months
 
    org-drill-leech-method             'warn
    org-drill-leech-failure-threshold   5
@@ -68,13 +70,19 @@
    org-drill-maximum-items-per-session            nil
    org-drill-add-random-noise-to-intervals-p      t
    org-drill-save-buffers-after-drill-sessions-p  nil
-
+   org-drill-hide-item-headings-p                 nil
+   org-drill-overdue-interval-factor              1.2
+   org-drill-days-before-old                      10
+   
    org-drill-adjust-intervals-for-early-and-late-repetitions-p t    ; doesn't have any effect with sm2 though
 
-   ;; org-drill-scope 'file     ; https://orgmode.org/worg/org-contrib/org-drill.html#orgf1d69c8
+   org-drill-scope 'file-no-restriction     ; https://orgmode.org/worg/org-contrib/org-drill.html#orgf1d69c8
+   ;; TODO: write functions: ym-drill-file, ym-drill-math, ym-drill-eng, ym-drill-list
+   ;; or within each file, set org-drill-scope to 'directory'
 
    ;; defaults
    ;; org-drill-days-before-old 7
+   org-drill--help-key ?`   ; the key to the left of the 1 key
    )
   :config
   (defun org-drill-entry-empty-p () nil)   ; don't ignore "empty" cards -- https://emacs.stackexchange.com/questions/38440/make-org-drill-allow-reviewing-empty-cards/58568#58568
@@ -116,15 +124,3 @@
    ))
 ;; (setq org-src-tab-acts-natively t)
 ;; (setq org-babel-min-lines-for-block-output 9999)   ;; this forces indenting results with colons, because I don't like how #+end_example is inserted at the beginning of line, not indented at all
-
-
-
-
-
-
-
-
-
-
-
-

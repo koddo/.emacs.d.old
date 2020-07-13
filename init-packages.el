@@ -82,6 +82,11 @@
    )
   (amx-mode 1)
   (add-to-list 'warning-suppress-types '(amx))
+  ;;; I used to have the following to update smex cache
+  ;; (defun ym-smex-update-after-load-file (unused)
+  ;;   (when (boundp 'smex-cache)
+  ;;     (smex-update)))
+  ;; (add-hook 'after-load-functions 'ym-smex-update-after-load-file)   ; see init_keybindings.el
   )
 (use-package ido-completing-read+   ; enhanced ido-everywhere
   :config
@@ -114,37 +119,6 @@
    ;; ido-sort-mtime-tramp-files-at-end nil
    )
   )
-
-;; -------------------------------------------------------------------
-
-
-;; (use-package ag)
-;; (use-package projectile-ripgrep)
-(use-package deadgrep)
-;; (use-package emacs-wgrep)   ;; for editing grep buffer; deadgrep support -- https://github.com/mhayashi1120/Emacs-wgrep/pull/58
-
-(use-package projectile
-  :config
-  (projectile-mode +1)
-  (setq frame-title-format     ;; taken from https://emacs.stackexchange.com/questions/35432/how-to-set-projectile-project-name-as-frame-title
-        '(""
-          "%b"
-          (:eval
-           (let ((project-name (projectile-project-name)))
-             (unless (string= "-" project-name)
-               (format " in [%s]" project-name))))))
-  )
-
-
-;; -------------------------------------------------------------------
-
-
-(use-package treemacs)
-(use-package treemacs-projectile
-  :after treemacs projectile)
-(use-package treemacs-magit
-  :after treemacs magit)
-(use-package lsp-treemacs)
 
 ;; -------------------------------------------------------------------
 
