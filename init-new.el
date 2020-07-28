@@ -48,6 +48,7 @@
 (load-file (expand-file-name "init-emacs.el" user-emacs-directory))
 (load-file (expand-file-name "init-packages.el" user-emacs-directory))
 (load-file (expand-file-name "init-org.el" user-emacs-directory))
+(load-file (expand-file-name "init-dev.el" user-emacs-directory))
 
 (load-file (expand-file-name "init-colors.el" user-emacs-directory))
 
@@ -63,5 +64,6 @@
 
 
 ;; (find-file "~/drill/drill.org")
+(setq org-agenda-files '("~/workspace.new"))
 (find-file "~/workspace.new/Notes.org")
 
