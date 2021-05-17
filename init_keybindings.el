@@ -2,10 +2,6 @@
 ;;;; KEYBINDINGS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun dont-kill-emacs ()   ;; disable C-x C-c
-  (interactive)
-  (message (substitute-command-keys "To exit emacs: \\[save-buffers-kill-emacs]")))
-(global-set-key "\C-x\C-c" 'dont-kill-emacs)
 
 (setq cua-rectangle-mark-key [C-c\ C-q\ C-w\ C-e\ C-r\ C-t\ C-y])   ; was C-RET -- disabled now
 (cua-mode t)   ; CUA mode: C-x, C-c, C-v for copying, pasting, C-z for undo
@@ -21,7 +17,7 @@
 ;;    now tab-key is (kbd "TAB")
 ;;       and C-i is [tab]
 (define-key function-key-map [tab] nil) ;; 1. Don't translate tab into C-i
-(define-key key-translation-map [9] [tab]) ;; 2. Swap the meanings of tab and C-i 
+(define-key key-translation-map [9] [tab]) ;; 2. Swap the meanings of tab and C-i
 (define-key key-translation-map [tab] [9])
 (global-set-key [tab] (lambda () (interactive) (message "C-i is undefined")))
 (global-set-key (kbd "S-TAB") (lambda () (interactive) (message "C-S-i is undefined")))
@@ -84,7 +80,7 @@
 
 
 ;; -------------------------------------------------------------------
-(defvar ym-keys-minor-mode-map (make-keymap) "ym-keys-minor-mode keymap.")                           
+(defvar ym-keys-minor-mode-map (make-keymap) "ym-keys-minor-mode keymap.")
 (define-minor-mode ym-keys-minor-mode
   "My minor mode for global keybindings."
   :init-value t :lighter "" :keymap 'ym-keys-minor-mode-map)
@@ -117,9 +113,9 @@
 ;; +      -       -          -
 ;; -      +       +          +
 ;; +      +       +          -
-(defun ym-keys-ijkl-move (func shift-pressed) 
-  (interactive) 
-  (when (and 
+(defun ym-keys-ijkl-move (func shift-pressed)
+  (interactive)
+  (when (and
          (not mark-active)
          shift-pressed)
     (cua-set-mark))
@@ -168,7 +164,7 @@
 (define-key isearch-mode-map (kbd "C-S-f") 'isearch-repeat-backward)
 (define-key isearch-mode-map (kbd "C-M-S-f") 'isearch-repeat-backward)
 (ym-define-key (kbd "C-s") 'save-buffer)   ; save with C-s
-(ym-define-key (kbd "C-r") 'revert-buffer)       
+(ym-define-key (kbd "C-r") 'revert-buffer)
 (ym-define-key (kbd "C-w") (lambda () (interactive) (kill-buffer (current-buffer))))
 (ym-define-key (kbd "C-b") 'ido-switch-buffer)
 (ym-define-key (kbd "C-S-b") 'ibuffer)
@@ -386,7 +382,7 @@
     (forward-line 1)
     (end-of-line)
     (if (eq (point) (point-max))
-        (progn 
+        (progn
           (newline-and-indent)
           (forward-line -1))
       )
@@ -701,7 +697,7 @@ there's a region, all lines that region covers will be duplicated."
          (selection (buffer-substring-no-properties beg end)))
     (deactivate-mark)
     (isearch-mode forward nil nil nil)
-    (isearch-yank-string selection)))  
+    (isearch-yank-string selection)))
 (defun ym-search-selection-or-isearch-forward  () (interactive) (if mark-active (ym-search-selection-or-isearch t)   (isearch-forward)))
 (defun ym-search-selection-or-isearch-backward () (interactive) (if mark-active (ym-search-selection-or-isearch nil) (isearch-backward)))
 
@@ -749,7 +745,3 @@ narrowed."
   (delete-other-windows))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
-

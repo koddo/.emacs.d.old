@@ -10,7 +10,7 @@
 (setq debug-on-error t)
 (tool-bar-mode -1)   ; menu-bar-mode moved to preinit
 (setq inhibit-startup-message t)
-(setq initial-scratch-message ";; scratch buffer")
+(setq initial-scratch-message ";; scratch buffer\\n\\n")
 (setq frame-title-format "emacs")
 (setq debug-on-error t)
 (setq visible-bell t)
@@ -74,5 +74,55 @@
 (recentf-mode 1)
 (setq recentf-max-saved-items 200)
 
+
+;; -------------------------------------------------------------------
+;; auto save buffers
+
+(defun ym/save-buffer-silently ()
+  (interactive)
+  (cl-flet ((message (format &rest args)
+		     nil))
+    (save-buffer)))
+
+(defun ym/save-some-buffers-silently ()
+  (interactive)
+  (cl-flet ((message (format &rest args)
+		     nil))
+    (save-some-buffers t)))
+
+(add-hook 'focus-out-hook 'ym/save-some-buffers-silently)   ; https://emacs.stackexchange.com/questions/265/how-to-auto-save-buffers-when-emacs-loses-focus
+
+(defadvice switch-to-buffer (before ym/save-buffer-silently activate)
+  (when buffer-file-name (ym/save-buffer-silently)))
+(defadvice other-window (before other-window-now activate)
+  (when buffer-file-name (ym/save-buffer-silently)))
+(defadvice windmove-up (before other-window-now activate)
+  (when buffer-file-name (ym/save-buffer-silently)))
+(defadvice windmove-down (before other-window-now activate)
+  (when buffer-file-name (ym/save-buffer-silently)))
+(defadvice windmove-left (before other-window-now activate)
+  (when buffer-file-name (ym/save-buffer-silently)))
+(defadvice windmove-right (before other-window-now activate)
+  (when buffer-file-name (ym/save-buffer-silently)))
+
+;; -------------------------------------------------------------------
+
+;; isearch extension that shows number of matches and current match index
+(use-package anzu
+  :config
+  (setq anzu-search-threshold 1000)
+  (global-anzu-mode +1)
+  )
+
+;; -------------------------------------------------------------------
+
+;; https://stackoverflow.com/questions/2081577/setting-emacs-to-split-buffers-side-by-side
+(setq split-height-threshold nil)
+(setq split-width-threshold 160)
+
+;; -------------------------------------------------------------------
+
+;; https://www.emacswiki.org/emacs/CleanBufferList
+(require 'midnight)
 
 ;; -------------------------------------------------------------------

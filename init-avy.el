@@ -6,12 +6,12 @@
   (ym-define-key (kbd "s-;") #'avy-goto-word-1)
   (ym-define-key (kbd "M-s-…") #'avy-goto-char-2)   ; == "M-s-;" -- this only looks like an underscore, but in fact it's some unicode symbol
 
-  ;; (defun avy-goto-parens ()
-  ;;   (interactive)
-  ;;   (let ((avy-command this-command))   ; for look up in avy-orders-alist
-  ;;     (avy-jump "(+")))
-  ;; (add-to-list 'avy-orders-alist '(avy-goto-parens . avy-order-closest))
-  ;; (ym-define-key (kbd "s-p") 'avy-goto-parens)
+  (defun avy-goto-parens ()
+    (interactive)
+    (let ((avy-command this-command))   ; for look up in avy-orders-alist
+      (avy-jump "\\[+\\|\\]\\|(+\\|)+")))
+  (add-to-list 'avy-orders-alist '(avy-goto-parens . avy-order-closest))
+  (ym-define-key (kbd "s-^") #'avy-goto-parens)   ; "S-s-;" -- thisi is not a usual ^
 
   (setq avy-keys
 	(list

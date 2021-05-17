@@ -3,9 +3,6 @@
 (setq require-final-newline t)
 (setq next-line-add-newlines t)
 (setq vc-handled-backends nil)          ;; disable version control (vc) enabled by default, it slows down emacs, and i don't use it
-(setq split-width-threshold nil) ; for calendar. otherwise emacs splits windows horizontally
-(setq split-height-threshold nil)
-(setq split-width-threshold 160)
 (put 'downcase-region 'disabled nil)
 (put   'upcase-region 'disabled nil)
 (setq      comint-buffer-maximum-size 5000) ; truncate the shell buffer
@@ -45,7 +42,7 @@
 ;; -------------------------------------------------------------------
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
-(require 'whitespace) 
+(require 'whitespace)
 (setq whitespace-style '(tabs tab-mark)) ; show tabs
 (setq global-whitespace-mode 1)
 ;; -------------------------------------------------------------------
@@ -92,9 +89,7 @@
     (when (and path (equal "" (car path)))
       (setq output (concat (car path) "/" output))
       (setq path (cdr path))
-      )    
+      )
     (when path
       (setq output (concat ".../" output)))
     output))
-
-

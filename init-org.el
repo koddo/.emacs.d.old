@@ -20,6 +20,17 @@
   (setq-default org-adapt-indentation nil)
   (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)   ; usage: org-id, org-store-link, org-insert-link, org-id-update-id-locations
   (setq org-refile-targets '((org-agenda-files :maxlevel . 3)))
+  (setq org-preview-latex-image-directory ".ltximg/")
+
+
+  (setq org-agenda-custom-commands   ; STATES
+	'(("dt" "Only working to quickly switch between them"
+	   (
+	    (tags "-english-spanish+drill+SCHEDULED<=\"<today>\"")
+	    )
+	  )))
+
+
   )
 
 
@@ -73,8 +84,9 @@
    org-drill-hide-item-headings-p                 nil
    org-drill-overdue-interval-factor              1.2
    org-drill-days-before-old                      10
-   
-   org-drill-adjust-intervals-for-early-and-late-repetitions-p t    ; doesn't have any effect with sm2 though
+   ;; org-drill-failure-quality                      2
+
+   ;; org-drill-adjust-intervals-for-early-and-late-repetitions-p t    ; doesn't have any effect on sm2
 
    org-drill-scope 'file-no-restriction     ; https://orgmode.org/worg/org-contrib/org-drill.html#orgf1d69c8
    ;; TODO: write functions: ym-drill-file, ym-drill-math, ym-drill-eng, ym-drill-list

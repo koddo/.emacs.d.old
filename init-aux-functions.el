@@ -1,0 +1,13 @@
+(defun goto-random-line ()
+  (interactive)
+  (end-of-buffer)
+  (let ((eof-line-number (line-number-at-pos)))
+    (beginning-of-buffer)
+    (forward-line (random eof-line-number))
+    )
+  )
+
+(defun ym-org-agenda-drill-today-only ()
+  (interactive)
+  (org-agenda nil "dt")
+  )

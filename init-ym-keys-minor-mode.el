@@ -138,6 +138,7 @@
 ;; -------------------------------------------------------------------
 
 ;; we can now assign keys
+(ym-define-key (kbd "M-_") (lambda () (interactive) (insert "—")))
 
 ;; -------------------------------------------------------------------
 
@@ -167,6 +168,10 @@
 (ym-define-key (kbd "s-j") (lambda () (interactive "^") (backward-char)))
 (ym-define-key (kbd "s-l") (lambda () (interactive "^") (forward-char)))
 
+(ym-define-key (kbd "s-b") #'ido-switch-buffer)
+(ym-define-key (kbd "s-B") #'ibuffer)
+(global-set-key [remap list-buffers] 'ibuffer)
+
 ;; -------------------------------------------------------------------
 
 ;; mwim = move where I mean
@@ -181,20 +186,21 @@
 	   (end (mwim-code-end))
 	   (middle (/ (+ end begin) 2)))
       (goto-char middle)))
-  (ym-define-key (kbd "s-,") #'ym-move-to-middle-of-line)
+  ;; (ym-define-key (kbd "s-,") #'ym-move-to-middle-of-line)
   )
 
 
 ;; -------------------------------------------------------------------
 
-(ym-define-key (kbd "M-s-^") #'ym-undefined-key-message)   ; M-s-i
-(ym-define-key (kbd "M-s-˚") #'ym-undefined-key-message)   ; M-s-k
-(ym-define-key (kbd "M-s-∆") #'backward-word)   ; M-s-k
-(ym-define-key (kbd "M-s-¬") #'forward-word)   ; M-s-l
+;; (ym-define-key (kbd "M-s-^") #'ym-undefined-key-message)   ; M-s-i
+;; (ym-define-key (kbd "M-s-˚") #'ym-undefined-key-message)   ; M-s-k
+;; (ym-define-key (kbd "M-s-∆") #'backward-word)   ; M-s-k
+;; (ym-define-key (kbd "M-s-¬") #'forward-word)   ; M-s-l
 
 ;; -------------------------------------------------------------------
 
 (ym-define-key (kbd "s-z") #'undo)
+(ym-define-key (kbd "s-Z") #'undo-tree-visualize)
 (ym-define-key (kbd "s-x")
                (lambda (beg end)
                  (interactive "r")
@@ -256,10 +262,10 @@
 
 ;; -------------------------------------------------------------------
 
-(use-package ace-window
-  :config
-  (global-set-key (kbd "M-o") 'ace-window)
-  )
+;; (use-package ace-window
+;;   :config
+;;   (global-set-key (kbd "M-o") 'ace-window)
+;;   )
 
 ;; -------------------------------------------------------------------
 
@@ -276,5 +282,17 @@
 
 ;; -------------------------------------------------------------------
 
+(defun ignore-error-wrapper (fn)
+  "Funtion return new function that ignore errors.
+   The function wraps a function with `ignore-errors' macro."
+  (lexical-let ((fn fn))
+    (lambda ()
+      (interactive)
+      (ignore-errors
+        (funcall fn)))))
+;; (global-set-key [s-left] (ignore-error-wrapper 'windmove-left))
+;; (global-set-key [s-right] (ignore-error-wrapper 'windmove-right))
+;; (global-set-key [s-up] (ignore-error-wrapper 'windmove-up))
+;; (global-set-key [s-down] (ignore-error-wrapper 'windmove-down))
 
 ;; -------------------------------------------------------------------
