@@ -13,6 +13,7 @@
 /.org-id-locations
 
 /init__preinit_this_machine.el
+/init-preinit-softlink.el
 /org-clock-save.el
 /projectile-bookmarks.eld
 /.emacs-places

@@ -5,8 +5,8 @@
 
 ;; TODO: remove this
 ;; or use this: https://emacs.stackexchange.com/questions/19936/running-spacemacs-alongside-regular-emacs-how-to-keep-a-separate-emacs-d/20508#20508
-(setq user-emacs-directory "~/.emacs.d.new")
-(setq package-user-dir "~/.emacs.d.packages")
+;(setq user-emacs-directory "~/.emacs.d.new")
+;(setq package-user-dir "~/.emacs.d.packages")
 
 
 
@@ -43,7 +43,7 @@
 
 
 
-(load-file (expand-file-name "init__preinit_this_machine.el" user-emacs-directory))
+(load-file (expand-file-name "init-preinit-softlink.el" user-emacs-directory))
 
 (load-file (expand-file-name "init-emacs.el" user-emacs-directory))
 (load-file (expand-file-name "init-packages.el" user-emacs-directory))
@@ -57,10 +57,10 @@
 (load-file (expand-file-name "init-avy.el" user-emacs-directory))
 
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-(setq custom-file (expand-file-name "init_custom.el" user-emacs-directory))
+(setq custom-file (expand-file-name "init-customize.el" user-emacs-directory))
 (load custom-file 'noerror)
 
 
 ;; (find-file "~/drill/drill.org")
-(setq org-agenda-files '("~/workspace.new"))
-(find-file "~/workspace.new/Notes.org")
+(setq org-agenda-files '("~/workspace"))
+(find-file "~/workspace/Notes.org")
