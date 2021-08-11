@@ -2,8 +2,8 @@
 
 ;; -------------------------------------------------------------------
 
-(setq user-full-name "Alex Scherbanov")
-(setq user-mail-address "alex@egotv.ru")
+(setq user-full-name "Alexander Scherbanov")
+(setq user-mail-address "alexander.scherbanov@gmail.com")
 
 ;; -------------------------------------------------------------------
 
@@ -15,9 +15,14 @@
 (setq debug-on-error t)
 (setq visible-bell t)
 (setq calendar-week-start-day 1)     ;; week starts from Monday
+(setq truncate-partial-width-windows nil)
 
 (line-number-mode t)
 (column-number-mode t)
+
+(setq scroll-error-top-bottom t)  ;; point moves to the beginning or the end of the buffer (depending on scrolling direction) when no more scrolling possible
+(setq next-line-add-newlines t)
+;; maybe someday try to fix hl-line-mode at the end of buffer: https://emacs.stackexchange.com/questions/24311/eval-buffer-works-init-does-not-hl-line-fix
 
 ;; for warning-suppress-types later in init
 (require 'warnings)
@@ -42,6 +47,10 @@
 
 ;; -------------------------------------------------------------------
 
+(setq delete-by-moving-to-trash t)
+
+;; -------------------------------------------------------------------
+
 
 (add-hook 'dired-mode-hook 'auto-revert-mode)   ; watch filesystem for changes
 (use-package dired+)
@@ -61,7 +70,6 @@
 ;; (setq ls-lisp-ignore-case t)
 ;; (setq ls-lisp-use-insert-directory-program nil)
 ;; (setq ls-lisp-use-string-collate nil)
-;; (setq delete-by-moving-to-trash t)
 ;; (set-face-attribute 'diredp-symlink nil :foreground "Blue")   ; trash-directory is set in preinit.this_machine.el
 
 (require 'wdired)
@@ -117,7 +125,7 @@
 ;; -------------------------------------------------------------------
 
 ;; https://stackoverflow.com/questions/2081577/setting-emacs-to-split-buffers-side-by-side
-(setq split-height-threshold nil)
+(setq split-height-threshold 80)
 (setq split-width-threshold 160)
 
 ;; -------------------------------------------------------------------

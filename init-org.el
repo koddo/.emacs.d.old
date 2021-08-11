@@ -23,13 +23,27 @@
   (setq org-preview-latex-image-directory ".ltximg/")
 
 
-  (setq org-agenda-custom-commands   ; STATES
-	'(("dt" "Only working to quickly switch between them"
-	   (
-	    (tags "-english-spanish+drill+SCHEDULED<=\"<today>\"")
-	    )
-	  )))
-
+  ;; t vs. T
+  ;; "PAUSED(p!)"
+  ;; "WORKING(w!)"
+  (setq ym-org-todo-keywords-working '("TODAY(T!)" "NOW(n!)"))
+  (setq ym-org-todo-keywords-undone `("TODO(t!)" "NEXT(n!)" ,@ym-org-todo-keywords-working "POSTPONED(P!)" "WAITING(W!)" "IN PROGRESS(i!)" "REGULARLY(r!)" "SOMEDAY(S!)" "MAYBE(M!)"))
+  (setq ym-org-todo-keywords-done '("DONE(d!)" "CANCELLED(c@)" "REDIRECTED(R@)" "DELEGATED(D@)" "MERGED(m@)" "JIRA(j@)"))
+  (setq ym-org-todo-state-string-in-log "State:     (")
+  (setq org-todo-keywords
+	`((sequence ,@ym-org-todo-keywords-undone "|" ,@ym-org-todo-keywords-done)))
+  (setq ym-org-todo-keywords-working-regexp
+	(concat "\\("
+		(mapconcat (lambda (str) (car (split-string str "("))) ym-org-todo-keywords-working "\\|")
+		"\\)"))
+  (setq ym-org-todo-keywords-undone-regexp
+	(concat ym-org-todo-state-string-in-log "\\("
+		(mapconcat (lambda (str) (car (split-string str "("))) ym-org-todo-keywords-undone "\\|")
+		"\\))"))
+  (setq ym-org-todo-keywords-done-regexp
+	(concat ym-org-todo-state-string-in-log "\\("
+		(mapconcat (lambda (str) (car (split-string str "("))) ym-org-todo-keywords-done "\\|")
+		"\\))"))
 
   )
 
@@ -52,9 +66,6 @@
   (advice-add 'org-download-image :around #'org-download-advice)
 
   :config
-  (setq org-download-screenshot-method "screencapture -i %s"   ; TODO: move to preinit
-        org-download-edit-cmd "open -a Krita %s"   ; TODO: move to preinit
-        org-download-backend "wget \"%s\" -O \"%s\"")
   (setq-default org-download-heading-lvl nil)   ; don't take header text into account, just put everything into the specified folder
   (setq org-download-annotate-function (lambda (link)   ; don't annotate screenshots, but annotate other images
                                          (if (equal link org-download-screenshot-file)   ; see the org-download source code
@@ -66,7 +77,7 @@
 
 (use-package org-drill
   :after org
-  :commands (org-drill)
+  ;; :commands (org-drill)
   :init
   (setq
    org-drill-spaced-repetition-algorithm  'sm2
@@ -132,7 +143,30 @@
    ;; (sqlite . t)
    ;; (typescript . t)     ; (use-package ob-typescript)
    ;; (mongo . t)     ; (use-package ob-mongo)
-   (jupyter . t)
+   ;; (jupyter . t)
    ))
 ;; (setq org-src-tab-acts-natively t)
 ;; (setq org-babel-min-lines-for-block-output 9999)   ;; this forces indenting results with colons, because I don't like how #+end_example is inserted at the beginning of line, not indented at all
+
+
+
+(use-package org-recent-headings
+  :config
+  (defun org-recent-headings-my-aux-fn () nil)
+  (add-to-list 'org-recent-headings-advise-functions #'org-recent-headings-my-aux-fn)
+  (let ((repeat-interval 20))
+    (if (boundp 'org-recent-headings-my-timer)
+      (cancel-timer org-recent-headings-my-timer))
+    (setq org-recent-headings-my-timer
+	  (run-with-timer 0 repeat-interval #'org-recent-headings-my-aux-fn))
+    )
+  (org-recent-headings-mode)  ; this clears the list, unfortunately
+  )
+
+
+(use-package org-ql)
+
+(use-package org-super-agenda
+  :config
+  (org-super-agenda-mode 1)
+  )

@@ -144,8 +144,6 @@
 (ym-define-key (kbd "M-C-j") (lambda () (interactive) (ym-keys-ijkl-move 'beginning-of-buffer nil)))
 (ym-define-key (kbd "M-C-l") (lambda () (interactive) (ym-keys-ijkl-move 'end-of-buffer nil)))
 (delete '(10 . exit-minibuffer) minibuffer-local-completion-map)   ; 10 = C-j
-(define-key minibuffer-local-completion-map (kbd "C-j") (lambda () (interactive) (ym-keys-ijkl-move 'left-char nil)))
-(define-key minibuffer-local-completion-map (kbd "C-l") (lambda () (interactive) (ym-keys-ijkl-move 'right-char nil)))
 (define-key isearch-mode-map [tab] (lambda () (interactive) (isearch-exit) (ym-keys-ijkl-move 'previous-line nil)))
 (define-key isearch-mode-map (kbd "S-TAB") (lambda () (interactive) (isearch-exit) (ym-keys-ijkl-move 'previous-line t)))
 (ym-define-key (kbd "C-S-<backspace>") 'ym-delete-line)
@@ -225,24 +223,6 @@
 (add-hook 'help-mode-hook (lambda () (define-key help-mode-map "b" 'help-go-back)))
 (add-hook 'help-mode-hook (lambda () (define-key help-mode-map "f" 'help-go-forward)))
 (define-key yas-keymap (kbd "<backspace>") 'ym-yas-skip-and-clear-or-delete-backward-char)
-;; -------------------------------------------------------------------
-(defadvice ido-init-completion-maps (after ido-init-completion-maps-with-ym-keybindings activate)
-  "My keybindings in ido."
-  (define-key ido-common-completion-map (kbd "C-j") 'ido-prev-match)
-  (define-key ido-common-completion-map (kbd "C-l") 'ido-next-match)
-  (define-key ido-file-completion-map (kbd "C-l") 'ido-next-match)
-  (define-key ido-file-completion-map (kbd "C-j") 'ido-prev-match)
-  (define-key ido-file-dir-completion-map (kbd "C-l") 'ido-next-match)
-  (define-key ido-file-dir-completion-map (kbd "C-j") 'ido-prev-match)
-  (define-key ido-buffer-completion-map (kbd "C-j") 'ido-prev-match)
-  (define-key ido-buffer-completion-map (kbd "C-l") 'ido-next-match)
-  (define-key ido-common-completion-map (kbd "C-f") 'ido-fallback-command)
-  (define-key ido-common-completion-map (kbd "C-r") 'ido-toggle-regexp)
-  (define-key ido-file-dir-completion-map (kbd "C-e") 'ym-ido-merge-or-unmerge-work-directories)
-  (define-key ido-file-completion-map [\C-return] 'ido-enter-dired)
-  (define-key ido-file-dir-completion-map [\C-return] 'ido-enter-dired)
-  )
-(ido-init-completion-maps)
 ;; -------------------------------------------------------------------
 (add-hook 'org-agenda-mode-hook
           (lambda ()

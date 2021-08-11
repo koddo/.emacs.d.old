@@ -101,25 +101,6 @@
 (setq org-agenda-dim-blocked-tasks t)   ; was 'invisible, broke my stuck projects list
 (setq org-agenda-todo-list-sublevels t)
 ;; -------------------------------------------------------------------
-(setq ym-org-todo-keywords-working '("WORKING(w!)" "WAITING(W!)" "PAUSED(p!)"))   ; STATES
-(setq ym-org-todo-keywords-undone `("REGULARLY(r!)" "NEXT(n!)" "TODO(t!)" ,@ym-org-todo-keywords-working))
-(setq ym-org-todo-keywords-done '("DONE(d!)" "CANCELLED(c@)" "REDIRECTED(R@)" "MERGED(m@)"))
-(setq ym-org-todo-state-string-in-log "State:     (")
-(setq org-todo-keywords
-      `((sequence ,@ym-org-todo-keywords-undone "|" ,@ym-org-todo-keywords-done)))
-(setq ym-org-todo-keywords-working-regexp
-      (concat "\\("
-              (mapconcat (lambda (str) (car (split-string str "("))) ym-org-todo-keywords-working "\\|")
-              "\\)"))
-(setq ym-org-todo-keywords-undone-regexp
-      (concat ym-org-todo-state-string-in-log "\\("
-              (mapconcat (lambda (str) (car (split-string str "("))) ym-org-todo-keywords-undone "\\|")
-              "\\))"))
-(setq ym-org-todo-keywords-done-regexp
-      (concat ym-org-todo-state-string-in-log "\\("
-              (mapconcat (lambda (str) (car (split-string str "("))) ym-org-todo-keywords-done "\\|")
-              "\\))"))
-;; -------------------------------------------------------------------
 (setq org-capture-templates
       '(("t" "todo" entry (file+headline ym-org-agenda-file "Tasks")
          "* TODO %?\n  :LOGBOOK:\n  - Added %U\n  :END:" :empty-lines 1)
@@ -290,7 +271,3 @@
 (add-hook 'org-clock-in-hook (lambda () (call-process "/usr/bin/osascript" nil 0 nil "-e" (concat "tell application \"org-clock-statusbar\" to clock in \"" (replace-regexp-in-string "\"" "\\\\\"" org-clock-current-task) "\""))))
 (add-hook 'org-clock-out-hook (lambda () (call-process "/usr/bin/osascript" nil 0 nil "-e" "tell application \"org-clock-statusbar\" to clock out")))
 ;; -------------------------------------------------------------------
-
-
-
-

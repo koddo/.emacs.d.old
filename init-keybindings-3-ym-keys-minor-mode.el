@@ -240,6 +240,7 @@
                                           ))   ; comment this block if removing whitespaces only is annoying
                         ))))
 (ym-define-key (kbd "<M-backspace>") #'ym-backward-kill-word)
+(ym-define-key (kbd "<s-backspace>") #'ym-backward-kill-word)
 
 ;; -------------------------------------------------------------------
 
@@ -294,5 +295,30 @@
 ;; (global-set-key [s-right] (ignore-error-wrapper 'windmove-right))
 ;; (global-set-key [s-up] (ignore-error-wrapper 'windmove-up))
 ;; (global-set-key [s-down] (ignore-error-wrapper 'windmove-down))
+
+;; -------------------------------------------------------------------
+
+;; we turn off our keybindings-only minor mode in minibuffer
+;; but the very same keybindings still work in global keymap
+;; so ido takes precedence in minibuffer
+(add-hook 'minibuffer-setup-hook (lambda () (ym-keys-minor-mode 0)))
+
+(mapcar (lambda (map)
+	  (define-key map (kbd "s-j") #'ido-prev-match)
+	  (define-key map (kbd "s-l") #'ido-next-match)
+	  )
+        (list
+	 ido-buffer-completion-map
+	 ido-common-completion-map
+	 ido-file-completion-map
+	 ido-file-dir-completion-map
+	 ))
+
+;; -------------------------------------------------------------------
+
+(define-key isearch-mode-map (kbd "s-;") 'avy-isearch)
+(ym-define-key (kbd "s-;") #'avy-goto-word-1)
+(ym-define-key (kbd "M-s-…") #'avy-goto-char-2)   ; == "M-s-;" -- this only looks like an underscore, but in fact it's some unicode symbol
+(ym-define-key (kbd "s-^") #'avy-goto-parens)   ; "S-s-;" -- this is not a usual ^, it's a unicode character
 
 ;; -------------------------------------------------------------------

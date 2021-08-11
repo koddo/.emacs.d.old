@@ -182,9 +182,21 @@
 
 (setq org-agenda-custom-commands
       '(
-	("dn" "list new cards"      tags "+drill-SCHEDULED={.}-english-spanish")
-	("dt" "list due cards"      tags "+drill+SCHEDULED<=\"<today>\"-english-spanish")
-	("dl" "list learned cards"  tags "+drill+SCHEDULED>\"<today>\"-english-spanish")
+	("dc" "Drill cards"
+	 (
+	  (tags "+drill+SCHEDULED<=\"<today>\"-english-spanish" ((org-agenda-overriding-header "Due cards")))
+	  (tags "+drilltodo" ((org-agenda-overriding-header "Unfinished cards")))
+	  (tags "+drill-SCHEDULED={.}-english-spanish" ((org-agenda-overriding-header "New cards")))
+	  ))
+	("dC" "Show learned cards"
+	 (
+	  (tags "+drill+SCHEDULED>\"<today>\"-english-spanish")
+	  ))
+	("de" "Drill English"
+	 (
+	  (tags "+english+drill+SCHEDULED<=\"<today>\"" ((org-agenda-overriding-header "Due")))
+	  (tags "+english+drill-SCHEDULED={.}" ((org-agenda-overriding-header "New")))
+	  ))
 	))
 
 (pretty-hydra-define hydra-drill ()
@@ -199,10 +211,11 @@
     ("c" (lambda () (interactive) (org-agenda nil "df"))
      "show future")
     ("q" (lambda () (interactive) (org-toggle-tag "drill")) "toggle :drill:")
-    ("w" (lambda () (interactive) (org-toggle-tag "drill_todo")) "toggle :drill_todo:")
+    ("w" (lambda () (interactive) (org-toggle-tag "drilltodo")) "toggle :drilltodo:")
     ;; TODO: org-set-tags
     )
    ))
+
 
 (pretty-hydra-define hydra-search ()
   ("search and replace"
@@ -235,8 +248,18 @@
    ))
 ;; (yas-expand-snippet (yas-lookup-snippet "let"))
 
+
+
+;; add narrow-to-subtree
+
+
 ;; -------------------------------------------------------------------
 
 ;; C-backspace
 ;; C-d = delete line
 ;; C-D = cut line
+
+
+;; = and | in agenda views to regex-filter entries
+
+;; org-timer-start, then C-c C-x .

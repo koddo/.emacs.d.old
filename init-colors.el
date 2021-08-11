@@ -4,9 +4,33 @@
 (global-hl-line-mode)
 (blink-cursor-mode 0)
 (set-cursor-color "#000")
+(setq-default cursor-type 'box)
+(setq-default cursor-in-non-selected-windows t)   ;;  displays a cursor related to the usual cursor type
 
-
-
+(defun xah-syntax-color-hex ()
+  "Syntax color text of the form 「#ff1100」 and 「#abc」 in current buffer.
+URL `http://ergoemacs.org/emacs/emacs_CSS_colors.html'
+Version 2017-03-12"
+  (interactive)
+  (font-lock-add-keywords
+   nil
+   '(("#[[:xdigit:]]\\{3\\}"
+      (0 (put-text-property
+          (match-beginning 0)
+          (match-end 0)
+          'face (list :background
+                      (let* (
+                             (ms (match-string-no-properties 0))
+                             (r (substring ms 1 2))
+                             (g (substring ms 2 3))
+                             (b (substring ms 3 4)))
+                        (concat "#" r r g g b b))))))
+     ("#[[:xdigit:]]\\{6\\}"
+      (0 (put-text-property
+          (match-beginning 0)
+          (match-end 0)
+          'face (list :background (match-string-no-properties 0)))))))
+  (font-lock-flush))
 
 ;; http://chriskempson.com/projects/base16/
 ;; https://github.com/belak/base16-emacs
@@ -23,19 +47,21 @@
 			    :base02 "#d8d8d8"    ; Selection Background
 			    :base03 "grey60"     ; Comments, Invisibles, Line Highlighting
 			    :base04 "#585858"    ; Dark Foreground (Used for status bars)
-			    :base05 "grey20"     ; Default Foreground, Caret, Delimiters, Operators
+			    :base05 "grey25"     ; Default Foreground, Caret, Delimiters, Operators
 			    :base06 "#282828"    ; Light Foreground (Not often used)
 			    :base07 "#181818"    ; Light Background (Not often used)
 			    :base08 "#ab4642"    ; Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
 			    :base09 "#dc9656"    ; Integers, Boolean, Constants, XML Attributes, Markup Link Url
-			    :base0A "#f7ca88"    ; Classes, Markup Bold, Search Text Background
+			    :base0A "#cca770"    ; Classes, Markup Bold, Search Text Background
 			    :base0B "#a1b56c"    ; Strings, Inherited Class, Markup Code, Diff Inserted
 			    :base0C "#86c1b9"    ; Support, Regular Expressions, Escape Characters, Markup Quotes
 			    :base0D "#7cafc2"    ; Functions, Methods, Attribute IDs, Headings
 			    :base0E "#ba8baf"    ; Keywords, Storage, Selector, Markup Italic, Diff Changed
 			    :base0F "#a16946"    ; Deprecated, Opening/Closing Embedded Language Tags, e.g. <?php ?>
 			    ))
-    (base16-theme-define 'ym-base16-theme ym-base16-colors))
+    (base16-theme-define 'ym-base16-theme ym-base16-colors)
+    (enable-theme 'ym-base16-theme)
+    )
 
   ;; temporarily fixing this: https://github.com/belak/base16-emacs/issues/114
   ;; font-lock-comment-delimiter-face should be base03, not base02

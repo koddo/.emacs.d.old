@@ -17,7 +17,7 @@
 ;;(load "/opt/local/share/emacs/site-lisp/ledger.el")
 
 
-(defun open-file-with-os (filename)   ; TODO: should be customized in 
+(defun open-file-with-os (filename)   ; TODO: should be customized in
   (shell-command (concat "open '" filename "'")))
 
 (use-package exec-path-from-shell
@@ -26,6 +26,3 @@
             (exec-path-from-shell-initialize)))
 
 (use-package reveal-in-osx-finder)
-
-
-
