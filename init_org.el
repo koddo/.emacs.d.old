@@ -1,30 +1,3 @@
-(setq org-modules '(org-habit org-id org-inlinetask))        ; (add-to-list 'org-modules 'org-habit)
-(require 'org)
-(require 'org-id)
-;;         -- (require 'org-special-blocks)
-;; (require 'org-table)
-;; (require 'org-colview)
-;; (require 'org-datetree)
-;; (require 'org-archive)
-
-
-(setq org-log-repeat nil)
-
-
-;; -------------------------------------------------------------------
-(setq org-habit-show-all-today t)
-(setq org-habit-show-habits nil)
-(setq org-habit-show-habits-only-for-today t)
-(setq org-habit-graph-column 55)
-(setq org-habit-preceding-days 35)
-(setq org-habit-following-days 2)
-;; (setq ym-timer-list-to-show-habits   ; (dolist (x ym-timer-list-to-show-habits) (cancel-timer x))
-;;       (list
-;;        (run-at-time "07:00pm" (* 60 60 24)
-;;                    (lambda () (setq org-habit-show-habits t)))
-;;        (run-at-time "07:00am" (* 60 60 24)
-;;                    (lambda () (setq org-habit-show-habits t)))))
-(defun org-habit-get-priority (habit &optional moment) 1000)   ; this disables sorting by scheduled time, shows in the same order as in org file
 ;; -------------------------------------------------------------------
 (setq org-startup-with-inline-images t)
 (setq org-cycle-separator-lines 0)
@@ -52,7 +25,6 @@
 (setq ym-org-clock-buffer-name "*Org Clock Summary*")
 (setq ym-org-contacts-view-buffer-name "*Org Contacts*")
 (setq ym-org-problems-count-view-buffer-name "*Org Problems Count*")
-(setq org-latex-preview-ltxpng-directory ".ltxpng/")
 (setq org-archive-location ".org.archive.org.gpg::")
 ;; -------------------------------------------------------------------
 (setq org-refile-targets '((org-agenda-files . (:tag . "PROJECT"))))
@@ -63,14 +35,6 @@
 ;; -------------------------------------------------------------------
 (setq org-agenda-tags-column -110)
 (setq org-complete-tags-always-offer-all-agenda-tags t)
-;; -------------------------------------------------------------------
-(setq org-agenda-log-mode-items '(state))
-(setq org-log-refile 'time)
-(setq org-log-into-drawer t)
-(setq org-log-states-order-reversed nil)
-(setq org-log-redeadline 'note)
-(setq org-log-reschedule 'note)
-(setq org-agenda-skip-scheduled-if-done t)
 ;; -------------------------------------------------------------------
 (setq org-agenda-time-grid '((daily today)
                              "----------------"

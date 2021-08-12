@@ -113,3 +113,31 @@ Version 2017-03-12"
 
 
 (set-face-attribute 'ido-virtual nil :foreground (plist-get ym-base16-colors :base03))
+
+
+
+;; agenda coloring, configure this later
+  ;; (setq ym-org-todo-keywords-working-regexp
+  ;; 	(concat "\\("
+  ;; 		(mapconcat (lambda (str) (car (split-string str "("))) ym-org-todo-keywords-working "\\|")
+  ;; 		"\\)"))
+  ;; (setq ym-org-todo-keywords-undone-regexp
+  ;; 	(concat ym-org-todo-state-string-in-log "\\("
+  ;; 		(mapconcat (lambda (str) (car (split-string str "("))) ym-org-todo-keywords-undone "\\|")
+  ;; 		"\\))"))
+  ;; (setq ym-org-todo-keywords-done-regexp
+  ;; 	(concat ym-org-todo-state-string-in-log "\\("
+  ;; 		(mapconcat (lambda (str) (car (split-string str "("))) ym-org-todo-keywords-done "\\|")
+  ;; 		"\\))"))
+
+
+
+(custom-set-faces
+ '(org-habit-clear-face                 ((t (:background "white"))) t)
+ '(org-habit-clear-future-face          ((t (:background "white"))) t)
+ '(org-habit-ready-face                 ((t (:background "white"))) t)
+ '(org-habit-ready-future-face          ((t (:background "white"))) t)
+ '(org-habit-alert-face                 ((t (:background "white"))) t)
+ '(org-habit-alert-future-face          ((t (:background "white"))) t)
+ '(org-habit-overdue-face               ((t (:background "white"))) t)
+ '(org-habit-overdue-future-face        ((t (:background "white"))) t))

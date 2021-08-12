@@ -19,33 +19,20 @@
   :config
   (setq-default org-adapt-indentation nil)
   (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)   ; usage: org-id, org-store-link, org-insert-link, org-id-update-id-locations
-  (setq org-refile-targets '((org-agenda-files :maxlevel . 3)))
+  (setq org-refile-targets '(("~/workspace" :maxlevel . 3)))  ; TODO: variable
   (setq org-preview-latex-image-directory ".ltximg/")
 
-
-  ;; t vs. T
-  ;; "PAUSED(p!)"
-  ;; "WORKING(w!)"
-  (setq ym-org-todo-keywords-working '("TODAY(T!)" "NOW(n!)"))
-  (setq ym-org-todo-keywords-undone `("TODO(t!)" "NEXT(n!)" ,@ym-org-todo-keywords-working "POSTPONED(P!)" "WAITING(W!)" "IN PROGRESS(i!)" "REGULARLY(r!)" "SOMEDAY(S!)" "MAYBE(M!)"))
-  (setq ym-org-todo-keywords-done '("DONE(d!)" "CANCELLED(c@)" "REDIRECTED(R@)" "DELEGATED(D@)" "MERGED(m@)" "JIRA(j@)"))
-  (setq ym-org-todo-state-string-in-log "State:     (")
-  (setq org-todo-keywords
-	`((sequence ,@ym-org-todo-keywords-undone "|" ,@ym-org-todo-keywords-done)))
-  (setq ym-org-todo-keywords-working-regexp
-	(concat "\\("
-		(mapconcat (lambda (str) (car (split-string str "("))) ym-org-todo-keywords-working "\\|")
-		"\\)"))
-  (setq ym-org-todo-keywords-undone-regexp
-	(concat ym-org-todo-state-string-in-log "\\("
-		(mapconcat (lambda (str) (car (split-string str "("))) ym-org-todo-keywords-undone "\\|")
-		"\\))"))
-  (setq ym-org-todo-keywords-done-regexp
-	(concat ym-org-todo-state-string-in-log "\\("
-		(mapconcat (lambda (str) (car (split-string str "("))) ym-org-todo-keywords-done "\\|")
-		"\\))"))
-
+  (setq org-startup-folded 'showall)   ; only fold the :PROPERTIES: drawer
   )
+
+
+;; TODO: why can't I do (require 'org-checklist) without this?
+(use-package org-contrib)
+
+;; TODO: move to org-modules
+(require 'org-habit)
+(require 'org-checklist)   ; for the reset_check_boxes property of repeated tasks
+
 
 
 
@@ -71,7 +58,6 @@
                                          (if (equal link org-download-screenshot-file)   ; see the org-download source code
                                              ""
                                            (format "#+DOWNLOADED: %s @ %s\n" link (format-time-string "%Y-%m-%d %H:%M:%S"))))))
-
 
 
 
@@ -161,12 +147,4 @@
 	  (run-with-timer 0 repeat-interval #'org-recent-headings-my-aux-fn))
     )
   (org-recent-headings-mode)  ; this clears the list, unfortunately
-  )
-
-
-(use-package org-ql)
-
-(use-package org-super-agenda
-  :config
-  (org-super-agenda-mode 1)
   )

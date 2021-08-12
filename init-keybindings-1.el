@@ -180,25 +180,6 @@
    ))
 (global-set-key (kbd "H-w") 'hydra-window/body)
 
-(setq org-agenda-custom-commands
-      '(
-	("dc" "Drill cards"
-	 (
-	  (tags "+drill+SCHEDULED<=\"<today>\"-english-spanish" ((org-agenda-overriding-header "Due cards")))
-	  (tags "+drilltodo" ((org-agenda-overriding-header "Unfinished cards")))
-	  (tags "+drill-SCHEDULED={.}-english-spanish" ((org-agenda-overriding-header "New cards")))
-	  ))
-	("dC" "Show learned cards"
-	 (
-	  (tags "+drill+SCHEDULED>\"<today>\"-english-spanish")
-	  ))
-	("de" "Drill English"
-	 (
-	  (tags "+english+drill+SCHEDULED<=\"<today>\"" ((org-agenda-overriding-header "Due")))
-	  (tags "+english+drill-SCHEDULED={.}" ((org-agenda-overriding-header "New")))
-	  ))
-	))
-
 (pretty-hydra-define hydra-drill ()
   ("asdfasdf"
    (("d" org-drill)

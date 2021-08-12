@@ -39,15 +39,6 @@
 (defface ym-org-agenda-dim-top-tag-face '((t :foreground "grey80")) "")
 (defface ym-org-agenda-scheduled-task-face '((t :foreground "red" :weight bold)) "")
 (custom-set-faces
- '(org-habit-clear-face                 ((t (:background "grey95"))) t)
- '(org-habit-clear-future-face          ((t (:background "grey95"))) t)
- '(org-habit-ready-face                 ((t (:background "grey95"))) t) ; was LightSteelBlue2
- '(org-habit-ready-future-face          ((t (:background "grey95"))) t)
- '(org-habit-alert-face                 ((t (:background "grey95"))) t)
- '(org-habit-alert-future-face          ((t (:background "grey95"))) t)
- '(org-habit-overdue-face               ((t (:background "grey95"))) t)
- '(org-habit-overdue-future-face        ((t (:background "grey95"))) t))
-(custom-set-faces
  ;; '(outline-1                 ((t (:foreground "Blue1"))) t)
  '(outline-1                 ((t (:foreground "Red"))) t)
  '(outline-2                 ((t (:foreground "Blue1"))) t)
@@ -196,13 +187,3 @@
 ;; (add-to-list 'diredp-font-lock-keywords-1
 ;;              (list "^  \\(.*\\(\\.org[*]?\\)\\)$" 2 'ym-diredp-org-extension t))   ;; (pop diredp-font-lock-keywords-1)
 ;; -------------------------------------------------------------------
-
-
-
-
- 
-
-
-
-
-
