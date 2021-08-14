@@ -86,6 +86,11 @@
 	  ))
 	("de" "Drill English"
 	 (
+	  (todo "" (
+		    (org-agenda-files nil)
+		    (org-agenda-overriding-header "test")
+		    ))
+	  (org-agenda-files '("~/workspace/English.org"))
 	  (tags "+english+drill+SCHEDULED<=\"<today>\"" ((org-agenda-overriding-header "Due")))
 	  (tags "+english+drill-SCHEDULED={.}" ((org-agenda-overriding-header "New")))
 	  ))
@@ -93,16 +98,56 @@
 	 (
 	  (agenda "" (
 		      (org-agenda-files '("~/workspace/Habits.org"))
+		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 1"))
 		      (org-agenda-span 1)
 		      (org-agenda-overriding-header "")
 		      (org-agenda-todo-keyword-format "")
-		      (org-agenda-prefix-format " ")
+		      (org-agenda-prefix-format "")
 		      ))
-	  (todo "" (
-		    (org-agenda-files nil)
-		    (org-agenda-overriding-header "test")
-		    ))
+	  (agenda "" (
+		      (org-agenda-files '("~/workspace/Habits.org"))
+		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 2"))
+		      (org-agenda-span 1)
+		      (org-agenda-overriding-header "")
+		      (org-agenda-todo-keyword-format "")
+		      (org-agenda-prefix-format "")
+		      ))
+	  (agenda "" (
+		      (org-agenda-files '("~/workspace/Habits.org"))
+		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 3"))
+		      (org-agenda-span 1)
+		      (org-agenda-overriding-header "")
+		      (org-agenda-todo-keyword-format "")
+		      (org-agenda-prefix-format "")
+		      ))
+	  (agenda "" (
+		      (org-agenda-files '("~/workspace/Habits.org"))
+		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 4"))
+		      (org-agenda-span 1)
+		      (org-agenda-overriding-header "")
+		      (org-agenda-todo-keyword-format "")
+		      (org-agenda-prefix-format "")
+		      ))
+	  (agenda "" (
+		      (org-agenda-files '("~/workspace/Habits.org"))
+		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 5"))
+		      (org-agenda-span 1)
+		      (org-agenda-overriding-header "")
+		      (org-agenda-todo-keyword-format "")
+		      (org-agenda-prefix-format "")
+		      ))
 	  ))
+	("x1" "today"
+	 (
+	  (agenda ""
+		  (
+		   (org-agenda-span 1)
+                   (org-agenda-show-log t)
+		   ))
+	  ))
+	("x2" "21 days"
+
+	 )
 	))
 
 

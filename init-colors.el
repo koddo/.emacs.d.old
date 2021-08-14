@@ -141,3 +141,9 @@ Version 2017-03-12"
  '(org-habit-alert-future-face          ((t (:background "white"))) t)
  '(org-habit-overdue-face               ((t (:background "white"))) t)
  '(org-habit-overdue-future-face        ((t (:background "white"))) t))
+
+
+;; fixed in org 9.5 -- https://protesilaos.com/codelog/2020-09-24-org-headings-adapt/
+;; (setq org-todo-keyword-faces '(
+;; 			       ("HABIT" . (:height 3.0))
+;; 			       ))
