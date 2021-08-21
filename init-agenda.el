@@ -53,7 +53,7 @@
 
 
   ;; TODO: ignore if missing
-  (load-file "~/.org-gcal.secrets.el")
+  ;; (load-file "~/.org-gcal.secrets.el")
 
   ;; TODO: make sure org-gcal-token-file is in no-littering-var
 
