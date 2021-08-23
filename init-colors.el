@@ -3,9 +3,9 @@
 (setq global-hl-line-sticky-flag nil)   ; only appear in one window
 (global-hl-line-mode)
 (blink-cursor-mode 0)
-(set-cursor-color "#000")
 (setq-default cursor-type 'box)
 (setq-default cursor-in-non-selected-windows t)   ;;  displays a cursor related to the usual cursor type
+;; cursor color is set by base16, it used to be (set-cursor-color "#000")
 
 (defun xah-syntax-color-hex ()
   "Syntax color text of the form 「#ff1100」 and 「#abc」 in current buffer.

@@ -10,7 +10,9 @@
 (setq debug-on-error t)
 (tool-bar-mode -1)   ; menu-bar-mode moved to preinit
 (setq inhibit-startup-message t)
-(setq initial-scratch-message ";; scratch buffer\\n\\n")
+(setq initial-scratch-message
+      ";; scratch buffer\n\n"
+      )
 (setq frame-title-format "emacs")
 (setq debug-on-error t)
 (setq visible-bell t)

@@ -1,5 +1,5 @@
 
-(setq org-agenda-files '("~/workspace"))
+(setq org-agenda-files '("~/workspace.new"))
 
 
 ;; -------------------------------------------------------------------

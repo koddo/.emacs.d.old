@@ -111,7 +111,7 @@
 (setq ido-use-url-at-point t)
 (setq ido-file-extensions-order '(".org" ".md"))
 ;; (setq ido-enter-matching-directory nil)
-;; (setq ido-show-dot-for-dired t)
+(setq ido-show-dot-for-dired t)
 ;; (setq ido-enable-tramp-completion nil)
 ;; (setq ido-max-prospects 7)
 
