@@ -88,10 +88,15 @@
 	 (
 	  (todo "" (
 		    (org-agenda-files nil)
-		    (org-agenda-overriding-header "test")
+		    (org-agenda-overriding-header "-=*=- this title gets replaced -=*=-")
 		    ))
 	  (org-agenda-files '("~/workspace/English.org"))
-	  (tags "+english+drill+SCHEDULED<=\"<today>\"" ((org-agenda-overriding-header "Due")))
+	  (tags "+english+drill+SCHEDULED<=\"<-4w>\""
+		((org-agenda-overriding-header "Overdue -4w")))
+	  (tags "+english+drill+SCHEDULED<=\"<-1w>\"&+english+drill+SCHEDULED>\"<-4w>\""
+		((org-agenda-overriding-header "Overdue -1w")))
+	  (tags "+english+drill+SCHEDULED<=\"<today>\"&+english+drill+SCHEDULED>\"<-1w>\""
+		((org-agenda-overriding-header "Due")))
 	  (tags "+english+drill-SCHEDULED={.}" ((org-agenda-overriding-header "New")))
 	  ))
 	("dh" "habits"
@@ -148,6 +153,42 @@
 	("x2" "21 days"
 
 	 )
+
+	("x3" "test"
+	 (
+	  (tags-todo "-TIMESTAMP_IA={.}|+TIMESTAMP_IA<=\"<today>\""
+		  (
+		   (org-agenda-files '("~/workspace.new/Agenda.org"))
+		   (org-agenda-overriding-header "TODO")
+		   ))
+	  (tags-todo "+TIMESTAMP_IA>\"<today>\"&+TIMESTAMP_IA<=\"<+1w>\""
+		  (
+		   (org-agenda-files '("~/workspace.new/Agenda.org"))
+		   (org-agenda-overriding-header "Postponed for a couple of days")
+		   ))
+	  (tags-todo "+TIMESTAMP_IA>\"<+1w>\"&+TIMESTAMP_IA<=\"<+4w>\""
+		  (
+		   (org-agenda-files '("~/workspace.new/Agenda.org"))
+		   (org-agenda-overriding-header "Postponed > +1w")
+		   ))
+	  (tags-todo "+TIMESTAMP_IA>\"<+4w>\""
+		     (
+		      (org-agenda-files '("~/workspace.new/Agenda.org"))
+		      (org-agenda-overriding-header "Postponed > +4w")
+		      ))
+	  ))
+	("x4" "test"
+	 (
+	  (agenda ""
+		  (
+		   (org-agenda-files '("~/workspace.new/Agenda.org"))
+		   (org-agenda-start-day "-2d")
+		   (org-agenda-span 10)
+		   (org-agenda-start-on-weekday nil)
+                   (org-agenda-show-log t)
+		   ))
+	  ))
+
 	))
 
 
