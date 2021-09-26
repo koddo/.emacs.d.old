@@ -31,6 +31,7 @@
 (setq ym-org-todo-keywords-done
       '("DONE(d!)"
 	"CANCELED(c@)"
+	"HABIT SKIPPED(!)"
 	"REDIRECTED(R@)" "DELEGATED(D@)"
 	"MERGED(m@)" "JIRA(j@)"))
 (setq ym-org-todo-state-string-in-log "State:     (")
@@ -43,8 +44,8 @@
 (use-package org-gcal
   :config
   (setq org-gcal-file-alist '(
-			      ("alexander@superlearn.it" .  "~/workspace/Google_calendar.superlearn.org")
-			      ("alexander.scherbanov@gmail.com" . "~/workspace/Google_calendar.gmail.org")
+			      ("alexander@superlearn.it" .  "~/workspace.new/Google_calendar.superlearn.org")
+			      ("alexander.scherbanov@gmail.com" . "~/workspace.new/Google_calendar.gmail.org")
 			      ))
   ;; (setq org-gcal-local-timezone "Europe/Moscow")
 
@@ -90,19 +91,24 @@
 		    (org-agenda-files nil)
 		    (org-agenda-overriding-header "-=*=- this title gets replaced -=*=-")
 		    ))
-	  (org-agenda-files '("~/workspace/English.org"))
+	  (org-agenda-files '("~/workspace.new/English.org"))
 	  (tags "+english+drill+SCHEDULED<=\"<-4w>\""
-		((org-agenda-overriding-header "Overdue -4w")))
+		((org-agenda-overriding-header "Overdue 4w")
+		 ))
 	  (tags "+english+drill+SCHEDULED<=\"<-1w>\"&+english+drill+SCHEDULED>\"<-4w>\""
-		((org-agenda-overriding-header "Overdue -1w")))
+		((org-agenda-overriding-header "Overdue 1w")
+		 ))
 	  (tags "+english+drill+SCHEDULED<=\"<today>\"&+english+drill+SCHEDULED>\"<-1w>\""
-		((org-agenda-overriding-header "Due")))
-	  (tags "+english+drill-SCHEDULED={.}" ((org-agenda-overriding-header "New")))
+		((org-agenda-overriding-header "Due")
+		 ))
+	  (tags "+english+drill-SCHEDULED={.}"
+		((org-agenda-overriding-header "New")
+		 ))
 	  ))
 	("dh" "habits"
 	 (
 	  (agenda "" (
-		      (org-agenda-files '("~/workspace/Habits.org"))
+		      (org-agenda-files '("~/workspace.new/Habits.org"))
 		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 1"))
 		      (org-agenda-span 1)
 		      (org-agenda-overriding-header "")
@@ -110,7 +116,7 @@
 		      (org-agenda-prefix-format "")
 		      ))
 	  (agenda "" (
-		      (org-agenda-files '("~/workspace/Habits.org"))
+		      (org-agenda-files '("~/workspace.new/Habits.org"))
 		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 2"))
 		      (org-agenda-span 1)
 		      (org-agenda-overriding-header "")
@@ -118,7 +124,7 @@
 		      (org-agenda-prefix-format "")
 		      ))
 	  (agenda "" (
-		      (org-agenda-files '("~/workspace/Habits.org"))
+		      (org-agenda-files '("~/workspace.new/Habits.org"))
 		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 3"))
 		      (org-agenda-span 1)
 		      (org-agenda-overriding-header "")
@@ -126,7 +132,7 @@
 		      (org-agenda-prefix-format "")
 		      ))
 	  (agenda "" (
-		      (org-agenda-files '("~/workspace/Habits.org"))
+		      (org-agenda-files '("~/workspace.new/Habits.org"))
 		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 4"))
 		      (org-agenda-span 1)
 		      (org-agenda-overriding-header "")
@@ -134,7 +140,7 @@
 		      (org-agenda-prefix-format "")
 		      ))
 	  (agenda "" (
-		      (org-agenda-files '("~/workspace/Habits.org"))
+		      (org-agenda-files '("~/workspace.new/Habits.org"))
 		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 5"))
 		      (org-agenda-span 1)
 		      (org-agenda-overriding-header "")
@@ -151,11 +157,27 @@
 		   ))
 	  ))
 	("x2" "21 days"
-
-	 )
+	 (
+	  (agenda ""
+		  (
+		   (org-agenda-files '("~/workspace.new/Agenda.org"))
+		   (org-agenda-start-day "-7d")
+		   (org-agenda-span 35)
+		   (org-agenda-start-on-weekday nil)
+                   (org-agenda-show-log t)
+		   ))
+	 ))
 
 	("x3" "test"
 	 (
+	  (agenda ""
+		  (
+		   (org-agenda-files '("~/workspace.new/Agenda.org"))
+		   (org-agenda-start-day "-2d")
+		   (org-agenda-span 10)
+		   (org-agenda-start-on-weekday nil)
+                   (org-agenda-show-log t)
+		   ))
 	  (tags-todo "-TIMESTAMP_IA={.}|+TIMESTAMP_IA<=\"<today>\""
 		  (
 		   (org-agenda-files '("~/workspace.new/Agenda.org"))
@@ -179,21 +201,14 @@
 	  ))
 	("x4" "test"
 	 (
-	  (agenda ""
-		  (
-		   (org-agenda-files '("~/workspace.new/Agenda.org"))
-		   (org-agenda-start-day "-2d")
-		   (org-agenda-span 10)
-		   (org-agenda-start-on-weekday nil)
-                   (org-agenda-show-log t)
-		   ))
+
 	  ))
 
 	))
 
 
 (if nil
-    (org-ql-search "~/workspace/Habits.org"
+    (org-ql-search "~/workspace.new/Habits.org"
       '(habit)
       :title "Habits"
       :super-groups '(

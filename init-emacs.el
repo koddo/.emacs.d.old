@@ -136,3 +136,22 @@
 (require 'midnight)
 
 ;; -------------------------------------------------------------------
+
+;; (global-auto-revert-mode)
+;; (revert-without-query '())
+;; (use-package revbufs
+;;   )
+
+;; magit-ionotify-mode ?
+
+;; (auto-revert-verbose t)
+;; maybe also see this: https://www.gnu.org/software/emacs/manual/html_node/emacs/Interlocking.html
+;; (defun ask-user-about-supersession-threat (fn)
+;;   "blatantly ignore files that changed on disk"
+;;   )
+;; (defun ask-user-about-lock (file opponent)
+;;   "always grab lock"
+;;   t
+;;   )
+
+;; -------------------------------------------------------------------
