@@ -137,7 +137,9 @@
 
 ;; -------------------------------------------------------------------
 
-;; (global-auto-revert-mode)
+(global-auto-revert-mode 1)
+(setq auto-revert-interval 2)
+
 ;; (revert-without-query '())
 ;; (use-package revbufs
 ;;   )
