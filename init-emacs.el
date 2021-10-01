@@ -140,6 +140,20 @@
 (global-auto-revert-mode 1)
 (setq auto-revert-interval 2)
 
+;; According to EmacsWiki(https://www.emacswiki.org/emacs/AutoRevertMode), binding revert-buffer-function to a function discarding changes and then reverting might work.
+
+;; You should try:
+
+;; (setq revert-buffer-function 'inform-revert-modified-file)
+
+;; If you use use-package, you can use something like that:
+
+;; (use-package files
+;;   :ensure nil
+;;   :custom (revert-buffer-function 'inform-revert-modified-file))
+
+
+
 ;; (revert-without-query '())
 ;; (use-package revbufs
 ;;   )

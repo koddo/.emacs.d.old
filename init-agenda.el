@@ -1,5 +1,5 @@
 
-(setq org-agenda-files '("~/workspace.new"))
+(setq org-agenda-files '("~/werk"))
 
 
 ;; -------------------------------------------------------------------
@@ -44,8 +44,8 @@
 (use-package org-gcal
   :config
   (setq org-gcal-file-alist '(
-			      ("alexander@superlearn.it" .  "~/workspace.new/Google_calendar.superlearn.org")
-			      ("alexander.scherbanov@gmail.com" . "~/workspace.new/Google_calendar.gmail.org")
+			      ("alexander@superlearn.it" .  "~/werk/Google_calendar.superlearn.org")
+			      ("alexander.scherbanov@gmail.com" . "~/werk/Google_calendar.gmail.org")
 			      ))
   ;; (setq org-gcal-local-timezone "Europe/Moscow")
 
@@ -91,7 +91,7 @@
 		    (org-agenda-files nil)
 		    (org-agenda-overriding-header "-=*=- this title gets replaced -=*=-")
 		    ))
-	  (org-agenda-files '("~/workspace.new/English.org"))
+	  (org-agenda-files '("~/werk/English.org"))
 	  (tags "+english+drill+SCHEDULED<=\"<-4w>\""
 		((org-agenda-overriding-header "Overdue 4w")
 		 ))
@@ -108,7 +108,7 @@
 	("dh" "habits"
 	 (
 	  (agenda "" (
-		      (org-agenda-files '("~/workspace.new/Habits.org"))
+		      (org-agenda-files '("~/werk/Habits.org"))
 		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 1"))
 		      (org-agenda-span 1)
 		      (org-agenda-overriding-header "")
@@ -116,7 +116,7 @@
 		      (org-agenda-prefix-format "")
 		      ))
 	  (agenda "" (
-		      (org-agenda-files '("~/workspace.new/Habits.org"))
+		      (org-agenda-files '("~/werk/Habits.org"))
 		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 2"))
 		      (org-agenda-span 1)
 		      (org-agenda-overriding-header "")
@@ -124,7 +124,7 @@
 		      (org-agenda-prefix-format "")
 		      ))
 	  (agenda "" (
-		      (org-agenda-files '("~/workspace.new/Habits.org"))
+		      (org-agenda-files '("~/werk/Habits.org"))
 		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 3"))
 		      (org-agenda-span 1)
 		      (org-agenda-overriding-header "")
@@ -132,7 +132,7 @@
 		      (org-agenda-prefix-format "")
 		      ))
 	  (agenda "" (
-		      (org-agenda-files '("~/workspace.new/Habits.org"))
+		      (org-agenda-files '("~/werk/Habits.org"))
 		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 4"))
 		      (org-agenda-span 1)
 		      (org-agenda-overriding-header "")
@@ -140,7 +140,7 @@
 		      (org-agenda-prefix-format "")
 		      ))
 	  (agenda "" (
-		      (org-agenda-files '("~/workspace.new/Habits.org"))
+		      (org-agenda-files '("~/werk/Habits.org"))
 		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 5"))
 		      (org-agenda-span 1)
 		      (org-agenda-overriding-header "")
@@ -160,7 +160,7 @@
 	 (
 	  (agenda ""
 		  (
-		   (org-agenda-files '("~/workspace.new/Agenda.org"))
+		   (org-agenda-files '("~/werk/Agenda.org"))
 		   (org-agenda-start-day "-7d")
 		   (org-agenda-span 35)
 		   (org-agenda-start-on-weekday nil)
@@ -172,7 +172,7 @@
 	 (
 	  (agenda ""
 		  (
-		   (org-agenda-files '("~/workspace.new/Agenda.org"))
+		   (org-agenda-files '("~/werk/Agenda.org"))
 		   (org-agenda-start-day "-2d")
 		   (org-agenda-span 10)
 		   (org-agenda-start-on-weekday nil)
@@ -180,22 +180,22 @@
 		   ))
 	  (tags-todo "-TIMESTAMP_IA={.}|+TIMESTAMP_IA<=\"<today>\""
 		  (
-		   (org-agenda-files '("~/workspace.new/Agenda.org"))
+		   (org-agenda-files '("~/werk/Agenda.org"))
 		   (org-agenda-overriding-header "TODO")
 		   ))
 	  (tags-todo "+TIMESTAMP_IA>\"<today>\"&+TIMESTAMP_IA<=\"<+1w>\""
 		  (
-		   (org-agenda-files '("~/workspace.new/Agenda.org"))
+		   (org-agenda-files '("~/werk/Agenda.org"))
 		   (org-agenda-overriding-header "Postponed for a couple of days")
 		   ))
 	  (tags-todo "+TIMESTAMP_IA>\"<+1w>\"&+TIMESTAMP_IA<=\"<+4w>\""
 		  (
-		   (org-agenda-files '("~/workspace.new/Agenda.org"))
+		   (org-agenda-files '("~/werk/Agenda.org"))
 		   (org-agenda-overriding-header "Postponed > +1w")
 		   ))
 	  (tags-todo "+TIMESTAMP_IA>\"<+4w>\""
 		     (
-		      (org-agenda-files '("~/workspace.new/Agenda.org"))
+		      (org-agenda-files '("~/werk/Agenda.org"))
 		      (org-agenda-overriding-header "Postponed > +4w")
 		      ))
 	  ))
@@ -208,7 +208,7 @@
 
 
 (if nil
-    (org-ql-search "~/workspace.new/Habits.org"
+    (org-ql-search "~/werk/Habits.org"
       '(habit)
       :title "Habits"
       :super-groups '(

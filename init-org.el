@@ -136,19 +136,19 @@
 
 
 
-(use-package org-recent-headings
-  :config
-  (defun org-recent-headings--my-advised-aux-fn () nil)
-  (defun org-recent-headings--my-major-mode-check-and-run-on-timer ()
-    (if (eq major-mode 'clojure-mode)
-	(org-recent-headings--my-advised-aux-fn)
-      ))
-  (add-to-list 'org-recent-headings-advise-functions #'org-recent-headings--my-advised-aux-fn)
-  (let ((repeat-interval 20))
-    (if (boundp 'org-recent-headings-my-timer)
-      (cancel-timer org-recent-headings-my-timer))
-    (setq org-recent-headings-my-timer
-	  (run-with-timer 0 repeat-interval #'org-recent-headings--my-major-mode-check-and-run-on-timer))
-    )
-  (org-recent-headings-mode)  ; this clears the list, unfortunately
-  )
+;; (use-package org-recent-headings
+;;   :config
+;;   (defun org-recent-headings--my-advised-aux-fn () nil)
+;;   (defun org-recent-headings--my-major-mode-check-and-run-on-timer ()
+;;     (if (eq major-mode 'clojure-mode)
+;; 	(org-recent-headings--my-advised-aux-fn)
+;;       ))
+;;   (add-to-list 'org-recent-headings-advise-functions #'org-recent-headings--my-advised-aux-fn)
+;;   (let ((repeat-interval 20))
+;;     (if (boundp 'org-recent-headings-my-timer)
+;;       (cancel-timer org-recent-headings-my-timer))
+;;     (setq org-recent-headings-my-timer
+;; 	  (run-with-timer 0 repeat-interval #'org-recent-headings--my-major-mode-check-and-run-on-timer))
+;;     )
+;;   (org-recent-headings-mode)  ; this clears the list, unfortunately
+;;   )
