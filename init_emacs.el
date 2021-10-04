@@ -25,12 +25,10 @@
 (require   'uniquify)  ; buffer names are uniquified with parts of directory name, for ex.: name|folder
 (setq       uniquify-buffer-name-style 'reverse)
 ;; -------------------------------------------------------------------
-(setq auto-save-interval 600)
 (setq backup-inhibited t)
 (setq make-backup-files nil)
 (setq auto-save-list-file-name nil)
 (setq auto-save-list-file-prefix nil)
-(setq auto-save-include-big-deletions t)
 (setq create-lockfiles nil)
 ;; (setq auto-save-visited-file-name t) -- I found this glitchy, sometimes it saves to #auto-save-files#, but not to originals, probably because of auto-save-list-file-name set to nil
 (defun save-buffer-if-visiting-file (&optional args)   ; https://shreevatsa.wordpress.com/2008/01/22/emacs-auto-save/, http://bryan-murdock.blogspot.ru/2008/03/beat-save-habit.html

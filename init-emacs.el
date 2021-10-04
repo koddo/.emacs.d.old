@@ -86,34 +86,60 @@
 
 
 ;; -------------------------------------------------------------------
-;; auto save buffers
+;; auto-save
 
-(defun ym/save-buffer-silently ()
-  (interactive)
-  (cl-flet ((message (format &rest args)
-		     nil))
-    (save-buffer)))
 
-(defun ym/save-some-buffers-silently ()
-  (interactive)
-  (cl-flet ((message (format &rest args)
-		     nil))
-    (save-some-buffers t)))
+;; disable the old and built-in auto-save-mode that creates a lot of junk files
+(setq auto-save-default nil)
+(setq auto-save-no-message t)   ; not sure if it's only used only by the old and built-in auto-save mode
+;; (setq auto-save-interval 10)
+;; (setq auto-save-include-big-deletions t)
 
-(add-hook 'focus-out-hook 'ym/save-some-buffers-silently)   ; https://emacs.stackexchange.com/questions/265/how-to-auto-save-buffers-when-emacs-loses-focus
+;; ;; enable the new and shiny mode that just auto-saves files
+;; (auto-save-visited-mode 1)   ; instead of the obsolete auto-save-visited-file-name variable
+;; (setq auto-save-visited-interval 5)
 
-(defadvice switch-to-buffer (before ym/save-buffer-silently activate)
-  (when buffer-file-name (ym/save-buffer-silently)))
-(defadvice other-window (before other-window-now activate)
-  (when buffer-file-name (ym/save-buffer-silently)))
-(defadvice windmove-up (before other-window-now activate)
-  (when buffer-file-name (ym/save-buffer-silently)))
-(defadvice windmove-down (before other-window-now activate)
-  (when buffer-file-name (ym/save-buffer-silently)))
-(defadvice windmove-left (before other-window-now activate)
-  (when buffer-file-name (ym/save-buffer-silently)))
-(defadvice windmove-right (before other-window-now activate)
-  (when buffer-file-name (ym/save-buffer-silently)))
+
+
+(use-package super-save
+  :config
+  (setq super-save-auto-save-when-idle t)   ; must be set before activating the mode
+  (setq super-save-idle-duration 5)
+  (setq save-silently t)
+  (super-save-mode +1)
+  )
+
+;; ;; auto save buffers on any focus change:
+;; ;; switching to another app
+;; (defun ym/save-some-buffers-silently ()
+;;   (interactive)
+;;   (cl-flet ((message (format &rest args)
+;; 		     nil))
+;;     (save-some-buffers t)))
+;; (add-hook 'focus-out-hook 'ym/save-some-buffers-silently)   ; https://emacs.stackexchange.com/questions/265/how-to-auto-save-buffers-when-emacs-loses-focus
+
+;; ;; or just switching buffer windows
+;; (defun ym/save-buffer-silently ()
+;;   (interactive)
+;;   (cl-flet ((message (format &rest args)
+;; 		     nil))
+;;     (save-buffer)))
+;; (defadvice switch-to-buffer (before ym/save-buffer-silently activate)
+;;   (when buffer-file-name (ym/save-buffer-silently)))
+;; (defadvice other-window (before other-window-now activate)
+;;   (when buffer-file-name (ym/save-buffer-silently)))
+;; (defadvice windmove-up (before other-window-now activate)
+;;   (when buffer-file-name (ym/save-buffer-silently)))
+;; (defadvice windmove-down (before other-window-now activate)
+;;   (when buffer-file-name (ym/save-buffer-silently)))
+;; (defadvice windmove-left (before other-window-now activate)
+;;   (when buffer-file-name (ym/save-buffer-silently)))
+;; (defadvice windmove-right (before other-window-now activate)
+;;   (when buffer-file-name (ym/save-buffer-silently)))
+;; (defadvice next-buffer (before other-window-now activate)
+;;   (when buffer-file-name (ym/save-buffer-silently)))
+;; (defadvice previous-buffer (before other-window-now activate)
+;;   (when buffer-file-name (ym/save-buffer-silently)))
 
 ;; -------------------------------------------------------------------
 
@@ -138,7 +164,10 @@
 ;; -------------------------------------------------------------------
 
 (global-auto-revert-mode 1)
-(setq auto-revert-interval 2)
+(setq auto-revert-interval 1)
+(setq auto-revert-use-notify t)   ; t is the default
+;; (setq auto-revert-remote-files t)   ; nil is the default -- this is for tramp, remote files
+
 
 ;; According to EmacsWiki(https://www.emacswiki.org/emacs/AutoRevertMode), binding revert-buffer-function to a function discarding changes and then reverting might work.
 
