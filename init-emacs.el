@@ -86,23 +86,34 @@
 
 
 ;; -------------------------------------------------------------------
-;; auto-save
+;; auto-save, backup, and lockfiles
 
-;; disable the old and built-in auto-save-mode that creates a lot of junk files
+;; disable the old and built-in auto-save-mode that creates a lot of junk #files#
 (setq auto-save-default nil)
+(setq auto-save-list-file-name nil)
+(setq auto-save-list-file-prefix nil)
 (setq auto-save-no-message t)   ; not sure if it has effect in other modes, but leaving it
 
 (use-package super-save
   :config
-  ;; (setq super-save-auto-save-when-idle t)   ; must be set before activating the mode
-  ;; (setq super-save-idle-duration 5)
-  ;; alternatively,
-  (auto-save-visited-mode 1)
+
+  (auto-save-visited-mode 1)   ; it's a built-in mode, I found the super-save-auto-save-when-idle less usable, because it polluted messages
+  ;; or, for fine-grained control: https://github.com/ChillarAnand/real-auto-save
+  ;; it allows the following: (add-hook 'org-mode-hook 'real-auto-save-mode)
+
+
+  (setq super-save-remote-files nil)
+  (setq super-save-exclude '(".gpg"))
+
 
   (setq save-silently t)
   (super-save-mode +1)
 )
 
+(setq make-backup-files nil)
+
+;; editing files by different instances almost never happens in my case
+(setq create-lockfiles nil)
 
 ;; -------------------------------------------------------------------
 

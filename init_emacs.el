@@ -25,19 +25,6 @@
 (require   'uniquify)  ; buffer names are uniquified with parts of directory name, for ex.: name|folder
 (setq       uniquify-buffer-name-style 'reverse)
 ;; -------------------------------------------------------------------
-(setq backup-inhibited t)
-(setq make-backup-files nil)
-(setq auto-save-list-file-name nil)
-(setq auto-save-list-file-prefix nil)
-(setq create-lockfiles nil)
-;; (setq auto-save-visited-file-name t) -- I found this glitchy, sometimes it saves to #auto-save-files#, but not to originals, probably because of auto-save-list-file-name set to nil
-(defun save-buffer-if-visiting-file (&optional args)   ; https://shreevatsa.wordpress.com/2008/01/22/emacs-auto-save/, http://bryan-murdock.blogspot.ru/2008/03/beat-save-habit.html
-  "Save the current buffer only if it is visiting a file"
-  (interactive)
-  (if (buffer-file-name)
-      (save-buffer args)))
-(add-hook 'auto-save-hook 'save-buffer-if-visiting-file)   ; forces saving the buffer to file, still creates #files#, but they are gitignored
-;; -------------------------------------------------------------------
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
 (require 'whitespace)
