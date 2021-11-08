@@ -77,9 +77,19 @@
       '(
 	("dc" "Drill cards"
 	 (
-	  (tags "+drill+SCHEDULED<=\"<today>\"-english-spanish" ((org-agenda-overriding-header "Due cards")))
-	  (tags "+drilltodo" ((org-agenda-overriding-header "Unfinished cards")))
-	  (tags "+drill-SCHEDULED={.}-english-spanish" ((org-agenda-overriding-header "New cards")))
+	  (tags "+drill+SCHEDULED<=\"<-3w>\"-english-spanish"
+		((org-agenda-overriding-header "Overdue 3w")
+		 ))
+	  (tags "+drill+SCHEDULED<=\"<-1w>\"-english-spanish&+drill+SCHEDULED>\"<-3w>\"-english-spanish"
+		((org-agenda-overriding-header "Overdue 1w")
+		 ))
+	  (tags "+drill+SCHEDULED<=\"<today>\"-english-spanish&+drill+SCHEDULED>\"<-1w>\"-english-spanish"
+		((org-agenda-overriding-header "Due")
+		 ))
+	  (tags "+drilltodo" ((org-agenda-overriding-header "Unfinished cards")
+			      ))
+	  (tags "+drill-SCHEDULED={.}-english-spanish" ((org-agenda-overriding-header "New cards")
+							))
 	  ))
 	("dC" "Show learned cards"
 	 (
@@ -92,10 +102,10 @@
 		    (org-agenda-overriding-header "-=*=- this title gets replaced -=*=-")
 		    ))
 	  (org-agenda-files '("~/werk/English.org"))
-	  (tags "+english+drill+SCHEDULED<=\"<-4w>\""
-		((org-agenda-overriding-header "Overdue 4w")
+	  (tags "+english+drill+SCHEDULED<=\"<-3w>\""
+		((org-agenda-overriding-header "Overdue 3w")
 		 ))
-	  (tags "+english+drill+SCHEDULED<=\"<-1w>\"&+english+drill+SCHEDULED>\"<-4w>\""
+	  (tags "+english+drill+SCHEDULED<=\"<-1w>\"&+english+drill+SCHEDULED>\"<-3w>\""
 		((org-agenda-overriding-header "Overdue 1w")
 		 ))
 	  (tags "+english+drill+SCHEDULED<=\"<today>\"&+english+drill+SCHEDULED>\"<-1w>\""
