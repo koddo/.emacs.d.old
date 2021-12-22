@@ -72,149 +72,223 @@
 ;; -------------------------------------------------------------------
 
 
+(let ((asdf
+       '(org-agenda-overriding-header "
 
-(setq org-agenda-custom-commands
-      '(
-	("dc" "Drill cards"
-	 (
-	  (tags "+drill+SCHEDULED<=\"<-3w>\"-english-spanish"
-		((org-agenda-overriding-header "Overdue 3w")
-		 ))
-	  (tags "+drill+SCHEDULED<=\"<-1w>\"-english-spanish&+drill+SCHEDULED>\"<-3w>\"-english-spanish"
-		((org-agenda-overriding-header "Overdue 1w")
-		 ))
-	  (tags "+drill+SCHEDULED<=\"<today>\"-english-spanish&+drill+SCHEDULED>\"<-1w>\"-english-spanish"
-		((org-agenda-overriding-header "Due")
-		 ))
-	  (tags "+drilltodo" ((org-agenda-overriding-header "Unfinished cards")
-			      ))
-	  (tags "+drill-SCHEDULED={.}-english-spanish" ((org-agenda-overriding-header "New cards")
-							))
-	  ))
-	("dC" "Show learned cards"
-	 (
-	  (tags "+drill+SCHEDULED>\"<today>\"-english-spanish")
-	  ))
-	("de" "Drill English"
-	 (
-	  (todo "" (
-		    (org-agenda-files nil)
-		    (org-agenda-overriding-header "-=*=- this title gets replaced -=*=-")
-		    ))
-	  (org-agenda-files '("~/werk/English.org"))
-	  (tags "+english+drill+SCHEDULED<=\"<-3w>\""
-		((org-agenda-overriding-header "Overdue 3w")
-		 ))
-	  (tags "+english+drill+SCHEDULED<=\"<-1w>\"&+english+drill+SCHEDULED>\"<-3w>\""
-		((org-agenda-overriding-header "Overdue 1w")
-		 ))
-	  (tags "+english+drill+SCHEDULED<=\"<today>\"&+english+drill+SCHEDULED>\"<-1w>\""
-		((org-agenda-overriding-header "Due")
-		 ))
-	  (tags "+english+drill-SCHEDULED={.}"
-		((org-agenda-overriding-header "New")
-		 ))
-	  ))
-	("dh" "habits"
-	 (
-	  (agenda "" (
-		      (org-agenda-files '("~/werk/Habits.org"))
-		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 1"))
-		      (org-agenda-span 1)
-		      (org-agenda-overriding-header "")
-		      (org-agenda-todo-keyword-format "")
-		      (org-agenda-prefix-format "")
-		      ))
-	  (agenda "" (
-		      (org-agenda-files '("~/werk/Habits.org"))
-		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 2"))
-		      (org-agenda-span 1)
-		      (org-agenda-overriding-header "")
-		      (org-agenda-todo-keyword-format "")
-		      (org-agenda-prefix-format "")
-		      ))
-	  (agenda "" (
-		      (org-agenda-files '("~/werk/Habits.org"))
-		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 3"))
-		      (org-agenda-span 1)
-		      (org-agenda-overriding-header "")
-		      (org-agenda-todo-keyword-format "")
-		      (org-agenda-prefix-format "")
-		      ))
-	  (agenda "" (
-		      (org-agenda-files '("~/werk/Habits.org"))
-		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 4"))
-		      (org-agenda-span 1)
-		      (org-agenda-overriding-header "")
-		      (org-agenda-todo-keyword-format "")
-		      (org-agenda-prefix-format "")
-		      ))
-	  (agenda "" (
-		      (org-agenda-files '("~/werk/Habits.org"))
-		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 5"))
-		      (org-agenda-span 1)
-		      (org-agenda-overriding-header "")
-		      (org-agenda-todo-keyword-format "")
-		      (org-agenda-prefix-format "")
-		      ))
-	  ))
-	("x1" "today"
-	 (
-	  (agenda ""
-		  (
-		   (org-agenda-span 1)
-                   (org-agenda-show-log t)
-		   ))
-	  ))
-	("x2" "21 days"
-	 (
-	  (agenda ""
-		  (
-		   (org-agenda-files '("~/werk/Agenda.org"))
-		   (org-agenda-start-day "-7d")
-		   (org-agenda-span 35)
-		   (org-agenda-start-on-weekday nil)
-                   (org-agenda-show-log t)
-		   ))
-	 ))
 
-	("x3" "test"
-	 (
-	  (agenda ""
-		  (
-		   (org-agenda-files '("~/werk/Agenda.org"))
-		   (org-agenda-start-day "-2d")
-		   (org-agenda-span 10)
-		   (org-agenda-start-on-weekday nil)
-                   (org-agenda-show-log t)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-=*=- this title gets replaced -=*=-")
+	    ))
+  (setq org-agenda-custom-commands
+	`(
+	  ("dc" "Drill cards"
+	   (              ; try org-agenda-file-regexp to exclude English.org
+	    (tags "+drill+SCHEDULED<=\"<-3w>\"-english-spanish"
+		  ((org-agenda-overriding-header "Overdue 3w")
 		   ))
-	  (tags-todo "-TIMESTAMP_IA={.}|+TIMESTAMP_IA<=\"<today>\""
-		  (
-		   (org-agenda-files '("~/werk/Agenda.org"))
-		   (org-agenda-overriding-header "TODO")
+	    (tags "+drill+SCHEDULED<=\"<-1w>\"-english-spanish&+drill+SCHEDULED>\"<-3w>\"-english-spanish"
+		  ((org-agenda-overriding-header "Overdue 1w")
 		   ))
-	  (tags-todo "+TIMESTAMP_IA>\"<today>\"&+TIMESTAMP_IA<=\"<+1w>\""
-		  (
-		   (org-agenda-files '("~/werk/Agenda.org"))
-		   (org-agenda-overriding-header "Postponed for a couple of days")
+	    (tags "+drill+SCHEDULED<=\"<today>\"-english-spanish&+drill+SCHEDULED>\"<-1w>\"-english-spanish"
+		  ((org-agenda-overriding-header "Due")
 		   ))
-	  (tags-todo "+TIMESTAMP_IA>\"<+1w>\"&+TIMESTAMP_IA<=\"<+4w>\""
-		  (
-		   (org-agenda-files '("~/werk/Agenda.org"))
-		   (org-agenda-overriding-header "Postponed > +1w")
+	    (tags "+drill-SCHEDULED={.}-english-spanish"
+		  ((org-agenda-overriding-header "New")
 		   ))
-	  (tags-todo "+TIMESTAMP_IA>\"<+4w>\""
-		     (
-		      (org-agenda-files '("~/werk/Agenda.org"))
-		      (org-agenda-overriding-header "Postponed > +4w")
+	    (todo "" (
+		      (org-agenda-files nil)
+		      ,asdf
 		      ))
-	  ))
-	("x4" "test"
-	 (
+	    (tags "+drilltodo"
+		  ((org-agenda-overriding-header "Unfinished cards")
+		   ))
+	    ))
+	  ("dC" "Show learned cards"
+	   (
+	    (tags "+drill+SCHEDULED>\"<today>\"-english-spanish")
+	    ))
+	  ("de" "Drill English"
+	   (
+	    (todo "" (
+		      (org-agenda-files nil)
+		      (org-agenda-overriding-header "-=*=- this title gets replaced -=*=-")
+		      ))
+	    (tags "+english+drill+SCHEDULED<=\"<-3w>\""
+		  ((org-agenda-files '("~/werk/English.org"))
+		   (org-agenda-overriding-header "Overdue 3w")
+		   ))
+	    (tags "+english+drill+SCHEDULED<=\"<-1w>\"&+english+drill+SCHEDULED>\"<-3w>\""
+		  ((org-agenda-files '("~/werk/English.org"))
+		   (org-agenda-overriding-header "Overdue 1w")
+		   ))
+	    (tags "+english+drill+SCHEDULED<=\"<today>\"&+english+drill+SCHEDULED>\"<-1w>\""
+		  ((org-agenda-files '("~/werk/English.org"))
+		   (org-agenda-overriding-header "Due")
+		   ))
+	    (tags "+english+drill-SCHEDULED={.}"
+		  ((org-agenda-files '("~/werk/English.org"))
+		   (org-agenda-overriding-header "New")
+		   ))
+	    ))
+	  ("dr" "read"
+	   (
+	    (todo "" (
+		      (org-agenda-files nil)
+		      (org-agenda-overriding-header "-=*=- this title gets replaced -=*=-")
+		      ))
+	    (tags "+reading"
+		  ((org-agenda-overriding-header "Reading")
+		   ))
+	    (tags "+reading1"
+		  ((org-agenda-overriding-header "Reading 1")
+		   ))
+	    (tags "+reading2"
+		  ((org-agenda-overriding-header "Reading 2")
+		   ))
+	    (tags "+reading3"
+		  ((org-agenda-overriding-header "Reading 3")
+		   ))
+	    (tags "+reading4"
+		  ((org-agenda-overriding-header "Reading 4")
+		   ))
+	    (tags "+reading5"
+		  ((org-agenda-overriding-header "Reading 5")
+		   ))
+	    (tags "+reading6"
+		  ((org-agenda-overriding-header "Reading 6")
+		   ))
+	    (tags "+reading7"
+		  ((org-agenda-overriding-header "Reading 7")
+		   ))
+	    (todo "" (
+		      (org-agenda-files nil)
+		      ,asdf
+		      ))
+	    (tags "+read-reading-reading2-reading3-reading4-reading5"
+		  ((org-agenda-overriding-header "")
+		   ))
 
-	  ))
+	    ))
+	  ("dh" "habits"
+	   (
+	    (agenda "" (
+			(org-agenda-files '("~/werk/Habits.org"))
+			(org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 1"))
+			(org-agenda-span 1)
+			(org-agenda-overriding-header "")
+			(org-agenda-todo-keyword-format "")
+			(org-agenda-prefix-format "")
+			))
+	    (agenda "" (
+			(org-agenda-files '("~/werk/Habits.org"))
+			(org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 2"))
+			(org-agenda-span 1)
+			(org-agenda-overriding-header "")
+			(org-agenda-todo-keyword-format "")
+			(org-agenda-prefix-format "")
+			))
+	    (agenda "" (
+			(org-agenda-files '("~/werk/Habits.org"))
+			(org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 3"))
+			(org-agenda-span 1)
+			(org-agenda-overriding-header "")
+			(org-agenda-todo-keyword-format "")
+			(org-agenda-prefix-format "")
+			))
+	    (agenda "" (
+			(org-agenda-files '("~/werk/Habits.org"))
+			(org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 4"))
+			(org-agenda-span 1)
+			(org-agenda-overriding-header "")
+			(org-agenda-todo-keyword-format "")
+			(org-agenda-prefix-format "")
+			))
+	    (agenda "" (
+			(org-agenda-files '("~/werk/Habits.org"))
+			(org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 5"))
+			(org-agenda-span 1)
+			(org-agenda-overriding-header "")
+			(org-agenda-todo-keyword-format "")
+			(org-agenda-prefix-format "")
+			))
+	    ))
+	  ("x1" "today"
+	   (
+	    (agenda ""
+		    (
+		     (org-agenda-span 1)
+                     (org-agenda-show-log t)
+		     ))
+	    ))
+	  ("x2" "21 days"
+	   (
+	    (agenda ""
+		    (
+		     (org-agenda-files '("~/werk/Agenda.org"))
+		     (org-agenda-start-day "-7d")
+		     (org-agenda-span 35)
+		     (org-agenda-start-on-weekday nil)
+                     (org-agenda-show-log t)
+		     ))
+	    ))
 
-	))
+	  ("x3" "test"
+	   (
+	    (agenda ""
+		    (
+		     (org-agenda-files '("~/werk/Agenda.org"))
+		     (org-agenda-start-day "-2d")
+		     (org-agenda-span 10)
+		     (org-agenda-start-on-weekday nil)
+                     (org-agenda-show-log t)
+		     ))
+	    (tags-todo "-TIMESTAMP_IA={.}|+TIMESTAMP_IA<=\"<today>\""
+		       (
+			(org-agenda-files '("~/werk/Agenda.org"))
+			(org-agenda-overriding-header "TODO")
+			))
+	    (tags-todo "+TIMESTAMP_IA>\"<today>\"&+TIMESTAMP_IA<=\"<+1w>\""
+		       (
+			(org-agenda-files '("~/werk/Agenda.org"))
+			(org-agenda-overriding-header "Postponed for a couple of days")
+			))
+	    (tags-todo "+TIMESTAMP_IA>\"<+1w>\"&+TIMESTAMP_IA<=\"<+4w>\""
+		       (
+			(org-agenda-files '("~/werk/Agenda.org"))
+			(org-agenda-overriding-header "Postponed > +1w")
+			))
+	    (tags-todo "+TIMESTAMP_IA>\"<+4w>\""
+		       (
+			(org-agenda-files '("~/werk/Agenda.org"))
+			(org-agenda-overriding-header "Postponed > +4w")
+			))
+	    ))
+	  ("x4" "test"
+	   (
+
+	    ))
+
+	  )))
 
 
 (if nil
