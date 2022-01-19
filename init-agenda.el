@@ -260,15 +260,21 @@
 
 	  ("x3" "test"
 	   (
+	    (tags-todo "+SCHEDULED<\"<-5d>\""
+		       (
+			(org-agenda-files '("~/werk/Agenda.org"))
+			(org-agenda-overriding-header " ")
+			))
 	    (agenda ""
 		    (
 		     (org-agenda-files '("~/werk/Agenda.org"))
-		     (org-agenda-start-day "-2d")
-		     (org-agenda-span 10)
+		     (org-agenda-start-day "-5d")
+		     (org-agenda-span 20)
 		     (org-agenda-start-on-weekday nil)
                      (org-agenda-show-log t)
+		     (org-scheduled-past-days 0)
 		     ))
-	    (tags-todo "-TIMESTAMP_IA={.}|+TIMESTAMP_IA<=\"<today>\""
+	    (tags-todo "-TIMESTAMP_IA={.}-SCHEDULED={.}|+TIMESTAMP_IA<=\"<today>\""
 		       (
 			(org-agenda-files '("~/werk/Agenda.org"))
 			(org-agenda-overriding-header "TODO")
