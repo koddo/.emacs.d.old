@@ -72,6 +72,12 @@
 ;; -------------------------------------------------------------------
 
 
+;; TODO: try https://github.com/alphapapa/org-ql#function-org-ql-block
+;; https://github.com/alphapapa/org-ql/blob/master/examples.org
+;; and https://github.com/alphapapa/org-super-agenda in one of the views
+;; https://github.com/alphapapa/org-super-agenda/blob/master/examples.org
+;; https://github.com/alphapapa/org-sidebar
+
 (let ((asdf
        '(org-agenda-overriding-header "
 
