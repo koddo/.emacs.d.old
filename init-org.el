@@ -1,5 +1,8 @@
 ;;; -*- lexical-binding: t; -*-
 
+
+
+
 (use-package org
   :mode (("\\.org$" . org-mode))
   :ensure org-plus-contrib
@@ -19,10 +22,16 @@
   :config
   (setq-default org-adapt-indentation nil)
   (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)   ; usage: org-id, org-store-link, org-insert-link, org-id-update-id-locations
-  (setq org-refile-targets '(("~/workspace" :maxlevel . 3)))  ; TODO: variable
+  ;; (setq org-refile-targets '(("~/werk" :maxlevel . 3)))
+					; TODO: variable
+  (setq org-refile-targets '((org-agenda-files :maxlevel . 3)))
   (setq org-preview-latex-image-directory ".ltximg/")
 
   (setq org-startup-folded 'showall)   ; only fold the :PROPERTIES: drawer
+
+  (setq org-goto-interface 'outline-path-completion)
+  (setq org-outline-path-complete-in-steps nil)
+
   )
 
 

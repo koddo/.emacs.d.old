@@ -244,3 +244,17 @@
 ;; = and | in agenda views to regex-filter entries
 
 ;; org-timer-start, then C-c C-x .
+
+
+
+
+
+
+;; -------------------------------------------------------------------
+
+;; by default C-u C-c C-w
+;; (defun my/org-search ()
+;;   (interactive)
+;;   (let ((org-refile-targets '((org-agenda-files :maxlevel . 1))))
+;;     (org-refile '(4))))
+
