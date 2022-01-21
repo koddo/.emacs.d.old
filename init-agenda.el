@@ -282,6 +282,8 @@
 			))
 	    (agenda ""
 		    (
+		     ;; ????
+		     ;; (org-agenda-day-face-function (lambda (date) 'org-agenda-date))
 		     (org-agenda-overriding-header " ")
 		     (org-agenda-files '("~/werk/Agenda.org"))
 		     (org-agenda-span 'day)
@@ -301,6 +303,7 @@
 		     (org-agenda-span 7)
 		     (org-agenda-start-on-weekday nil)
                      (org-agenda-show-log t)
+		     (org-scheduled-past-days 0)
 		     (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:ha:$"))   ; quick and dirty -- hide tagged with :ha: from agenda view, couldn't find a better way yet
 					; neither of these work: (org-agenda-filter-by-tag "h"), (org-agenda-tag-filter-preset '("-h")); maybe try this to filter agenda view by tag: https://stackoverflow.com/questions/10074016/org-mode-filter-on-tag-in-agenda-view/33444799#33444799
 					; excessive inactive timestamps show in agenda -- :ha: -- Hide from Agenda
@@ -344,8 +347,18 @@
 	    ))
 	  ("x4" "test"
 	   (
-
-	    ))
+	    (agenda ""
+		    (
+		     (org-agenda-overriding-header " ")
+		     (org-agenda-files '("~/werk/Agenda.org"))
+		     (org-agenda-start-day "-7d")
+		     (org-agenda-span 42)
+		     (org-agenda-start-on-weekday nil)
+                     (org-agenda-show-log t)
+		     (org-scheduled-past-days 0)
+		     (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:ha:$"))
+		     )
+	    )))
 
 	  )))
 
