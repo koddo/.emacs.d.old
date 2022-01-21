@@ -82,33 +82,8 @@
 
 (setq org-agenda-hide-tags-regexp (regexp-opt '("ha" "ht")))
 
-
 (let ((asdf
-       '(org-agenda-overriding-header "
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--=*=- this title gets replaced -=*=-")
+       '(org-agenda-overriding-header "\n\n\n-=*=- this title gets replaced -=*=-")
 	    ))
   (setq org-agenda-custom-commands
 	`(
@@ -319,15 +294,7 @@
 			))
 	    (todo "" (
 		      (org-agenda-files nil)
-		      (org-agenda-overriding-header "
-
-
-
-
-
-
-
-                       ")
+		      (org-agenda-overriding-header " \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 		      ))
 	    (tags-todo "+TIMESTAMP>\"<+7d>\"&+TIMESTAMP<=\"<+1m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+7d>\"&+TIMESTAMP_IA<=\"<+1m>\""
 		       (
