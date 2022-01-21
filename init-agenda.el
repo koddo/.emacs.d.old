@@ -78,6 +78,11 @@
 ;; https://github.com/alphapapa/org-super-agenda/blob/master/examples.org
 ;; https://github.com/alphapapa/org-sidebar
 
+
+
+(setq org-agenda-hide-tags-regexp (regexp-opt '("ha" "ht")))
+
+
 (let ((asdf
        '(org-agenda-overriding-header "
 
@@ -162,35 +167,44 @@
 		      (org-agenda-files nil)
 		      (org-agenda-overriding-header "-=*=- this title gets replaced -=*=-")
 		      ))
-	    (tags "+reading"
+	    (tags "+reading-done-cancelled"
 		  ((org-agenda-overriding-header "Reading")
 		   ))
-	    (tags "+reading1"
+	    (tags "+reading1-done-cancelled"
 		  ((org-agenda-overriding-header "Reading 1")
 		   ))
-	    (tags "+reading2"
+	    (tags "+reading2-done-cancelled"
 		  ((org-agenda-overriding-header "Reading 2")
 		   ))
-	    (tags "+reading3"
+	    (tags "+reading3-done-cancelled"
 		  ((org-agenda-overriding-header "Reading 3")
 		   ))
-	    (tags "+reading4"
+	    (tags "+reading4-done-cancelled"
 		  ((org-agenda-overriding-header "Reading 4")
 		   ))
-	    (tags "+reading5"
+	    (tags "+reading5-done-cancelled"
 		  ((org-agenda-overriding-header "Reading 5")
 		   ))
-	    (tags "+reading6"
-		  ((org-agenda-overriding-header "Reading 6")
-		   ))
-	    (tags "+reading7"
-		  ((org-agenda-overriding-header "Reading 7")
-		   ))
+	    ;; (tags "+reading6-done-cancelled"
+	    ;; 	  ((org-agenda-overriding-header "Reading 6")
+	    ;; 	   ))
+	    ;; (tags "+reading7-done-cancelled"
+	    ;; 	  ((org-agenda-overriding-header "Reading 7")
+	    ;; 	   ))
+	    ;; (tags "+reading8-done-cancelled"
+	    ;; 	  ((org-agenda-overriding-header "Reading 8")
+	    ;; 	   ))
+	    ;; (tags "+reading9-done-cancelled"
+	    ;; 	  ((org-agenda-overriding-header "Reading 9")
+	    ;; 	   ))
+	    ;; (tags "+reading0-done-cancelled"
+	    ;; 	  ((org-agenda-overriding-header "Reading 0")
+	    ;; 	   ))
 	    (todo "" (
 		      (org-agenda-files nil)
 		      ,asdf
 		      ))
-	    (tags "+read-reading-reading2-reading3-reading4-reading5"
+	    (tags "+read-done-cancelled-reading-reading2-reading3-reading4-reading5-reading6-reading7-reading8-reading9-reading0"
 		  ((org-agenda-overriding-header "")
 		   ))
 
@@ -260,39 +274,72 @@
 
 	  ("x3" "test"
 	   (
-	    (tags-todo "+SCHEDULED<\"<-5d>\""
+	    (tags-todo "+SCHEDULED<\"<+0d>\"|+TIMESTAMP<\"<+0d>\""
+		       (
+			(org-agenda-files '("~/werk/Agenda.org"))
+			(org-agenda-overriding-header " ")
+			
+			))
+	    (agenda ""
+		    (
+		     (org-agenda-overriding-header " ")
+		     (org-agenda-files '("~/werk/Agenda.org"))
+		     (org-agenda-span 'day)
+		     (org-scheduled-past-days 0)
+		     (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:ha:$"))
+		     ))
+	    (tags-todo "+TIMESTAMP<=\"<today>\"-ht|-TIMESTAMP={.}+TIMESTAMP_IA<=\"<today>\"|-TIMESTAMP={.}-TIMESTAMP_IA={.}-SCHEDULED={.}"     ; |+SCHEDULED<=\"<today>\"|+DEADLINE<=\"<today>\"
 		       (
 			(org-agenda-files '("~/werk/Agenda.org"))
 			(org-agenda-overriding-header " ")
 			))
 	    (agenda ""
 		    (
+		     (org-agenda-overriding-header " ")
 		     (org-agenda-files '("~/werk/Agenda.org"))
-		     (org-agenda-start-day "-5d")
-		     (org-agenda-span 20)
+		     (org-agenda-start-day "+1d")
+		     (org-agenda-span 7)
 		     (org-agenda-start-on-weekday nil)
                      (org-agenda-show-log t)
-		     (org-scheduled-past-days 0)
+		     (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:ha:$"))   ; quick and dirty -- hide tagged with :ha: from agenda view, couldn't find a better way yet
+					; neither of these work: (org-agenda-filter-by-tag "h"), (org-agenda-tag-filter-preset '("-h")); maybe try this to filter agenda view by tag: https://stackoverflow.com/questions/10074016/org-mode-filter-on-tag-in-agenda-view/33444799#33444799
+					; excessive inactive timestamps show in agenda -- :ha: -- Hide from Agenda
+					; excessive active timestamps show in todo -- :ht: -- Hide from Todo
+					; see org-agenda-hide-tags-regexp
+
+
 		     ))
-	    (tags-todo "-TIMESTAMP_IA={.}-SCHEDULED={.}|+TIMESTAMP_IA<=\"<today>\""
+	    (tags-todo "+TIMESTAMP>\"<today>\"&+TIMESTAMP<=\"<+7d>\"-ht|-TIMESTAMP={.}+TIMESTAMP_IA>\"<today>\"&+TIMESTAMP_IA<=\"<+7d>\""
 		       (
 			(org-agenda-files '("~/werk/Agenda.org"))
-			(org-agenda-overriding-header "TODO")
+			(org-agenda-overriding-header "Soon")
 			))
-	    (tags-todo "+TIMESTAMP_IA>\"<today>\"&+TIMESTAMP_IA<=\"<+1w>\""
+	    (todo "" (
+		      (org-agenda-files nil)
+		      (org-agenda-overriding-header "
+
+
+
+
+
+
+
+                       ")
+		      ))
+	    (tags-todo "+TIMESTAMP>\"<+7d>\"&+TIMESTAMP<=\"<+1m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+7d>\"&+TIMESTAMP_IA<=\"<+1m>\""
 		       (
 			(org-agenda-files '("~/werk/Agenda.org"))
-			(org-agenda-overriding-header "Postponed for a couple of days")
+			(org-agenda-overriding-header "> +7d")
 			))
-	    (tags-todo "+TIMESTAMP_IA>\"<+1w>\"&+TIMESTAMP_IA<=\"<+4w>\""
+	    (tags-todo "+TIMESTAMP>\"<+1m>\"&+TIMESTAMP<=\"<+3m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+1m>\"&+TIMESTAMP_IA<=\"<+3m>\""
 		       (
 			(org-agenda-files '("~/werk/Agenda.org"))
-			(org-agenda-overriding-header "Postponed > +1w")
+			(org-agenda-overriding-header "> +1m")
 			))
-	    (tags-todo "+TIMESTAMP_IA>\"<+4w>\""
+	    (tags-todo "+TIMESTAMP_IA>\"<+3m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+3m>\""
 		       (
 			(org-agenda-files '("~/werk/Agenda.org"))
-			(org-agenda-overriding-header "Postponed > +4w")
+			(org-agenda-overriding-header "> +3m")
 			))
 	    ))
 	  ("x4" "test"
@@ -313,3 +360,5 @@
 		      )
       )
   )
+
+
