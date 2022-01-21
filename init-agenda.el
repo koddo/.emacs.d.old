@@ -82,9 +82,78 @@
 
 (setq org-agenda-hide-tags-regexp (regexp-opt '("ha" "ht")))
 
-(let ((asdf
-       '(org-agenda-overriding-header "\n\n\n-=*=- this title gets replaced -=*=-")
-	    ))
+(let ((asdf '(org-agenda-overriding-header "\n\n\n-=*=- this title gets replaced -=*=-"))
+
+      (fdsa '(
+
+	      
+	      (tags-todo "+SCHEDULED<\"<+0d>\"|+TIMESTAMP<\"<+0d>\""
+			 (
+			  (org-agenda-files '("~/werk/Agenda.org"))
+			  (org-agenda-overriding-header " ")
+			  
+			  ))
+	      (agenda ""
+		      (
+		       ;; ????
+		       ;; (org-agenda-day-face-function (lambda (date) 'org-agenda-date))
+		       (org-agenda-overriding-header " ")
+		       (org-agenda-files '("~/werk/Agenda.org"))
+		       (org-agenda-span 'day)
+		       (org-scheduled-past-days 0)
+		       (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:ha:$"))
+		       ))
+	      (tags-todo "+TIMESTAMP<=\"<today>\"-ht|-TIMESTAMP={.}+TIMESTAMP_IA<=\"<today>\"|-TIMESTAMP={.}-TIMESTAMP_IA={.}-SCHEDULED={.}"     ; |+SCHEDULED<=\"<today>\"|+DEADLINE<=\"<today>\"
+			 (
+			  (org-agenda-files '("~/werk/Agenda.org"))
+			  (org-agenda-overriding-header " ")
+			  ))
+	      (agenda ""
+		      (
+		       (org-agenda-overriding-header " ")
+		       (org-agenda-files '("~/werk/Agenda.org"))
+		       (org-agenda-start-day "+1d")
+		       (org-agenda-span 7)
+		       (org-agenda-start-on-weekday nil)
+		       (org-agenda-show-log t)
+		       (org-scheduled-past-days 0)
+		       (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:ha:$"))   ; quick and dirty -- hide tagged with :ha: from agenda view, couldn't find a better way yet
+					; neither of these work: (org-agenda-filter-by-tag "h"), (org-agenda-tag-filter-preset '("-h")); maybe try this to filter agenda view by tag: https://stackoverflow.com/questions/10074016/org-mode-filter-on-tag-in-agenda-view/33444799#33444799
+					; excessive inactive timestamps show in agenda -- :ha: -- Hide from Agenda
+					; excessive active timestamps show in todo -- :ht: -- Hide from Todo
+					; see org-agenda-hide-tags-regexp
+
+
+		       ))
+	      (tags-todo "+TIMESTAMP>\"<today>\"&+TIMESTAMP<=\"<+7d>\"-ht|-TIMESTAMP={.}+TIMESTAMP_IA>\"<today>\"&+TIMESTAMP_IA<=\"<+7d>\""
+			 (
+			  (org-agenda-files '("~/werk/Agenda.org"))
+			  (org-agenda-overriding-header "Soon")
+			  ))
+	      (todo "" (
+			(org-agenda-files nil)
+			(org-agenda-overriding-header "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+			))
+	      (tags-todo "+TIMESTAMP>\"<+7d>\"&+TIMESTAMP<=\"<+1m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+7d>\"&+TIMESTAMP_IA<=\"<+1m>\""
+			 (
+			  (org-agenda-files '("~/werk/Agenda.org"))
+			  (org-agenda-overriding-header "> +7d")
+			  ))
+	      (tags-todo "+TIMESTAMP>\"<+1m>\"&+TIMESTAMP<=\"<+3m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+1m>\"&+TIMESTAMP_IA<=\"<+3m>\""
+			 (
+			  (org-agenda-files '("~/werk/Agenda.org"))
+			  (org-agenda-overriding-header "> +1m")
+			  ))
+	      (tags-todo "+TIMESTAMP_IA>\"<+3m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+3m>\""
+			 (
+			  (org-agenda-files '("~/werk/Agenda.org"))
+			  (org-agenda-overriding-header "> +3m")
+			  ))
+	      
+
+	      ))
+      
+      )
   (setq org-agenda-custom-commands
 	`(
 	  ("dc" "Drill cards"
@@ -248,70 +317,8 @@
 	    ))
 
 	  ("x3" "test"
-	   (
-	    (tags-todo "+SCHEDULED<\"<+0d>\"|+TIMESTAMP<\"<+0d>\""
-		       (
-			(org-agenda-files '("~/werk/Agenda.org"))
-			(org-agenda-overriding-header " ")
-			
-			))
-	    (agenda ""
-		    (
-		     ;; ????
-		     ;; (org-agenda-day-face-function (lambda (date) 'org-agenda-date))
-		     (org-agenda-overriding-header " ")
-		     (org-agenda-files '("~/werk/Agenda.org"))
-		     (org-agenda-span 'day)
-		     (org-scheduled-past-days 0)
-		     (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:ha:$"))
-		     ))
-	    (tags-todo "+TIMESTAMP<=\"<today>\"-ht|-TIMESTAMP={.}+TIMESTAMP_IA<=\"<today>\"|-TIMESTAMP={.}-TIMESTAMP_IA={.}-SCHEDULED={.}"     ; |+SCHEDULED<=\"<today>\"|+DEADLINE<=\"<today>\"
-		       (
-			(org-agenda-files '("~/werk/Agenda.org"))
-			(org-agenda-overriding-header " ")
-			))
-	    (agenda ""
-		    (
-		     (org-agenda-overriding-header " ")
-		     (org-agenda-files '("~/werk/Agenda.org"))
-		     (org-agenda-start-day "+1d")
-		     (org-agenda-span 7)
-		     (org-agenda-start-on-weekday nil)
-                     (org-agenda-show-log t)
-		     (org-scheduled-past-days 0)
-		     (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:ha:$"))   ; quick and dirty -- hide tagged with :ha: from agenda view, couldn't find a better way yet
-					; neither of these work: (org-agenda-filter-by-tag "h"), (org-agenda-tag-filter-preset '("-h")); maybe try this to filter agenda view by tag: https://stackoverflow.com/questions/10074016/org-mode-filter-on-tag-in-agenda-view/33444799#33444799
-					; excessive inactive timestamps show in agenda -- :ha: -- Hide from Agenda
-					; excessive active timestamps show in todo -- :ht: -- Hide from Todo
-					; see org-agenda-hide-tags-regexp
-
-
-		     ))
-	    (tags-todo "+TIMESTAMP>\"<today>\"&+TIMESTAMP<=\"<+7d>\"-ht|-TIMESTAMP={.}+TIMESTAMP_IA>\"<today>\"&+TIMESTAMP_IA<=\"<+7d>\""
-		       (
-			(org-agenda-files '("~/werk/Agenda.org"))
-			(org-agenda-overriding-header "Soon")
-			))
-	    (todo "" (
-		      (org-agenda-files nil)
-		      (org-agenda-overriding-header " \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
-		      ))
-	    (tags-todo "+TIMESTAMP>\"<+7d>\"&+TIMESTAMP<=\"<+1m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+7d>\"&+TIMESTAMP_IA<=\"<+1m>\""
-		       (
-			(org-agenda-files '("~/werk/Agenda.org"))
-			(org-agenda-overriding-header "> +7d")
-			))
-	    (tags-todo "+TIMESTAMP>\"<+1m>\"&+TIMESTAMP<=\"<+3m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+1m>\"&+TIMESTAMP_IA<=\"<+3m>\""
-		       (
-			(org-agenda-files '("~/werk/Agenda.org"))
-			(org-agenda-overriding-header "> +1m")
-			))
-	    (tags-todo "+TIMESTAMP_IA>\"<+3m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+3m>\""
-		       (
-			(org-agenda-files '("~/werk/Agenda.org"))
-			(org-agenda-overriding-header "> +3m")
-			))
-	    ))
+	   ,fdsa
+	   )
 	  ("x4" "test"
 	   (
 	    (agenda ""
