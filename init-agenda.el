@@ -80,15 +80,16 @@
 
 
 
-(setq org-agenda-hide-tags-regexp (regexp-opt '("ha" "ht")))
+
 
 (let ((asdf '(org-agenda-overriding-header "\n\n\n-=*=- this title gets replaced -=*=-"))
 
-      (fdsa '(
+      (fdsa (lambda (files)
 	      
+	      `(
 	       (tags-todo "+SCHEDULED<\"<+0d>\"|+TIMESTAMP<\"<+0d>\""
 			  (
-			   (org-agenda-files '("~/werk/Agenda.org"))
+			   (org-agenda-files ',files)
 			   (org-agenda-overriding-header " ")
 			   
 			   ))
@@ -97,14 +98,14 @@
 			;; ????
 			;; (org-agenda-day-face-function (lambda (date) 'org-agenda-date))
 			(org-agenda-overriding-header " ")
-			(org-agenda-files '("~/werk/Agenda.org"))
+			(org-agenda-files ',files)
 			(org-agenda-span 'day)
 			(org-scheduled-past-days 0)
 			(org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:ha:$"))
 			))
 	       (tags-todo "+TIMESTAMP<=\"<today>\"-ht|-TIMESTAMP={.}+TIMESTAMP_IA<=\"<today>\"|-TIMESTAMP={.}-TIMESTAMP_IA={.}-SCHEDULED={.}"     ; |+SCHEDULED<=\"<today>\"|+DEADLINE<=\"<today>\"
 			  (
-			   (org-agenda-files '("~/werk/Agenda.org"))
+			   (org-agenda-files ',files)
 			   (org-agenda-overriding-header " ")
 			   ))
 	       (todo "" (
@@ -114,7 +115,7 @@
 	       (agenda ""
 		       (
 			(org-agenda-overriding-header " ")
-			(org-agenda-files '("~/werk/Agenda.org"))
+			(org-agenda-files ',files)
 			(org-agenda-start-day "+1d")
 			(org-agenda-span 10)
 			(org-agenda-start-on-weekday nil)
@@ -131,22 +132,22 @@
 			))
 	       (tags-todo "+TIMESTAMP=\"<+1d>\"-ht|-TIMESTAMP={.}+TIMESTAMP_IA=\"<+1d>\""
 			  (
-			   (org-agenda-files '("~/werk/Agenda.org"))
+			   (org-agenda-files ',files)
 			   (org-agenda-overriding-header "+1d")
 			   ))
 	       (tags-todo "+TIMESTAMP=\"<+2d>\"-ht|-TIMESTAMP={.}+TIMESTAMP_IA=\"<+2d>\""
 			  (
-			   (org-agenda-files '("~/werk/Agenda.org"))
+			   (org-agenda-files ',files)
 			   (org-agenda-overriding-header "+2d")
 			   ))
 	       (tags-todo "+TIMESTAMP=\"<+3d>\"-ht|-TIMESTAMP={.}+TIMESTAMP_IA=\"<+3d>\""
 			  (
-			   (org-agenda-files '("~/werk/Agenda.org"))
+			   (org-agenda-files ',files)
 			   (org-agenda-overriding-header "+3d")
 			   ))
 	       (tags-todo "+TIMESTAMP>\"<+3d>\"&+TIMESTAMP<=\"<+10d>\"-ht|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+3d>\"&+TIMESTAMP_IA<=\"<+10d>\""
 			  (
-			   (org-agenda-files '("~/werk/Agenda.org"))
+			   (org-agenda-files ',files)
 			   (org-agenda-overriding-header "Soon")
 			   ))
 	       (todo "" (
@@ -155,28 +156,25 @@
 			 ))
 	       (tags-todo "+TIMESTAMP>\"<+10d>\"&+TIMESTAMP<=\"<+1m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+10d>\"&+TIMESTAMP_IA<=\"<+1m>\""
 			  (
-			   (org-agenda-files '("~/werk/Agenda.org"))
+			   (org-agenda-files ',files)
 			   (org-agenda-overriding-header "> +10d")
 			   ))
 	       (tags-todo "+TIMESTAMP>\"<+1m>\"&+TIMESTAMP<=\"<+3m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+1m>\"&+TIMESTAMP_IA<=\"<+3m>\""
 			  (
-			   (org-agenda-files '("~/werk/Agenda.org"))
+			   (org-agenda-files ',files)
 			   (org-agenda-overriding-header "> +1m")
 			   ))
 	       (tags-todo "+TIMESTAMP_IA>\"<+3m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+3m>\""
 			  (
-			   (org-agenda-files '("~/werk/Agenda.org"))
+			   (org-agenda-files ',files)
 			   (org-agenda-overriding-header "> +3m")
 			   ))
-	       )
-
-
-
-	    )
+	       )))
       
       )
   (setq org-agenda-custom-commands
 	`(
+	  
 	  ("dc" "Drill cards"
 	   (              ; try org-agenda-file-regexp to exclude English.org
 	    (tags "+drill+SCHEDULED<=\"<-3w>\"-english-spanish"
@@ -338,9 +336,14 @@
 	    ))
 
 	  ("x3" "test"
-	   ,fdsa
+	   ,(funcall fdsa '("~/werk/Agenda.org"))
+	   (
+	    ;; (org-agenda-files '("~/werk/Agenda.org"))
+	    (org-agenda-tag-filter-preset '())
+	    (org-agenda-hide-tags-regexp (regexp-opt '("ha" "ht"))))
+	   
 	   )
-	  ("x4" "test"
+	  ("x9" "test"
 	   (
 	    (agenda ""
 		    (
@@ -352,8 +355,12 @@
                      (org-agenda-show-log t)
 		     (org-scheduled-past-days 0)
 		     (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:ha:$"))
-		     )
-	    )))
+		     ))
+	    
+
+	    )
+	   ((org-agenda-tag-filter-preset '("+home")))
+	   )
 
 	  )))
 
