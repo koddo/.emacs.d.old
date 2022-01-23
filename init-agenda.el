@@ -336,13 +336,26 @@
 	    ))
 
 	  ("x3" "test"
-	   ,(funcall fdsa '("~/werk/Agenda.org"))
+	   ,(funcall fdsa
+		     ;; '("~/werk")
+		     (directory-files "~/werk" t "Agenda")
+		     ;; '("~/werk/Agenda.org" "~/werk/Agenda-work.org" "~/werk/Agenda-superlearn.org")
+		     )
 	   (
 	    ;; (org-agenda-files '("~/werk/Agenda.org"))
 	    (org-agenda-tag-filter-preset '())
 	    (org-agenda-hide-tags-regexp (regexp-opt '("ha" "ht"))))
 	   
 	   )
+	  ("x4" "test"
+	   ,(funcall fdsa '("~/werk/Agenda-work.org"))
+	   (
+	    ;; (org-agenda-files '("~/werk/Agenda.org"))
+	    (org-agenda-tag-filter-preset '())
+	    (org-agenda-hide-tags-regexp (regexp-opt '("ha" "ht"))))
+	   
+	   )
+
 	  ("x9" "test"
 	   (
 	    (agenda ""

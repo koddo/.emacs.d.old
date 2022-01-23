@@ -230,6 +230,39 @@
 ;; (yas-expand-snippet (yas-lookup-snippet "let"))
 
 
+(set-face-attribute 'org-ql-view-due-date  nil :foreground "grey80" :slant 'normal :weight 'normal)
+
+(defun what-face (pos)
+  (interactive "d")
+  (let ((face (or (get-char-property pos 'read-face-name)
+                  (get-char-property pos 'face))))
+    (if face (message "Face: %s" face) (message "No face at %d" pos))))
+
+(pretty-hydra-define hydra-agenda ( :exit t)
+  ("asdfasdf" (
+	       ("3" (lambda () (interactive)
+		      (org-agenda nil "x3")
+		      (delete-other-windows)
+		      )
+		"full")
+	       ("2" (lambda () (interactive)
+		      (org-agenda nil "x2")
+		      (delete-other-windows)
+		      )
+		"month")
+	       ("e" (lambda () (interactive)
+		      (org-ql-search "~/werk/English.org" '(tags "drill") :sort 'date)
+		      (delete-other-windows)
+		      )
+		"english")
+	       ("c" (lambda () (interactive)
+		      (org-ql-search (org-agenda-files) '(tags "drill") :sort '(date))
+		      (delete-other-windows)
+		      )
+		"cards")
+	       
+    )))
+
 
 ;; add narrow-to-subtree
 
@@ -258,3 +291,13 @@
 ;;   (let ((org-refile-targets '((org-agenda-files :maxlevel . 1))))
 ;;     (org-refile '(4))))
 
+
+
+;; -------------------------------------------------------------------
+
+;; C-c C-n (org-next-visible-heading)
+;; C-c C-p (org-previous-visible-heading)
+;; C-c C-f (org-forward-heading-same-level)
+;; C-c C-b (org-backward-heading-same-level)
+;; C-c C-u (outline-up-heading)
+;; C-c C-j (org-goto)
