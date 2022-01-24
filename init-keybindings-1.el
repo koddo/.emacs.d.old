@@ -230,13 +230,7 @@
 ;; (yas-expand-snippet (yas-lookup-snippet "let"))
 
 
-(set-face-attribute 'org-ql-view-due-date  nil :foreground "grey80" :slant 'normal :weight 'normal)
 
-(defun what-face (pos)
-  (interactive "d")
-  (let ((face (or (get-char-property pos 'read-face-name)
-                  (get-char-property pos 'face))))
-    (if face (message "Face: %s" face) (message "No face at %d" pos))))
 
 (pretty-hydra-define hydra-agenda ( :exit t)
   ("asdfasdf" (
@@ -260,6 +254,11 @@
 		      (delete-other-windows)
 		      )
 		"cards")
+	       ("h" (lambda () (interactive)
+		      (org-agenda nil "dh")
+		      (delete-other-windows)
+		      )
+		"full")
 	       
     )))
 

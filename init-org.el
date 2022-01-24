@@ -32,6 +32,7 @@
   (setq org-goto-interface 'outline-path-completion)
   (setq org-outline-path-complete-in-steps nil)
 
+  (setq org-agenda-window-setup 'only-window)
   )
 
 

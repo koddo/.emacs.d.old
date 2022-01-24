@@ -1,5 +1,14 @@
 ;; (rainbow-mode)
 
+;; taken from stackoverflow
+(defun ym/what-face (pos)
+  (interactive "d")
+  (let ((face (or (get-char-property pos 'read-face-name)
+                  (get-char-property pos 'face))))
+    (if face (message "Face: %s" face) (message "No face at %d" pos))))
+
+
+
 (setq global-hl-line-sticky-flag nil)   ; only appear in one window
 (global-hl-line-mode)
 (blink-cursor-mode 0)
@@ -147,3 +156,12 @@ Version 2017-03-12"
 ;; (setq org-todo-keyword-faces '(
 ;; 			       ("HABIT" . (:height 3.0))
 ;; 			       ))
+
+
+
+
+
+;; (set-face-attribute 'org-ql-view-due-date  nil :foreground "grey80" :slant 'normal :weight 'normal)
+
+
+
