@@ -143,7 +143,31 @@ Version 2017-03-12"
  '(org-habit-overdue-future-face        ((t (:background "white"))) t))
 
 
+;; (set-face-attribute 'org-ql-view-due-date  nil :foreground "grey80" :slant 'normal :weight 'normal)
+(defface org-ql-view-due-date '((t :foreground "grey60")) "")
+
+
 ;; fixed in org 9.5 -- https://protesilaos.com/codelog/2020-09-24-org-headings-adapt/
 ;; (setq org-todo-keyword-faces '(
 ;; 			       ("HABIT" . (:height 3.0))
 ;; 			       ))
+
+
+;; maybe rename later to hi-something
+(defface ym/org-double-backslash-newline-highlight '((t :foreground "grey80")) "double backslash at eol")
+;; (set-face-attribute 'org-double-slash-newline-highlight nil :foreground "grey80")
+
+
+
+(defun what-face (pos)
+  (interactive "d")
+  (let ((face (or (get-char-property pos 'read-face-name)
+                  (get-char-property pos 'face))))
+    (if face (message "Face: %s" face) (message "No face at %d" pos))))
+
+
+
+
+
+;; (defface ym/habits-face '((t :family "Monaco" :height 80)) "")
+

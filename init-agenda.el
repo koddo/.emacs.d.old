@@ -62,7 +62,9 @@
 
 ;; -------------------------------------------------------------------
 
-(use-package org-ql)
+(use-package org-ql
+  :config
+  )
 
 (use-package org-super-agenda
   :config
@@ -87,7 +89,7 @@
       (fdsa (lambda (files)
 	      
 	      `(
-	       (tags-todo "+SCHEDULED<\"<+0d>\"|+TIMESTAMP<\"<+0d>\""
+	       (tags-todo "+SCHEDULED<\"<+0d>\"|+sa+TIMESTAMP<\"<+0d>\""
 			  (
 			   (org-agenda-files ',files)
 			   (org-agenda-overriding-header " ")
@@ -101,9 +103,9 @@
 			(org-agenda-files ',files)
 			(org-agenda-span 'day)
 			(org-scheduled-past-days 0)
-			(org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:ha:$"))
+			(org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:st:$"))
 			))
-	       (tags-todo "+TIMESTAMP<=\"<today>\"-ht|-TIMESTAMP={.}+TIMESTAMP_IA<=\"<today>\"|-TIMESTAMP={.}-TIMESTAMP_IA={.}-SCHEDULED={.}"     ; |+SCHEDULED<=\"<today>\"|+DEADLINE<=\"<today>\"
+	       (tags-todo "+TIMESTAMP<=\"<today>\"-sa|-TIMESTAMP={.}+TIMESTAMP_IA<=\"<today>\"|-TIMESTAMP={.}-TIMESTAMP_IA={.}-SCHEDULED={.}"     ; |+SCHEDULED<=\"<today>\"|+DEADLINE<=\"<today>\"
 			  (
 			   (org-agenda-files ',files)
 			   (org-agenda-overriding-header " ")
@@ -121,31 +123,31 @@
 			(org-agenda-start-on-weekday nil)
 			(org-agenda-show-log t)
 			(org-scheduled-past-days 0)
-					; (org-agenda-hide-tags-regexp ,(regexp-opt '("ha" "ht")))
-			(org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:ha:$"))   ; quick and dirty -- hide tagged with :ha: from agenda view, couldn't find a better way yet
+					; (org-agenda-hide-tags-regexp ,(regexp-opt '("st" "sa")))
+			(org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:st:$"))   ; quick and dirty -- hide tagged with :st: from agenda view, couldn't find a better way yet
 					; neither of these work: (org-agenda-filter-by-tag "h"), (org-agenda-tag-filter-preset '("-h")); maybe try this to filter agenda view by tag: https://stackoverflow.com/questions/10074016/org-mode-filter-on-tag-in-agenda-view/33444799#33444799
-					; excessive inactive timestamps show in agenda -- :ha: -- Hide from Agenda
-					; excessive active timestamps show in todo -- :ht: -- Hide from Todo
+					; excessive inactive timestamps show in agenda -- :st: -- Hide from Agenda
+					; excessive active timestamps show in todo -- :sa: -- Hide from Todo
 					; see org-agenda-hide-tags-regexp
 
 
 			))
-	       (tags-todo "+TIMESTAMP=\"<+1d>\"-ht|-TIMESTAMP={.}+TIMESTAMP_IA=\"<+1d>\""
+	       (tags-todo "+TIMESTAMP=\"<+1d>\"-sa|-TIMESTAMP={.}+TIMESTAMP_IA=\"<+1d>\""
 			  (
 			   (org-agenda-files ',files)
 			   (org-agenda-overriding-header "+1d")
 			   ))
-	       (tags-todo "+TIMESTAMP=\"<+2d>\"-ht|-TIMESTAMP={.}+TIMESTAMP_IA=\"<+2d>\""
+	       (tags-todo "+TIMESTAMP=\"<+2d>\"-sa|-TIMESTAMP={.}+TIMESTAMP_IA=\"<+2d>\""
 			  (
 			   (org-agenda-files ',files)
 			   (org-agenda-overriding-header "+2d")
 			   ))
-	       (tags-todo "+TIMESTAMP=\"<+3d>\"-ht|-TIMESTAMP={.}+TIMESTAMP_IA=\"<+3d>\""
+	       (tags-todo "+TIMESTAMP=\"<+3d>\"-sa|-TIMESTAMP={.}+TIMESTAMP_IA=\"<+3d>\""
 			  (
 			   (org-agenda-files ',files)
 			   (org-agenda-overriding-header "+3d")
 			   ))
-	       (tags-todo "+TIMESTAMP>\"<+3d>\"&+TIMESTAMP<=\"<+10d>\"-ht|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+3d>\"&+TIMESTAMP_IA<=\"<+10d>\""
+	       (tags-todo "+TIMESTAMP>\"<+3d>\"&+TIMESTAMP<=\"<+10d>\"-sa|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+3d>\"&+TIMESTAMP_IA<=\"<+10d>\""
 			  (
 			   (org-agenda-files ',files)
 			   (org-agenda-overriding-header "Soon")
@@ -344,7 +346,8 @@
 	   (
 	    ;; (org-agenda-files '("~/werk/Agenda.org"))
 	    (org-agenda-tag-filter-preset '())
-	    (org-agenda-hide-tags-regexp (regexp-opt '("ha" "ht"))))
+	    ;; (org-agenda-hide-tags-regexp (regexp-opt '("st" "sa")))
+	    )
 	   
 	   )
 	  ("x4" "test"
@@ -352,7 +355,8 @@
 	   (
 	    ;; (org-agenda-files '("~/werk/Agenda.org"))
 	    (org-agenda-tag-filter-preset '())
-	    (org-agenda-hide-tags-regexp (regexp-opt '("ha" "ht"))))
+	    ;; (org-agenda-hide-tags-regexp (regexp-opt '("st" "sa")))
+	    )
 	   
 	   )
 
@@ -367,7 +371,7 @@
 		     (org-agenda-start-on-weekday nil)
                      (org-agenda-show-log t)
 		     (org-scheduled-past-days 0)
-		     (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:ha:$"))
+		     (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:st:$"))
 		     ))
 	    
 
