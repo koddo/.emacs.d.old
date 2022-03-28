@@ -263,6 +263,33 @@
 
 
 ;; add narrow-to-subtree
+;; org-agenda-drag-line-forward, org-agenda-drag-line-backward
+
+
+(defun ym/org-agenda-goto-timestamp ()
+     (interactive)
+     (org-agenda-goto)
+     (progn (end-of-line)
+	    (next-line)
+	    (beginning-of-line))
+     (ignore-errors
+      (let ((cur-line (line-number-at-pos))
+	    (ts-line (save-excursion (re-search-forward org-ts-regexp-both)
+				     (line-number-at-pos)
+				     )))
+	(when (= cur-line ts-line)
+	  (re-search-forward org-ts-regexp-both)
+	  (beginning-of-line)
+	  (forward-char 10)      ; to the day pos [2022-01-31 Mon]
+	  )
+	)
+      )
+     )
+(add-hook 'org-agenda-mode-hook
+          (lambda ()
+            (local-set-key (kbd "t") 'ym/org-agenda-goto-timestamp)))
+;;  (define-key org-agenda-keymap (kbd "t") #'ym/org-agenda-goto-timestamp)
+;;  (define-key org-agenda-mode-map (kbd "t") #'ym/org-agenda-goto-timestamp)
 
 
 ;; -------------------------------------------------------------------

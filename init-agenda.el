@@ -416,3 +416,9 @@
   )
 
 
+
+
+
+
+;; https://emacs.stackexchange.com/questions/29585/key-binding-to-reschedule-agenda-todo-list-by-n-days
+
