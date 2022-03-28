@@ -230,7 +230,18 @@
 ;; (yas-expand-snippet (yas-lookup-snippet "let"))
 
 
+<<<<<<< HEAD
 
+||||||| merged common ancestors
+(set-face-attribute 'org-ql-view-due-date  nil :foreground "grey80" :slant 'normal :weight 'normal)
+
+(defun what-face (pos)
+  (interactive "d")
+  (let ((face (or (get-char-property pos 'read-face-name)
+                  (get-char-property pos 'face))))
+    (if face (message "Face: %s" face) (message "No face at %d" pos))))
+=======
+>>>>>>> f236561e472867f3f69ce1d9b19a4190a5450439
 
 (pretty-hydra-define hydra-agenda ( :exit t)
   ("asdfasdf" (
@@ -300,3 +311,10 @@
 ;; C-c C-b (org-backward-heading-same-level)
 ;; C-c C-u (outline-up-heading)
 ;; C-c C-j (org-goto)
+
+
+
+;; -------------------------------------------------------------------
+
+;; https://www.masteringemacs.org/article/highlighting-by-word-line-regexp
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Highlight-Interactively.html

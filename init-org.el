@@ -33,6 +33,11 @@
   (setq org-outline-path-complete-in-steps nil)
 
   (setq org-agenda-window-setup 'only-window)
+
+  (setq org-agenda-sticky t)
+
+  (add-hook 'org-mode-hook #'visual-line-mode)
+  
   )
 
 
@@ -116,31 +121,33 @@
   :config
   ;; don't forget to run the following:
   ;; $ pip install ipykernel && python -m ipykernel install --user
-  (setq org-babel-python-command "/Users/alex/.python_venv/default360/bin/python")
+  (setq org-babel-python-command "~/.python_venv/python3.8/bin/python")
   )
 
 
 
 
-(use-package ob-http)
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((emacs-lisp . t)
-   (python . t)
-   (http . t)
-   ;; (clojure . t)
-   ;; (haskell . t)
-   ;; (java . t)
-   ;; (javascript . t)
-   ;; (lisp . t)
-   ;; (R . t)
-   ;; (shell . t)
-   ;; (sql . t)
-   ;; (sqlite . t)
-   ;; (typescript . t)     ; (use-package ob-typescript)
-   ;; (mongo . t)     ; (use-package ob-mongo)
-   ;; (jupyter . t)
-   ))
+(use-package ob-http
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (python . t)
+     (http . t)
+     ;; (clojure . t)
+     ;; (haskell . t)
+     ;; (java . t)
+     ;; (javascript . t)
+     ;; (lisp . t)
+     ;; (R . t)
+     ;; (shell . t)
+     ;; (sql . t)
+     ;; (sqlite . t)
+     ;; (typescript . t)     ; (use-package ob-typescript)
+     ;; (mongo . t)     ; (use-package ob-mongo)
+     ;; (jupyter . t)
+     ))
+  )
 ;; (setq org-src-tab-acts-natively t)
 ;; (setq org-babel-min-lines-for-block-output 9999)   ;; this forces indenting results with colons, because I don't like how #+end_example is inserted at the beginning of line, not indented at all
 
@@ -161,4 +168,14 @@
 ;; 	  (run-with-timer 0 repeat-interval #'org-recent-headings--my-major-mode-check-and-run-on-timer))
 ;;     )
 ;;   (org-recent-headings-mode)  ; this clears the list, unfortunately
+;;   )
+
+
+
+
+
+;; (use-package ox
+;;   :config
+;;   ;; (setq org-export-preserve-breaks t)
+;;   ;; or set #+OPTIONS: \n:t
 ;;   )
