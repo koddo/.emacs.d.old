@@ -168,15 +168,6 @@ Version 2017-03-12"
 
 
 
-(defun what-face (pos)
-  (interactive "d")
-  (let ((face (or (get-char-property pos 'read-face-name)
-                  (get-char-property pos 'face))))
-    (if face (message "Face: %s" face) (message "No face at %d" pos))))
-
-
-
-
 
 ;; (defface ym/habits-face '((t :family "Monaco" :height 80)) "")
 
