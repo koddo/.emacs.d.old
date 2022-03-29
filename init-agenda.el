@@ -84,98 +84,156 @@
 
 
 
-(let ((asdf '(org-agenda-overriding-header "\n\n\n-=*=- this title gets replaced -=*=-"))    ; put generated text as ,asdf
-
-      (fdsa (lambda (files)
-	      
-	      `(
-	       (tags-todo "+SCHEDULED<\"<+0d>\"|+sa+TIMESTAMP<\"<+0d>\""
-			  (
-			   (org-agenda-files ',files)
-			   (org-agenda-overriding-header " ")
-			   
-			   ))
-	       (agenda ""
-		       (
-			;; ????
-			;; (org-agenda-day-face-function (lambda (date) 'org-agenda-date))
-			(org-agenda-overriding-header " ")
-			(org-agenda-files ',files)
-			(org-agenda-span 'day)
-			(org-scheduled-past-days 0)
-			(org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:st:$"))
-			(org-agenda-skip-scheduled-if-done t)
-			))
-	       (tags-todo "+TIMESTAMP<=\"<today>\"-sa|-TIMESTAMP={.}+TIMESTAMP_IA<=\"<today>\"|-TIMESTAMP={.}-TIMESTAMP_IA={.}-SCHEDULED={.}"     ; |+SCHEDULED<=\"<today>\"|+DEADLINE<=\"<today>\"
-			  (
-			   (org-agenda-files ',files)
-			   (org-agenda-overriding-header " ")
-			   ))
-	       (todo "" (
-			 (org-agenda-files nil)
-			 (org-agenda-overriding-header "\n\n\n\n\n")
-			 ))
-	       (agenda ""
-		       (
-			(org-agenda-overriding-header " ")
-			(org-agenda-files ',files)
-			(org-agenda-start-day "+1d")
-			(org-agenda-span 10)
-			(org-agenda-start-on-weekday nil)
-			(org-agenda-show-log t)
-			(org-scheduled-past-days 0)
+(let ((asdf '(org-agenda-overriding-header "\n\n\n-=*=- this title gets replaced -=*=-"))
+      (my-agenda-view-detailed (lambda (files)
+				 `(
+				   (tags-todo "+SCHEDULED<\"<+0d>\"|+sa+TIMESTAMP<\"<+0d>\""
+					      (
+					       (org-agenda-files ',files)
+					       (org-agenda-overriding-header " ")
+					       
+					       ))
+				   (agenda ""
+					   (
+					    ;; ????
+					    ;; (org-agenda-day-face-function (lambda (date) 'org-agenda-date))
+					    (org-agenda-overriding-header " ")
+					    (org-agenda-files ',files)
+					    (org-agenda-span 'day)
+					    (org-scheduled-past-days 0)
+					    (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:st:$"))
+					    (org-agenda-skip-scheduled-if-done t)
+					    ))
+				   (tags-todo "+TIMESTAMP<=\"<today>\"-sa|-TIMESTAMP={.}+TIMESTAMP_IA<=\"<today>\"|-TIMESTAMP={.}-TIMESTAMP_IA={.}-SCHEDULED={.}"     ; |+SCHEDULED<=\"<today>\"|+DEADLINE<=\"<today>\"
+					      (
+					       (org-agenda-files ',files)
+					       (org-agenda-overriding-header " ")
+					       ))
+				   (todo "" (
+					     (org-agenda-files nil)
+					     (org-agenda-overriding-header "\n\n\n\n\n")
+					     ))
+				   (agenda ""
+					   (
+					    (org-agenda-overriding-header " ")
+					    (org-agenda-files ',files)
+					    (org-agenda-start-day "+1d")
+					    (org-agenda-span 10)
+					    (org-agenda-start-on-weekday nil)
+					    (org-agenda-show-log t)
+					    (org-scheduled-past-days 0)
 					; (org-agenda-hide-tags-regexp ,(regexp-opt '("st" "sa")))
-			(org-agenda-skip-scheduled-if-done t)
-			(org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:st:$"))   ; quick and dirty -- hide tagged with :st: from agenda view, couldn't find a better way yet
+					    (org-agenda-skip-scheduled-if-done t)
+					    (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:st:$"))   ; quick and dirty -- hide tagged with :st: from agenda view, couldn't find a better way yet
 					; neither of these work: (org-agenda-filter-by-tag "h"), (org-agenda-tag-filter-preset '("-h")); maybe try this to filter agenda view by tag: https://stackoverflow.com/questions/10074016/org-mode-filter-on-tag-in-agenda-view/33444799#33444799
 					; excessive inactive timestamps show in agenda -- :st: -- Hide from Agenda
 					; excessive active timestamps show in todo -- :sa: -- Hide from Todo
 					; see org-agenda-hide-tags-regexp
 
 
-			))
-	       (tags-todo "+TIMESTAMP=\"<+1d>\"-sa|-TIMESTAMP={.}+TIMESTAMP_IA=\"<+1d>\""
-			  (
-			   (org-agenda-files ',files)
-			   (org-agenda-overriding-header "+1d")
-			   ))
-	       (tags-todo "+TIMESTAMP=\"<+2d>\"-sa|-TIMESTAMP={.}+TIMESTAMP_IA=\"<+2d>\""
-			  (
-			   (org-agenda-files ',files)
-			   (org-agenda-overriding-header "+2d")
-			   ))
-	       (tags-todo "+TIMESTAMP=\"<+3d>\"-sa|-TIMESTAMP={.}+TIMESTAMP_IA=\"<+3d>\""
-			  (
-			   (org-agenda-files ',files)
-			   (org-agenda-overriding-header "+3d")
-			   ))
-	       (tags-todo "+TIMESTAMP>\"<+3d>\"&+TIMESTAMP<=\"<+10d>\"-sa|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+3d>\"&+TIMESTAMP_IA<=\"<+10d>\""
-			  (
-			   (org-agenda-files ',files)
-			   (org-agenda-overriding-header "Next 10d")
-			   ))
-	       (todo "" (
-			 (org-agenda-files nil)
-			 (org-agenda-overriding-header " \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
-			 ))
-	       (tags-todo "+TIMESTAMP>\"<+10d>\"&+TIMESTAMP<=\"<+1m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+10d>\"&+TIMESTAMP_IA<=\"<+1m>\""
-			  (
-			   (org-agenda-files ',files)
-			   (org-agenda-overriding-header "Next 1m")
-			   ))
-	       (tags-todo "+TIMESTAMP>\"<+1m>\"&+TIMESTAMP<=\"<+3m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+1m>\"&+TIMESTAMP_IA<=\"<+3m>\""
-			  (
-			   (org-agenda-files ',files)
-			   (org-agenda-overriding-header "Next 3m")
-			   ))
-	       (tags-todo "+TIMESTAMP_IA>\"<+3m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+3m>\""
-			  (
-			   (org-agenda-files ',files)
-			   (org-agenda-overriding-header "Later")
-			   ))
-	       )))
-      
+					    ))
+				   (tags-todo "+TIMESTAMP=\"<+1d>\"-sa|-TIMESTAMP={.}+TIMESTAMP_IA=\"<+1d>\""
+					      (
+					       (org-agenda-files ',files)
+					       (org-agenda-overriding-header "+1d")
+					       ))
+				   (tags-todo "+TIMESTAMP=\"<+2d>\"-sa|-TIMESTAMP={.}+TIMESTAMP_IA=\"<+2d>\""
+					      (
+					       (org-agenda-files ',files)
+					       (org-agenda-overriding-header "+2d")
+					       ))
+				   (tags-todo "+TIMESTAMP=\"<+3d>\"-sa|-TIMESTAMP={.}+TIMESTAMP_IA=\"<+3d>\""
+					      (
+					       (org-agenda-files ',files)
+					       (org-agenda-overriding-header "+3d")
+					       ))
+				   (tags-todo "+TIMESTAMP>\"<+3d>\"&+TIMESTAMP<=\"<+10d>\"-sa|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+3d>\"&+TIMESTAMP_IA<=\"<+10d>\""
+					      (
+					       (org-agenda-files ',files)
+					       (org-agenda-overriding-header "Next 10d")
+					       ))
+				   (todo "" (
+					     (org-agenda-files nil)
+					     (org-agenda-overriding-header " \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+					     ))
+				   (tags-todo "+TIMESTAMP>\"<+10d>\"&+TIMESTAMP<=\"<+1m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+10d>\"&+TIMESTAMP_IA<=\"<+1m>\""
+					      (
+					       (org-agenda-files ',files)
+					       (org-agenda-overriding-header "Next 1m")
+					       ))
+				   (tags-todo ,(concat "+TIMESTAMP>\"<+1m>\"&+TIMESTAMP<=\"<+3m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+1m>\"&+TIMESTAMP_IA<=\"<+3m>\"")
+					      (
+					       (org-agenda-files ',files)
+					       (org-agenda-overriding-header "Next 3m")
+					       ))
+				   (tags-todo "+TIMESTAMP_IA>\"<+3m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+3m>\""
+					      (
+					       (org-agenda-files ',files)
+					       (org-agenda-overriding-header "Later")
+					       ))
+				   )))
+      (my-read-watch-list (lambda (tag)   ; e.g., "read" or "watch"
+			    (let ((my-read-watch-list-tags (concat
+							    "-" tag "ing"
+							    "-" tag "ing1"
+							    "-" tag "ing2"
+							    "-" tag "ing3"
+							    "-" tag "ing4"
+							    )))  ; e.g., "-reading-reading1-reading2-reading3-reading4")
+			      `(
+				(todo "" (
+					  (org-agenda-files nil)
+					  (org-agenda-overriding-header "-=*=- this title gets replaced -=*=-")
+					  ))
+				(tags ,(concat "+" tag "ing-done-cancelled")      ; e.g., "+reading-done-cancelled"
+				      ((org-agenda-overriding-header ,(concat tag))
+				       ))
+				(tags ,(concat "+" tag "ing1-done-cancelled")
+				      ((org-agenda-overriding-header ,(concat tag "1"))
+				       ))
+				(tags ,(concat "+" tag "ing2-done-cancelled")
+				      ((org-agenda-overriding-header ,(concat tag "2"))
+				       ))
+				(tags ,(concat "+" tag "ing3-done-cancelled")
+				      ((org-agenda-overriding-header ,(concat tag "3"))
+				       ))
+				(tags ,(concat "+" tag "ing4-done-cancelled")
+				      ((org-agenda-overriding-header ,(concat tag "4"))
+				       ))
+				(todo "" (
+					  (org-agenda-files nil)
+					  (org-agenda-overriding-header "\n\n\n\n\n")
+					  ))
+				(tags ,(concat "+TIMESTAMP_IA<=\"<+0d>\"+" tag "-done-cancelled" my-read-watch-list-tags "|" "-TIMESTAMP_IA={.}+" tag "-done-cancelled" my-read-watch-list-tags)
+				      ((org-agenda-overriding-header ,tag)
+				       ))
+				(todo "" (
+					  (org-agenda-files nil)
+					  (org-agenda-overriding-header "\n\n\n\n\n")
+					  ))
+				(tags ,(concat "+TIMESTAMP_IA>\"<+0d>\"&+TIMESTAMP_IA<=\"<+10d>\"+" tag "-done-cancelled" my-read-watch-list-tags)
+				      ((org-agenda-overriding-header "Next 10d")
+				       ))
+				(tags ,(concat "+TIMESTAMP_IA>\"<+10d>\"&+TIMESTAMP_IA<=\"<+1m>\"+" tag "-done-cancelled" my-read-watch-list-tags)
+				      ((org-agenda-overriding-header "Next month")
+				       ))
+				(tags ,(concat "+TIMESTAMP_IA>\"<+1m>\"&+TIMESTAMP_IA<=\"<+3m>\"+" tag "-done-cancelled" my-read-watch-list-tags)
+				      ((org-agenda-overriding-header "Next three months")
+				       ))
+				(tags ,(concat "+TIMESTAMP_IA>\"<+3m>\"&+TIMESTAMP_IA<=\"<+6m>\"+" tag "-done-cancelled" my-read-watch-list-tags)
+				      ((org-agenda-overriding-header "next half a year")
+				       ))
+				(tags ,(concat "+TIMESTAMP_IA>\"<+6m>\"&+TIMESTAMP_IA<=\"<+12m>\"+" tag "-done-cancelled" my-read-watch-list-tags)
+				      ((org-agenda-overriding-header "next year")
+				       ))
+				(tags ,(concat "+TIMESTAMP_IA>\"<+12m>\"+" tag "-done-cancelled" my-read-watch-list-tags)
+				      ((org-agenda-overriding-header "later")
+				       ))
+
+				)
+			      )))
       )
+
   (setq org-agenda-custom-commands
 	`(
 	  
@@ -229,75 +287,15 @@
 		   ))
 	    ))
 	  ("dr" "read"
-	   (
-	    (todo "" (
-		      (org-agenda-files nil)
-		      (org-agenda-overriding-header "-=*=- this title gets replaced -=*=-")
-		      ))
-	    (tags "+reading-done-cancelled"
-		  ((org-agenda-overriding-header "Reading")
-		   ))
-	    (tags "+reading1-done-cancelled"
-		  ((org-agenda-overriding-header "Reading 1")
-		   ))
-	    (tags "+reading2-done-cancelled"
-		  ((org-agenda-overriding-header "Reading 2")
-		   ))
-	    (tags "+reading3-done-cancelled"
-		  ((org-agenda-overriding-header "Reading 3")
-		   ))
-	    (tags "+reading4-done-cancelled"
-		  ((org-agenda-overriding-header "Reading 4")
-		   ))
-	    ;; (tags "+reading5-done-cancelled"
-	    ;; 	  ((org-agenda-overriding-header "Reading 5")
-	    ;; 	   ))
-	    ;; (tags "+reading6-done-cancelled"
-	    ;; 	  ((org-agenda-overriding-header "Reading 6")
-	    ;; 	   ))
-	    ;; (tags "+reading7-done-cancelled"
-	    ;; 	  ((org-agenda-overriding-header "Reading 7")
-	    ;; 	   ))
-	    ;; (tags "+reading8-done-cancelled"
-	    ;; 	  ((org-agenda-overriding-header "Reading 8")
-	    ;; 	   ))
-	    ;; (tags "+reading9-done-cancelled"
-	    ;; 	  ((org-agenda-overriding-header "Reading 9")
-	    ;; 	   ))
-	    ;; (tags "+reading0-done-cancelled"
-	    ;; 	  ((org-agenda-overriding-header "Reading 0")
-	    ;; 	   ))
-	    (todo "" (
-		      (org-agenda-files nil)
-		      (org-agenda-overriding-header "\n\n\n\n\n")
-		      ))
-	    (tags "+TIMESTAMP_IA<=\"<+0d>\"+read-done-cancelled-reading-reading1-reading2-reading3|-TIMESTAMP_IA={.}+read-done-cancelled-reading-reading1-reading2-reading3-reading4"           ; -reading4-reading5-reading6-reading7-reading8-reading9-reading0
-		  ((org-agenda-overriding-header "Read")
-		   ))
-	    (todo "" (
-		      (org-agenda-files nil)
-		      (org-agenda-overriding-header "\n\n\n\n\n")
-		      ))
-	    (tags "+TIMESTAMP_IA>\"<+0d>\"&+TIMESTAMP_IA<=\"<+10d>\"+read-done-cancelled-reading-reading1-reading2-reading3-reading4"
-		  ((org-agenda-overriding-header "Next 10d")
-		   ))
-	    (tags "+TIMESTAMP_IA>\"<+10d>\"&+TIMESTAMP_IA<=\"<+1m>\"+read-done-cancelled-reading-reading1-reading2-reading3-reading4"
-		  ((org-agenda-overriding-header "Next month")
-		   ))
-	    (tags "+TIMESTAMP_IA>\"<+1m>\"&+TIMESTAMP_IA<=\"<+3m>\"+read-done-cancelled-reading-reading1-reading2-reading3-reading4"
-		  ((org-agenda-overriding-header "Next three months")
-		   ))
-	    (tags "+TIMESTAMP_IA>\"<+3m>\"&+TIMESTAMP_IA<=\"<+6m>\"+read-done-cancelled-reading-reading1-reading2-reading3-reading4"
-		  ((org-agenda-overriding-header "next half a year")
-		   ))
-	    (tags "+TIMESTAMP_IA>\"<+6m>\"&+TIMESTAMP_IA<=\"<+12m>\"+read-done-cancelled-reading-reading1-reading2-reading3-reading4"
-		  ((org-agenda-overriding-header ">+6m")
-		   ))
-	    (tags "+TIMESTAMP_IA>\"<+12m>\"+read-done-cancelled-reading-reading1-reading2-reading3-reading4"
-		  ((org-agenda-overriding-header "next year")
-		   ))
+	   ,(funcall my-read-watch-list "read")
+	   )
+	  ("dw" "watch"
+	   ,(funcall my-read-watch-list "watch")
+	   )
+	  ("dl" "listen"
+	   ,(funcall my-read-watch-list "listen")
+	   )
 
-	    ))
 	  ("dh" "habits"
 	   (
 	    (agenda "" (
@@ -362,7 +360,7 @@
 	    ))
 
 	  ("x3" "test"
-	   ,(funcall fdsa
+	   ,(funcall my-agenda-view-detailed
 		     ;; '("~/werk")
 		     (directory-files "~/werk" t "Agenda")
 		     ;; '("~/werk/Agenda.org" "~/werk/Agenda-work.org" "~/werk/Agenda-superlearn.org")
@@ -375,7 +373,7 @@
 	   
 	   )
 	  ("x4" "test"
-	   ,(funcall fdsa '("~/werk/Agenda-work.org"))
+	   ,(funcall my-agenda-view-detailed '("~/werk/Agenda-work.org"))
 	   (
 	    ;; (org-agenda-files '("~/werk/Agenda.org"))
 	    (org-agenda-tag-filter-preset '())
@@ -425,3 +423,8 @@
 
 ;; https://emacs.stackexchange.com/questions/29585/key-binding-to-reschedule-agenda-todo-list-by-n-days
 
+
+
+
+#("+TIMESTAMP_IA<=\"<+0d>\"+read-done-cancelled-reading-reading1-reading2-reading3-reading4|-TIMESTAMP_IA={.}+read-done-cancelled-reading-reading1-reading2-reading3-reading4" 101 104
+      (regexp t))
