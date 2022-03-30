@@ -1,4 +1,6 @@
 ;; -------------------------------------------------------------------
+(require 'org-habit)
+(require 'org-checklist)   ; for the reset_check_boxes property of repeated tasks
 
 (setq org-habit-show-all-today t)
 (setq org-habit-show-habits t)

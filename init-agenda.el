@@ -263,6 +263,10 @@
 	   (
 	    (tags "+drill+SCHEDULED>\"<today>\"-english-spanish")
 	    ))
+	  ;; ("dE" "org-ql"
+	  ;;  ((org-agenda-files)
+	  ;;   (org-ql-block   ; :sort '(date) isn't supported yet: https://github.com/alphapapa/org-ql/issues/79
+	  ;;    '(and (tags "drill") (not (tags "english" "spanish" "humor"))))))
 	  ("de" "Drill English"
 	   (
 	    (todo "" (
@@ -426,5 +430,3 @@
 
 
 
-#("+TIMESTAMP_IA<=\"<+0d>\"+read-done-cancelled-reading-reading1-reading2-reading3-reading4|-TIMESTAMP_IA={.}+read-done-cancelled-reading-reading1-reading2-reading3-reading4" 101 104
-      (regexp t))

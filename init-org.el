@@ -44,9 +44,6 @@
 ;; TODO: why can't I do (require 'org-checklist) without this?
 (use-package org-contrib)
 
-;; TODO: move to org-modules
-(require 'org-habit)
-(require 'org-checklist)   ; for the reset_check_boxes property of repeated tasks
 
 
 
