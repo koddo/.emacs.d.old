@@ -166,7 +166,8 @@
 					       (org-agenda-files ',files)
 					       (org-agenda-overriding-header "Next 3m")
 					       ))
-				   (tags-todo "+TIMESTAMP_IA>\"<+3m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+3m>\""
+				   ;; (tags-todo "+TIMESTAMP_IA>\"<+3m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+3m>\""
+				   (tags-todo "+TIMESTAMP>\"<+3m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+3m>\""
 					      (
 					       (org-agenda-files ',files)
 					       (org-agenda-overriding-header "Later")

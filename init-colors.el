@@ -70,6 +70,9 @@ Version 2017-03-12"
 			    ))
     (base16-theme-define 'ym-base16-theme ym-base16-colors)
     (enable-theme 'ym-base16-theme)
+
+    ;; (disable-theme 'deeper-blue)
+    ;; (load-theme 'ym-base16-theme t)
     )
 
   ;; temporarily fixing this: https://github.com/belak/base16-emacs/issues/114
