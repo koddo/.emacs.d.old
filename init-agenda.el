@@ -83,15 +83,16 @@
 
 
 
+(setq org-agenda-hide-tags-regexp (regexp-opt '("st" "sa")))
 
 (let ((asdf '(org-agenda-overriding-header "\n\n\n-=*=- this title gets replaced -=*=-"))
       (my-agenda-view-detailed (lambda (files)
 				 `(
-				   (tags-todo "+SCHEDULED<\"<+0d>\"|+sa+TIMESTAMP<\"<+0d>\""
+				   (tags-todo "+SCHEDULED<\"<+0d>\"|TIMESTAMP<\"<+0d>\""    ; was "+SCHEDULED<\"<+0d>\"|+sa+TIMESTAMP<\"<+0d>\""
 					      (
 					       (org-agenda-files ',files)
 					       (org-agenda-overriding-header " ")
-					       
+					       (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:st:$"))
 					       ))
 				   (agenda ""
 					   (
@@ -103,11 +104,14 @@
 					    (org-scheduled-past-days 0)
 					    (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:st:$"))
 					    (org-agenda-skip-scheduled-if-done t)
+					    (org-agenda-use-time-grid nil)
 					    ))
-				   (tags-todo "+TIMESTAMP<=\"<today>\"-sa|-TIMESTAMP={.}+TIMESTAMP_IA<=\"<today>\"|-TIMESTAMP={.}-TIMESTAMP_IA={.}-SCHEDULED={.}"     ; |+SCHEDULED<=\"<today>\"|+DEADLINE<=\"<today>\"
+				   (tags-todo "+TIMESTAMP<\"<+1d>\"|-TIMESTAMP={.}+TIMESTAMP_IA<\"<+1d>\"|-TIMESTAMP={.}-TIMESTAMP_IA={.}-SCHEDULED={.}"     ; |+SCHEDULED<=\"<today>\"|+DEADLINE<=\"<today>\"
+					      ; was "+TIMESTAMP<=\"<today>\"-sa|-TIMESTAMP={.}+TIMESTAMP_IA<=\"<today>\"|-TIMESTAMP={.}-TIMESTAMP_IA={.}-SCHEDULED={.}"
 					      (
 					       (org-agenda-files ',files)
 					       (org-agenda-overriding-header " ")
+					       (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:sa:$"))
 					       ))
 				   (todo "" (
 					     (org-agenda-files nil)
@@ -132,25 +136,29 @@
 
 
 					    ))
-				   (tags-todo "+TIMESTAMP=\"<+1d>\"-sa|-TIMESTAMP={.}+TIMESTAMP_IA=\"<+1d>\""
+				   (tags-todo "+TIMESTAMP=\"<+1d>\"|-TIMESTAMP={.}+TIMESTAMP_IA=\"<+1d>\""
 					      (
 					       (org-agenda-files ',files)
 					       (org-agenda-overriding-header "+1d")
+					       (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:sa:$"))
 					       ))
-				   (tags-todo "+TIMESTAMP=\"<+2d>\"-sa|-TIMESTAMP={.}+TIMESTAMP_IA=\"<+2d>\""
+				   (tags-todo "+TIMESTAMP=\"<+2d>\"|-TIMESTAMP={.}+TIMESTAMP_IA=\"<+2d>\""
 					      (
 					       (org-agenda-files ',files)
 					       (org-agenda-overriding-header "+2d")
+					       (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:sa:$"))
 					       ))
-				   (tags-todo "+TIMESTAMP=\"<+3d>\"-sa|-TIMESTAMP={.}+TIMESTAMP_IA=\"<+3d>\""
+				   (tags-todo "+TIMESTAMP=\"<+3d>\"|-TIMESTAMP={.}+TIMESTAMP_IA=\"<+3d>\""
 					      (
 					       (org-agenda-files ',files)
 					       (org-agenda-overriding-header "+3d")
+					       (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:sa:$"))
 					       ))
-				   (tags-todo "+TIMESTAMP>\"<+3d>\"&+TIMESTAMP<=\"<+10d>\"-sa|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+3d>\"&+TIMESTAMP_IA<=\"<+10d>\""
+				   (tags-todo "+TIMESTAMP>\"<+3d>\"&+TIMESTAMP<=\"<+10d>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+3d>\"&+TIMESTAMP_IA<=\"<+10d>\""
 					      (
 					       (org-agenda-files ',files)
 					       (org-agenda-overriding-header "Next 10d")
+					       (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:sa:$"))
 					       ))
 				   (todo "" (
 					     (org-agenda-files nil)
@@ -166,7 +174,8 @@
 					       (org-agenda-files ',files)
 					       (org-agenda-overriding-header "Next 3m")
 					       ))
-				   (tags-todo "+TIMESTAMP_IA>\"<+3m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+3m>\""
+				   ;; (tags-todo "+TIMESTAMP_IA>\"<+3m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+3m>\""
+				   (tags-todo "+TIMESTAMP>\"<+3m>\"|-TIMESTAMP={.}+TIMESTAMP_IA>\"<+3m>\""
 					      (
 					       (org-agenda-files ',files)
 					       (org-agenda-overriding-header "Later")
