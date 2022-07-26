@@ -406,7 +406,7 @@
 	(list
 	 ?j ?k ?l
 	 ?f ?d ?s ?a
-	 ?u ?i ;; ?o -- similar to a   ;; ?p -- vertical line is not visible enough
+	 ?u ;; ?i=?l ;; ?o -- similar to a   ;; ?p -- vertical line is not visible enough
 	 ?r ?e ?w          ;; ?q -- I often can't distinguish q from g
 	 ?h ?g
 	 ?y ?t
