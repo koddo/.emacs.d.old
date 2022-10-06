@@ -1,5 +1,7 @@
 ;;(set-face-attribute 'default nil :family "Monospace" :height 80)
+;;(set-face-attribute 'default nil :family "JetBrains Mono" :height 80)
 (set-face-attribute 'default nil :family "Monaco" :height 75)
+
 
 (menu-bar-mode -1)
 
