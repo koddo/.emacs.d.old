@@ -152,11 +152,20 @@
 (use-package smartparens
   :config
   (require 'smartparens-config)   ; default configuration
+
+  ;; TODO: make show-paren-mode global
   (require 'paren)   ; I prefer stock show-paren-mode over show-smartparen-mode because it's ultra-fast
-  (setq show-paren-delay 0)
+  (setq show-paren-delay 0.1)
   (show-paren-mode t)
   (setq show-paren-style 'parenthesis)
 
+  ;; TODO autopair
+  ;; (progn (require 'autopair)   ; insert paired parenthesis
+  ;;      (autopair-global-mode)
+  ;;      (setq autopair-blink nil)
+  ;;      (setq autopair-skip-whitespace 'chomp))   ; ) ) => )) when closing
+
+  
   ;; https://stackoverflow.com/questions/34846531/show-parentheses-when-inside-them-emacs
   ;; (define-advice show-paren-function (:around (fn) fix)
   ;;   "Highlight enclosing parens."

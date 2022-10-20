@@ -79,6 +79,7 @@
 ;; https://github.com/alphapapa/org-super-agenda/blob/master/examples.org
 ;; https://github.com/alphapapa/org-sidebar
 
+(use-package f)
 
 
 
@@ -92,6 +93,18 @@
   (let ((asdf '(org-agenda-overriding-header "\n\n\n-=*=- this title gets replaced -=*=-"))
 	(my-agenda-view-detailed (lambda (files)
 				   `(
+				     (todo "" (
+					       (org-agenda-files nil)
+					       (org-agenda-overriding-header
+						(let* ((agenda-mob-path "~/syncthing/mobile_org/Agenda-mobile.org")
+						       (agenda-tmp-path "~/werk/Agenda-tmp.org")
+						       (agenda-mob (if (f-exists-p agenda-mob-path) (string-trim (f-read-text agenda-mob-path)) "file missing"))    ; (first-n (split-string ...))
+						       (agenda-tmp (if (f-exists-p agenda-tmp-path) (string-trim (f-read-text agenda-tmp-path)) "file missing")))
+						  (concat
+						   (unless (string-empty-p agenda-mob) (concat agenda-mob-path ": \n\n" agenda-mob "\n\n"))
+						   (unless (string-empty-p agenda-tmp) (concat agenda-tmp-path ": \n\n" agenda-tmp "\n\n"))
+						   ))
+						)))
 				     (tags-todo "+SCHEDULED<\"<+0d>\"|TIMESTAMP<\"<+0d>\""    ; was "+SCHEDULED<\"<+0d>\"|+sa+TIMESTAMP<\"<+0d>\""
 						(
 						 (org-agenda-files ',files)
@@ -431,8 +444,7 @@
 					    )
 				     )
 		     )
-    )
-  )
+    ))
 
 
 
