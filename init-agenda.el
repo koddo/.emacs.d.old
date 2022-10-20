@@ -83,7 +83,10 @@
 
 
 
-(setq org-agenda-hide-tags-regexp (regexp-opt '("st" "sa")))
+(setq org-agenda-hide-tags-regexp
+      ; (regexp-opt '("st" "sa"))
+      nil
+      )
 
 (let ((asdf '(org-agenda-overriding-header "\n\n\n-=*=- this title gets replaced -=*=-"))
       (my-agenda-view-detailed (lambda (files)
