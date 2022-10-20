@@ -104,23 +104,23 @@ Version 2017-03-12"
 
 
 
-(use-package rainbow-delimiters
-  :config
-  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
-  (setq rainbow-delimiters-max-face-count 6)
-  (custom-set-faces
-   ;; custom-set-faces was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
-   '(rainbow-delimiters-depth-1-face ((t (:foreground "firebrick3"))))
-   '(rainbow-delimiters-depth-2-face ((t (:foreground "dodger blue"))))
-   '(rainbow-delimiters-depth-3-face ((t (:foreground "green3"))))
-   '(rainbow-delimiters-depth-4-face ((t (:foreground "peru"))))
-   '(rainbow-delimiters-depth-5-face ((t (:foreground "grey50"))))
-   '(rainbow-delimiters-depth-6-face ((t (:foreground "black"))))
-   )
-  )
+;; (use-package rainbow-delimiters
+;;   :config
+;;   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+;;   (setq rainbow-delimiters-max-face-count 6)
+;;   (custom-set-faces
+;;    ;; custom-set-faces was added by Custom.
+;;    ;; If you edit it by hand, you could mess it up, so be careful.
+;;    ;; Your init file should contain only one such instance.
+;;    ;; If there is more than one, they won't work right.
+;;    '(rainbow-delimiters-depth-1-face ((t (:foreground "firebrick3"))))
+;;    '(rainbow-delimiters-depth-2-face ((t (:foreground "dodger blue"))))
+;;    '(rainbow-delimiters-depth-3-face ((t (:foreground "green3"))))
+;;    '(rainbow-delimiters-depth-4-face ((t (:foreground "peru"))))
+;;    '(rainbow-delimiters-depth-5-face ((t (:foreground "grey50"))))
+;;    '(rainbow-delimiters-depth-6-face ((t (:foreground "black"))))
+;;    )
+;;   )
 
 
 

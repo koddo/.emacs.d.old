@@ -124,6 +124,7 @@
 
 
 
+;; there's also a package named quickrun, for those who don't use babel
 (use-package ob-http
   :config
   (org-babel-do-load-languages
@@ -131,15 +132,15 @@
    '((emacs-lisp . t)
      (python . t)
      (http . t)
+     (shell . t)
+     (sqlite . t)
      ;; (clojure . t)
      ;; (haskell . t)
      ;; (java . t)
      ;; (javascript . t)
      ;; (lisp . t)
      ;; (R . t)
-     ;; (shell . t)
      ;; (sql . t)
-     ;; (sqlite . t)
      ;; (typescript . t)     ; (use-package ob-typescript)
      ;; (mongo . t)     ; (use-package ob-mongo)
      ;; (jupyter . t)
@@ -176,3 +177,8 @@
 ;;   ;; (setq org-export-preserve-breaks t)
 ;;   ;; or set #+OPTIONS: \n:t
 ;;   )
+
+
+
+
+;; TODO: markdown-mode

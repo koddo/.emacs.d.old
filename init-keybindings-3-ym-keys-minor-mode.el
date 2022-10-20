@@ -322,3 +322,23 @@
 (ym-define-key (kbd "s-^") #'avy-goto-parens)   ; "S-s-;" -- this is not a usual ^, it's a unicode character
 
 ;; -------------------------------------------------------------------
+
+;; spanish 
+;; https://emacs.stackexchange.com/questions/66629/how-to-make-c-x-9-the-same-as-c-x-8
+
+(defun ym-ctl-x-8-single-quote ()
+  "Simulate typing: C-x 8 \'"
+  (interactive)
+  (dolist (event (nreverse (list ?\C-x ?8 ?\')))
+    (push (cons t event) unread-command-events)))
+
+;; -------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
