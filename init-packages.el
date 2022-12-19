@@ -413,14 +413,19 @@
 
   (setq avy-keys
 	(list
-	 ?j ?k ?l
 	 ?f ?d ?s ?a
-	 ?u ;; ?i=?l  ; ?o -- similar to a   ;; ?p -- vertical line is not visible enough
 	 ?r ?e ?w          ; ?q -- I often can't distinguish q from g
-	 ?h           ; ?g -- similar to a
-	 ?y ?t
-	 ?m ;; ?n
 	 ?c ?x ?z   ; ?v -- y   ; ?b -- o
+	 ?m ;; ?n
+
+
+	 ?j ?k ?l
+	 
+	 ?u ;; ?i=?l  ; ?o -- similar to a   ;; ?p -- vertical line is not visible enough
+	 ; ?h -- hard to reach          ; ?g -- similar to a
+	 ; ?y ?t -- hard to reach
+
+	 ; ?, ?. -- these don't work for some reason
 	 )
   	)
 
@@ -428,6 +433,7 @@
   (setq avy-highlight-first nil)
   (setq avy-all-windows t) ; 'all-frames
   (setq avy-style 'at-full)
+  (setq avy-single-candidate-jump nil)
 
   (add-to-list 'avy-orders-alist '(avy-goto-char-2 . avy-order-closest))
   (add-to-list 'avy-orders-alist '(avy-goto-word-1 . avy-order-closest))
