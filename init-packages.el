@@ -415,12 +415,12 @@
 	(list
 	 ?j ?k ?l
 	 ?f ?d ?s ?a
-	 ?u ;; ?i=?l ;; ?o -- similar to a   ;; ?p -- vertical line is not visible enough
-	 ?r ?e ?w          ;; ?q -- I often can't distinguish q from g
-	 ?h ?g
+	 ?u ;; ?i=?l  ; ?o -- similar to a   ;; ?p -- vertical line is not visible enough
+	 ?r ?e ?w          ; ?q -- I often can't distinguish q from g
+	 ?h           ; ?g -- similar to a
 	 ?y ?t
 	 ?m ;; ?n
-	 ?c ?x ?z   ;; ?v -- y   ;; ?b -- o
+	 ?c ?x ?z   ; ?v -- y   ; ?b -- o
 	 )
   	)
 
@@ -465,52 +465,61 @@
       (set-cursor-color old-color)))
   (advice-add 'avy-jump :around #'avy-jump-advice-cursor-background-fix)   ; just in case: (advice-remove 'avy-jump #'avy-jump-cursor-background-fix-advice)
 
-  (defun avy-subdiv (n b)
-  "Distribute N in B terms in a balanced way."
-  (let* ((p (1- (floor (+ (log n b) 1e-6))))
-         (x1 (expt b p))
-         (x2 (* b x1))
-         (delta (- n x2))
-         (n2 (/ delta (- x2 x1)))
-         (n1 (- b n2 1)))
-    (append
-     (make-list n1 x1)
-     (make-list n2 x2)   ; originally this goes last, but I'd like the heaviest subtree to be bound to the first key in the list
-     (list
-      (- n (* n1 x1) (* n2 x2)))
-     )))
+  ;; (defun avy-subdiv (n b)
+  ;; "Distribute N in B terms in a balanced way."
+  ;; (let* ((p (1- (floor (+ (log n b) 1e-6))))
+  ;;        (x1 (expt b p))
+  ;;        (x2 (* b x1))
+  ;;        (delta (- n x2))
+  ;;        (n2 (/ delta (- x2 x1)))
+  ;;        (n1 (- b n2 1)))
+  ;;   (append
+  ;;    (make-list n1 x1)
+  ;;    (make-list n2 x2)   ; originally this goes last, but I'd like the heaviest subtree to be bound to the first key in the list
+  ;;    (list
+  ;;     (- n (* n1 x1) (* n2 x2)))
+  ;;    )))
 
-  (defun avy-tree (lst keys)   ; https://github.com/abo-abo/avy/issues/164#issuecomment-631785903
-    "Coerce LST into a balanced tree.
-     The degree of the tree is the length of KEYS.
-     KEYS are placed appropriately on internal nodes."
-    (let* ((len (length keys))
-	   (order-fn (cdr (assq avy-command avy-orders-alist)))
-	   (lst (if order-fn
-		    (cl-sort lst #'< :key order-fn)
-		  lst)))
-      (cl-labels
-	  ((rd (ls)
-	       (let ((ln (length ls)))
-		 (if (< ln len)
-		     (cl-pairlis keys
-				 (mapcar (lambda (x) (cons 'leaf x)) ls))
-		   (let* ((ks (copy-sequence keys))
-			  (subdiv (avy-subdiv ln len))
-			  (number-of-ones (cl-count 1 subdiv))
-			  (number-of-non-ones (- len number-of-ones))
-			  res)
-		     (dolist (s subdiv)
-		       (push (cons (pop (if (eq s 1)
-					    (nthcdr number-of-non-ones ks)
-					  ks)
-					)
-				   (if (eq s 1)
-				       (cons 'leaf (pop ls))
-				     (rd (avy-multipop ls s))))
-			     res))
-		     (nreverse res))))))
-	(rd lst))))
+  ;; (defun avy-tree (lst keys)   ; https://github.com/abo-abo/avy/issues/164#issuecomment-631785903
+  ;;   "Coerce LST into a balanced tree.
+  ;;    The degree of the tree is the length of KEYS.
+  ;;    KEYS are placed appropriately on internal nodes."
+  ;;   (let* ((len (length keys))
+  ;; 	   (order-fn (cdr (assq avy-command avy-orders-alist)))
+  ;; 	   (lst (if order-fn
+  ;; 		    (cl-sort lst #'< :key order-fn)
+  ;; 		  lst)))
+  ;;     (cl-labels
+  ;; 	  ((rd (ls)
+  ;; 	       (let ((ln (length ls)))
+  ;; 		 (if (< ln len)
+  ;; 		     (cl-pairlis keys
+  ;; 				 (mapcar (lambda (x) (cons 'leaf x)) ls))
+  ;; 		   (let* ((ks (copy-sequence keys))
+  ;; 			  (subdiv (avy-subdiv ln len))
+  ;; 			  (number-of-ones (cl-count 1 subdiv))
+  ;; 			  (number-of-non-ones (- len number-of-ones))
+  ;; 			  res)
+  ;; 		     (dolist (s subdiv)
+  ;; 		       (push (cons (pop (if (eq s 1)
+  ;; 					    (nthcdr number-of-non-ones ks)
+  ;; 					  ks)
+  ;; 					)
+  ;; 				   (if (eq s 1)
+  ;; 				       (cons 'leaf (pop ls))
+  ;; 				     (rd (avy-multipop ls s))))
+  ;; 			     res))
+  ;; 		     (nreverse res))))))
+  ;; 	(rd lst))))
   )
 
 ;; -------------------------------------------------------------------
+
+
+
+
+
+
+
+
+

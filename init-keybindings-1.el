@@ -300,7 +300,7 @@
 	(when (= cur-line ts-line)
 	  (re-search-forward org-ts-regexp-both)
 	  (beginning-of-line)
-	  (forward-char 10)      ; to the day pos [2022-01-31 Mon]
+	  (forward-char 7)      ; to the day pos [2022-01-31 Mon]
 	  )
 	)
       )
