@@ -143,7 +143,7 @@
 					      (org-agenda-start-day "+1d")
 					      (org-agenda-span 10)
 					      (org-agenda-start-on-weekday nil)
-					      (org-agenda-show-log t)
+					      (org-agenda-show-log nil)  ;; was t, why?
 					      (org-scheduled-past-days 0)
 					; (org-agenda-hide-tags-regexp ,(regexp-opt '("st" "sa")))
 					      (org-agenda-skip-scheduled-if-done t)
@@ -260,7 +260,24 @@
 
 				  )
 				)))
+	(my-agenda-view-month (lambda (files)
+				`(
+				  (agenda ""
+					  (
+					   (org-agenda-overriding-header " ")
+					   (org-agenda-files ',files)
+					   (org-agenda-start-day "-7d")
+					   (org-agenda-span 35)
+					   (org-agenda-start-on-weekday nil)
+					   (org-agenda-skip-scheduled-if-done t)
+					   (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:st:$"))
+					   ))
+
+				  )
+				)
+			      )
 	)
+    
 
     (setq org-agenda-custom-commands
 	  `(
@@ -328,7 +345,7 @@
 	     ,(funcall my-read-watch-list "listen")
 	     )
 
-	    ("dh" "habits"
+	    ("x1" "habits"
 	     (
 	      (agenda "" (
 			  (org-agenda-files '("~/werk/Habits.org"))
@@ -371,27 +388,8 @@
 			  (org-agenda-prefix-format "")
 			  ))
 	      ))
-	    ("x1" "today"
-	     (
-	      (agenda ""
-		      (
-		       (org-agenda-span 1)
-                       (org-agenda-show-log t)
-		       ))
-	      ))
-	    ("x2" "21 days"
-	     (
-	      (agenda ""
-		      (
-		       (org-agenda-files '("~/werk/Agenda.org"))
-		       (org-agenda-start-day "-7d")
-		       (org-agenda-span 35)
-		       (org-agenda-start-on-weekday nil)
-                       (org-agenda-show-log t)
-		       ))
-	      ))
 
-	    ("x3" "test"
+	    ("x2" "week"
 	     ,(funcall my-agenda-view-detailed
 		       ;; '("~/werk")
 		       (directory-files "~/werk" t "Agenda")
@@ -404,7 +402,35 @@
 	      )
 	     
 	     )
-	    ("x4" "test"
+
+	    ("x3" "month"
+	     ,(funcall my-agenda-view-month
+		       ;; '("~/werk")
+		       (directory-files "~/werk" t "Agenda")
+		       ;; '("~/werk/Agenda.org" "~/werk/Agenda-work.org" "~/werk/Agenda-superlearn.org")
+		       )
+	     (
+	      ;; (org-agenda-files '("~/werk/Agenda.org"))
+	      (org-agenda-tag-filter-preset '())
+	      ;; (org-agenda-hide-tags-regexp (regexp-opt '("st" "sa")))
+	      )
+	     
+	     )
+	    
+	    ("t6" "test month"
+	     (
+	      (agenda ""
+		      (
+		       (org-agenda-files '("~/werk/Agenda.org"))
+		       (org-agenda-start-day "-7d")
+		       (org-agenda-span 35)
+		       (org-agenda-start-on-weekday nil)
+                       (org-agenda-show-log t)
+		       ))
+	      ))
+
+	    
+	    ("t7" "test"
 	     ,(funcall my-agenda-view-detailed '("~/werk/Agenda-work.org"))
 	     (
 	      ;; (org-agenda-files '("~/werk/Agenda.org"))
@@ -414,7 +440,7 @@
 	     
 	     )
 
-	    ("x9" "test"
+	    ("t8" "test"
 	     (
 	      (agenda ""
 		      (
@@ -434,8 +460,17 @@
 	     ((org-agenda-tag-filter-preset '("+home")))
 	     )
 
-	    )))
+	    ("t9" "test today"
+	     (
+	      (agenda ""
+		      (
+		       (org-agenda-span 1)
+                       (org-agenda-show-log t)
+		       ))
+	      ))
 
+
+	    ))))
 
   (if nil
       (org-ql-search "~/werk/Habits.org"
