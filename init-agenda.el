@@ -105,11 +105,13 @@
 						   (unless (string-empty-p agenda-tmp) (concat agenda-tmp-path ": \n\n" agenda-tmp "\n\n"))
 						   ))
 						)))
-				     (tags-todo "+SCHEDULED<\"<+0d>\"|TIMESTAMP<\"<+0d>\""    ; was "+SCHEDULED<\"<+0d>\"|+sa+TIMESTAMP<\"<+0d>\""
+				     (tags-todo "+SCHEDULED={.}+st|+SCHEDULED<\"<+0d>\"|TIMESTAMP<\"<+0d>\"-st"   ; the first one means lost scheduled, which is scheduled and wrongly tagged with :st:
+					; was "+SCHEDULED<\"<+0d>\"|+sa+TIMESTAMP<\"<+0d>\""
+					; was "+SCHEDULED<\"<+0d>\"|TIMESTAMP<\"<+0d>\""
 						(
 						 (org-agenda-files ',files)
 						 (org-agenda-overriding-header " ")
-						 (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:st:$"))
+						 ;; (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "^\*+.*:st:$"))
 						 ))
 				     (agenda ""
 					     (
