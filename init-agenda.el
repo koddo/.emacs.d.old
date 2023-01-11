@@ -97,12 +97,12 @@
 					       (org-agenda-files nil)
 					       (org-agenda-overriding-header
 						(let* ((agenda-mob-path "~/syncthing/mobile_org/Agenda-mobile.org")
-						       (agenda-tmp-path "~/werk/Agenda-tmp.org")
+						       (agenda-top-path "~/werk/Agenda-top.org")
 						       (agenda-mob (if (f-exists-p agenda-mob-path) (string-trim (f-read-text agenda-mob-path)) "file missing"))    ; (first-n (split-string ...))
-						       (agenda-tmp (if (f-exists-p agenda-tmp-path) (string-trim (f-read-text agenda-tmp-path)) "file missing")))
+						       (agenda-top (if (f-exists-p agenda-top-path) (string-trim (f-read-text agenda-top-path)) "file missing")))
 						  (concat
 						   (unless (string-empty-p agenda-mob) (concat agenda-mob-path ": \n\n" agenda-mob "\n\n"))
-						   (unless (string-empty-p agenda-tmp) (concat agenda-tmp-path ": \n\n" agenda-tmp "\n\n"))
+						   (unless (string-empty-p agenda-top) (concat agenda-top-path ": \n\n" agenda-top "\n\n"))
 						   ))
 						)))
 				     (tags-todo "+SCHEDULED={.}+st|+SCHEDULED<\"<+0d>\"|TIMESTAMP<\"<+0d>\"-st"   ; the first one means lost scheduled, which is scheduled and wrongly tagged with :st:
