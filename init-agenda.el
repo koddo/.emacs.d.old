@@ -260,6 +260,49 @@
 
 				  )
 				)))
+
+
+
+	(my-read-watch-list-altogether
+	 (lambda (tags-list)
+	   (apply #'append
+		  (mapcar (lambda (tag)   ; e.g., "read" or "watch"
+			    (let ((my-read-watch-list-tags (concat
+							    "-" tag "ing"
+							    "-" tag "ing1"
+							    "-" tag "ing2"
+							    "-" tag "ing3"
+							    "-" tag "ing4"
+							    )))  ; e.g., "-reading-reading1-reading2-reading3-reading4")
+			      `(
+				(todo "" (
+					  (org-agenda-files nil)
+					  (org-agenda-overriding-header "-=*=- this title gets replaced -=*=-")
+					  ))
+				(tags ,(concat "+" tag "ing-done-cancelled")      ; e.g., "+reading-done-cancelled"
+				      ((org-agenda-overriding-header ,(concat tag "ing"))
+				       ))
+				(tags ,(concat "+" tag "ing1-done-cancelled")
+				      ((org-agenda-overriding-header ,(concat tag "ing1"))
+				       ))
+				(tags ,(concat "+" tag "ing2-done-cancelled")
+				      ((org-agenda-overriding-header ,(concat tag "ing2"))
+				       ))
+				(tags ,(concat "+" tag "ing3-done-cancelled")
+				      ((org-agenda-overriding-header ,(concat tag "ing3"))
+				       ))
+				(tags ,(concat "+" tag "ing4-done-cancelled")
+				      ((org-agenda-overriding-header ,(concat tag "ing4"))
+				       ))
+				(todo "" (
+					  (org-agenda-files nil)
+					  (org-agenda-overriding-header "\n\n\n\n\n")
+					  ))
+
+				)))
+			  tags-list)
+		  )))
+
 	(my-agenda-view-month (lambda (files)
 				`(
 				  (agenda ""
@@ -346,6 +389,9 @@
 	     )
 	    ("dt" "try"
 	     ,(funcall my-read-watch-list "try")
+	     )
+	    ("dy" "all"
+	     ,(funcall my-read-watch-list-altogether '("try" "read" "watch" "listen"))
 	     )
 
 
