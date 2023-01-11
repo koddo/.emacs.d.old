@@ -206,7 +206,7 @@
 							      "-" tag "ing1"
 							      "-" tag "ing2"
 							      "-" tag "ing3"
-							      "-" tag "ing4"
+							      ;; "-" tag "ing4"
 							      )))  ; e.g., "-reading-reading1-reading2-reading3-reading4")
 				`(
 				  (todo "" (
@@ -225,9 +225,9 @@
 				  (tags ,(concat "+" tag "ing3-done-cancelled")
 					((org-agenda-overriding-header ,(concat tag "ing3"))
 					 ))
-				  (tags ,(concat "+" tag "ing4-done-cancelled")
-					((org-agenda-overriding-header ,(concat tag "ing4"))
-					 ))
+				  ;; (tags ,(concat "+" tag "ing4-done-cancelled")
+				  ;; 	((org-agenda-overriding-header ,(concat tag "ing4"))
+				  ;; 	 ))
 				  (todo "" (
 					    (org-agenda-files nil)
 					    (org-agenda-overriding-header "\n\n\n\n\n")
@@ -272,7 +272,7 @@
 							    "-" tag "ing1"
 							    "-" tag "ing2"
 							    "-" tag "ing3"
-							    "-" tag "ing4"
+							    ;; "-" tag "ing4"
 							    )))  ; e.g., "-reading-reading1-reading2-reading3-reading4")
 			      `(
 				(todo "" (
@@ -291,9 +291,9 @@
 				(tags ,(concat "+" tag "ing3-done-cancelled")
 				      ((org-agenda-overriding-header ,(concat tag "ing3"))
 				       ))
-				(tags ,(concat "+" tag "ing4-done-cancelled")
-				      ((org-agenda-overriding-header ,(concat tag "ing4"))
-				       ))
+				;; (tags ,(concat "+" tag "ing4-done-cancelled")
+				;;       ((org-agenda-overriding-header ,(concat tag "ing4"))
+				;;        ))
 				(todo "" (
 					  (org-agenda-files nil)
 					  (org-agenda-overriding-header "\n\n\n\n\n")
@@ -378,20 +378,20 @@
 		     (org-agenda-overriding-header "New")
 		     ))
 	      ))
+	    ("xq" "try-read-watch-listen"
+	     ,(funcall my-read-watch-list-altogether '("try" "read" "watch" "listen"))
+	     )
+	    ("xw" "watch"
+	     ,(funcall my-read-watch-list "watch")
+	     )
+	    ("xe" "listen"
+	     ,(funcall my-read-watch-list "listen")
+	     )
 	    ("dr" "read"
 	     ,(funcall my-read-watch-list "read")
 	     )
-	    ("dw" "watch"
-	     ,(funcall my-read-watch-list "watch")
-	     )
-	    ("dl" "listen"
-	     ,(funcall my-read-watch-list "listen")
-	     )
-	    ("dt" "try"
+	    ("xt" "try"
 	     ,(funcall my-read-watch-list "try")
-	     )
-	    ("dy" "all"
-	     ,(funcall my-read-watch-list-altogether '("try" "read" "watch" "listen"))
 	     )
 
 
