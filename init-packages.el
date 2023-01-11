@@ -150,6 +150,8 @@
 
 
 (use-package smartparens
+  :demand t
+  
   :config
   (require 'smartparens-config)   ; default configuration
 
@@ -158,7 +160,7 @@
   (setq show-paren-delay 0.1)
   (show-paren-mode t)
   (setq show-paren-style 'parenthesis)
-
+  
   ;; TODO autopair
   ;; (progn (require 'autopair)   ; insert paired parenthesis
   ;;      (autopair-global-mode)
@@ -175,6 +177,23 @@
   ;; 	       (funcall fn)))))
   ;; (advice-remove 'show-paren-function 'fix)
 
+  ;; a modified snippet from https://stackoverflow.com/questions/34846531/show-parentheses-when-inside-them-emacs/34861578#34861578
+  ;; TODO: rename the advice and make it toggleable through hydra
+  (define-advice show-paren-function (:around (fn) fix)
+    "Highlight enclosing parens."
+    (cond ((looking-at-p "\\s(") (funcall fn))      ; \s( and \s) are open and close delimiter character
+	  ((save-match-data (looking-back "\\s)" 1)) (funcall fn))   ; if performance is an issue, replace looking-back with char-before and 
+	  (t (save-excursion
+	       (ignore-errors (backward-up-list))
+	       (funcall fn)))))
+
+  ;; (advice-add show-paren-data-function
+  ;;           ;; :around
+  ;;           (lambda (orig-fun)
+  ;;             (cond ((looking-at "\\s(")
+  ;;                    (funcall orig-fun))
+  ;;                   ((looking-at "\\s)")
+  ;;                    (save-excursion (forward-char 1) (funcall orig-fun))))))
 
   :bind (:map smartparens-mode-map
 
@@ -191,8 +210,9 @@
 	      ("H-s" . sp-splice-sexp-killing-forward)
 	      ("H-d" . sp-splice-sexp-killing-backward)
 	      ("H-f" . sp-splice-sexp-killing-around)
+	      )
 
-  ))
+  )
 
 
 
@@ -241,11 +261,18 @@
 
 ;; -------------------------------------------------------------------
 
+(use-package posframe)
+
 (use-package hydra
   :config
   ;; (setq sp-successive-kill-preserve-whitespace 1)   ; default is 1, https://github.com/Fuco1/smartparens/issues/197
   )
-(use-package pretty-hydra)
+;; (use-package pretty-hydra)
+(use-package major-mode-hydra)   ; includes pretty-hydra
+(use-package hydra-posframe
+  :straight (:host github :repo "Ladicle/hydra-posframe")
+  :hook (after-init . hydra-posframe-enable)
+  )
 
 ;; -------------------------------------------------------------------
 

@@ -387,7 +387,7 @@
 	    ("xe" "listen"
 	     ,(funcall my-read-watch-list "listen")
 	     )
-	    ("dr" "read"
+	    ("xr" "read"
 	     ,(funcall my-read-watch-list "read")
 	     )
 	    ("xt" "try"
