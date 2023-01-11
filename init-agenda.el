@@ -344,9 +344,22 @@
 	    ("dl" "listen"
 	     ,(funcall my-read-watch-list "listen")
 	     )
+	    ("dt" "try"
+	     ,(funcall my-read-watch-list "try")
+	     )
+
 
 	    ("x1" "habits"
 	     (
+	      (todo "" (
+			(org-agenda-files nil)
+			(org-agenda-overriding-header
+			 (let* ((habits-top-path "~/werk/Habits-top.org")
+				(habits-top (if (f-exists-p habits-top-path) (string-trim (f-read-text habits-top-path)) "file missing")))
+			   (concat
+			    (unless (string-empty-p habits-top) (concat habits-top-path ": \n\n" habits-top "\n\n"))
+			    ))
+			 )))
 	      (agenda "" (
 			  (org-agenda-files '("~/werk/Habits.org"))
 			  (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":MY_HABITS_GROUP: 1"))
