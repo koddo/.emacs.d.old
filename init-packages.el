@@ -179,21 +179,14 @@
 
   ;; a modified snippet from https://stackoverflow.com/questions/34846531/show-parentheses-when-inside-them-emacs/34861578#34861578
   ;; TODO: rename the advice and make it toggleable through hydra
-  (define-advice show-paren-function (:around (fn) fix)
-    "Highlight enclosing parens."
-    (cond ((looking-at-p "\\s(") (funcall fn))      ; \s( and \s) are open and close delimiter character
-	  ((save-match-data (looking-back "\\s)" 1)) (funcall fn))   ; if performance is an issue, replace looking-back with char-before and 
-	  (t (save-excursion
-	       (ignore-errors (backward-up-list))
-	       (funcall fn)))))
+  ;; (define-advice show-paren-function (:around (fn) fix)
+  ;;   "Highlight enclosing parens."
+  ;;   (cond ((looking-at-p "\\s(") (funcall fn))      ; \s( and \s) are open and close delimiter character
+  ;; 	  ((save-match-data (looking-back "\\s)" 1)) (funcall fn))   ; if performance is an issue, replace looking-back with char-before and 
+  ;; 	  (t (save-excursion
+  ;; 	       (ignore-errors (backward-up-list))
+  ;; 	       (funcall fn)))))
 
-  ;; (advice-add show-paren-data-function
-  ;;           ;; :around
-  ;;           (lambda (orig-fun)
-  ;;             (cond ((looking-at "\\s(")
-  ;;                    (funcall orig-fun))
-  ;;                   ((looking-at "\\s)")
-  ;;                    (save-excursion (forward-char 1) (funcall orig-fun))))))
 
   :bind (:map smartparens-mode-map
 
@@ -261,18 +254,24 @@
 
 ;; -------------------------------------------------------------------
 
-(use-package posframe)
 
 (use-package hydra
   :config
   ;; (setq sp-successive-kill-preserve-whitespace 1)   ; default is 1, https://github.com/Fuco1/smartparens/issues/197
   )
-;; (use-package pretty-hydra)
-(use-package major-mode-hydra)   ; includes pretty-hydra
-(use-package hydra-posframe
-  :straight (:host github :repo "Ladicle/hydra-posframe")
-  :hook (after-init . hydra-posframe-enable)
+(use-package major-mode-hydra
+  ;; includes pretty-hydra
   )
+
+;; (use-package posframe)
+;; (use-package hydra-posframe
+;;   :straight (:host github :repo "Ladicle/hydra-posframe")
+;;   :hook (after-init . hydra-posframe-enable)
+;;   )
+
+;; completion for hydras:
+;; https://sachachua.com/blog/2021/04/emacs-hydra-allow-completion-when-i-can-t-remember-the-command-name/
+;; https://sachachua.com/dotemacs/index.html#hydra-completion
 
 ;; -------------------------------------------------------------------
 

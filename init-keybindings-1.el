@@ -136,18 +136,18 @@
 
   ;; sp-escape-wrapped-region, sp-escape-quotes-after-insert
 
-  "Snippets"
-  (("y" yas-expand)
-   ("y" yas-insert-snippet)
-   ("y" yas-visit-snippet-file)
-   ("y" yas-new-snippet)
-   ("y" yas-reload-all)
-   ("y" ym-list-all-yasnippets)
-   ("y" ym-list-all-yasnippets-official "official snippets"))
+  ;; "Snippets"
+  ;; (("y" yas-expand)
+  ;;  ("y" yas-insert-snippet)
+  ;;  ("y" yas-visit-snippet-file)
+  ;;  ("y" yas-new-snippet)
+  ;;  ("y" yas-reload-all)
+  ;;  ("y" ym-list-all-yasnippets)
+  ;;  ("y" ym-list-all-yasnippets-official "official snippets"))
 
 
   ))
-(global-set-key (kbd "H-q") 'hydra-smartparens/body)
+(global-set-key (kbd "s-q") 'hydra-smartparens/body)
 
 
 
@@ -292,6 +292,8 @@
 	      ;; 	"agenda")
 	      
 	      )
+
+
    ))
    
 (global-set-key (kbd "<f1>") 'hydra-agenda/body)
