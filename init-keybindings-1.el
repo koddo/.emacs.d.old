@@ -293,9 +293,35 @@
 	      
 	      )
 
+   "ccc" (("7" (lambda () (interactive)
+		 (org-ql-search "~/werk/English.org" '(tags "drill") :sort 'date)
+		 (delete-other-windows)
+		 )
+	   "english")
+	  ("8" (lambda () (interactive)
+		 (org-ql-search "~/werk/Spanish.org" '(tags "drill") :sort 'date)
+		 (delete-other-windows)
+		 )
+	   "spanish")
+	  ("9" (lambda () (interactive)
+		 (org-ql-search (org-agenda-files) '(and (tags "clojure") (tags "drill" "drilltodo")) :sort 'date)
+		 (delete-other-windows)
+		 )
+	   "clojure")
+	  ("u" (lambda () (interactive)
+		 (org-ql-search (org-agenda-files) '(and (tags "drill" "drilltodo") (not (tags "english" "spanish" "humor"))) :sort '(date))
+		 (delete-other-windows)
+		 )
+	   "drill and drilltodo")
+	  ("i" (lambda () (interactive)
+		 (org-ql-search (org-agenda-files) '(and (tags "drilltodo") (not (tags "english" "spanish" "humor"))) :sort '(date))
+		 (delete-other-windows)
+		 )
+	   "drilltodo only")
+
+	  )
 
    ))
-   
 (global-set-key (kbd "<f1>") 'hydra-agenda/body)
 
 
