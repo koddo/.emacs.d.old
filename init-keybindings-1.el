@@ -31,58 +31,94 @@
   ("g" text-scale-increase "in")
   )
 (pretty-hydra-define hydra-smartparens ()  ; :title "smartparens"
+
+  ;; TODO: toggle show-parens-mode/show-smartparens-mode
+  ;; TODO: toggle smartparens-mode/smartparens-strict-mode
+  ;; smartparens-global-strict-mode
+  ;; turn-on-smartparens-strict-mode, turn-off-smartparens-strict-mode
+
+  ;; sp-narrow-to-sexp
+  
+  
   ("Move"
    (
-    ("f" sp-forward-sexp)
-    ("b" sp-backward-sexp)
+    ;;; these are cool
+    ;;; the only thing I'd fix in them is they cycle through the list, e.g., (a| b c) -> (a b| c) -> (a b c|) and then back to the first one
+    ("l" sp-forward-parallel-sexp)
+    ("j" sp-backward-parallel-sexp)
 
-    ("p" sp-up-sexp)
-    ;; sp-backward-up-sexp, sp-down-sexp, sp-backward-down-sexp
+    ("i" sp-backward-up-sexp)
+    ("k" sp-up-sexp)
 
-    ;; sp-next-sexp, sp-previous-sexp
-    ;; sp-beginning-of-sexp, sp-end-of-sexp
-    ;; sp-beginning-of-next-sexp, sp-beginning-of-previous-sexp, sp-end-of-next-sexp, sp-end-of-previous-sexp
+    ;;; not used, because they combine going left/right and up, I 
+    ;; ("" sp-next-sexp)
+    ;; ("" sp-backward-sexp)
+    ;; ("" sp-forward-sexp)
+    ;; ("" sp-previous-sexp)
+
+
+    ("q" sp-show-enclosing-pair)     ;; faces need configuration, see https://github.com/Fuco1/smartparens/wiki/User-interface
+    ;; sp-highlight-current-sexp -- useless for me
+
+
+
+    ;;; not used, because these are for jumping between (a|   b) (a   |b), it's easier to just use arrow keys
+    ;; ("" sp-skip-forward-to-symbol)
+    ;; ("" sp-skip-backward-to-symbol)
+    
+
+    ;;; not used, because these jump to these two positions: (|   ) and (    |)
+    ;; ("" sp-beginning-of-sexp)
+    ;; ("" sp-end-of-sexp)
+    ;; ("" sp-beginning-of-next-sexp)
+    ;; ("" sp-beginning-of-previous-sexp)
+    ;; ("" sp-end-of-next-sexp)
+    ;; ("" sp-end-of-previous-sexp)
+
+    ;;; not used, because it's easier to just move the cursor one position right, when I'm beforea paren, e.g., |(   ) -> (|   )
+    ;; ("" sp-down-sexp)
+    ;; ("" sp-backward-down-sexp)
 
     ;; these are internal functions: sp-forward-symbol, sp-backward-symbol
     )
 
   "Slurping & barfing"
-  (("l" sp-forward-slurp-sexp)
-   ("h" sp-backward-slurp-sexp)
-   ("L" sp-forward-barf-sexp)
-   ("H" sp-backward-barf-sexp)
+  (("" sp-forward-slurp-sexp)
+   ("" sp-backward-slurp-sexp)
+   ("" sp-forward-barf-sexp)
+   ("" sp-backward-barf-sexp)
 
-   ("_" sp-add-to-next-sexp)
-   ("_" sp-add-to-previous-sexp)
+   ("" sp-add-to-next-sexp)
+   ("" sp-add-to-previous-sexp)
 
-   ("_" sp-extract-before-sexp)
-   ("_" sp-extract-after-sexp)
+   ("" sp-extract-before-sexp)
+   ("" sp-extract-after-sexp)
    )
 
   "Wrapping"
-  (("R" sp-rewrap-sexp)
-   ("u" sp-unwrap-sexp)
-   ("U" sp-backward-unwrap-sexp)
-   ("(" sp-wrap-round)
-   ("{" sp-wrap-curly)
-   ("[" sp-wrap-square)
+  (("" sp-rewrap-sexp)
+   ("" sp-unwrap-sexp)
+   ("" sp-backward-unwrap-sexp)
+   ("" sp-wrap-round)
+   ("" sp-wrap-curly)
+   ("" sp-wrap-square)
    )
 
   "Sexp juggling"
-  (("S" sp-split-sexp)
+  (("" sp-split-sexp)
 
-   ("r" sp-raise-sexp)
-   ("j" sp-join-sexp)
+   ("" sp-raise-sexp)
+   ("" sp-join-sexp)
 
-   ("A" sp-absorb-sexp)
-   ("E" sp-emit-sexp)
-   ("o" sp-convolute-sexp)
-   ("_" sp-swap-enclosing-sexp)   ; should ask for a number
+   ("" sp-absorb-sexp)
+   ("" sp-emit-sexp)
+   ("" sp-convolute-sexp)
+   ("" sp-swap-enclosing-sexp)   ; should ask for a number
 
-   ("s" sp-splice-sexp)
+   ("" sp-splice-sexp)
    ;; sp-splice-sexp-killing-forward, sp-splice-sexp-killing-backward, sp-splice-sexp-killing-around   ; = sp-raise-sexp
 
-   ("t" sp-transpose-sexp)    ; = drag forward/backward
+   ("" sp-transpose-sexp)    ; = drag forward/backward
    )
 
   "Destructive editing"
@@ -92,22 +128,23 @@
    ;;    )
    ;; instead of ( ; )
 
-   ("c" sp-change-inner :exit t)
-   ("C" sp-change-enclosing :exit t)
+   ("" sp-change-inner :exit t)
+   ("" sp-change-enclosing :exit t)
 
-   ("k" sp-kill-sexp)   ; kill list forward, see docs
-   ("K" sp-backward-kill-sexp)
-
-   ("w" sp-copy-sexp)
+   ("" sp-kill-sexp)   ; kill list forward, see docs
+   ("" sp-backward-kill-sexp)
+   ("" sp-copy-sexp)
    ;; sp-backward-copy-sexp
-
+   ;; sp--kill-or-copy-region
+   ("" sp-clone-sexp)
+   ("" sp-kill-whole-line)
    )
 
   "Selecting"
-  (("x" sp-select-next-thing)
-   ("X" sp-select-previous-thing)
-   ("z" er/expand-region)
-   ("Z" er/contract-region)
+  (("" sp-select-next-thing)
+   ("" sp-select-previous-thing)
+   ("" er/expand-region)
+   ("" er/contract-region)
    ;; sp-select-next-thing-exchange, sp-select-previous-thing-exchange
    )
 
@@ -117,12 +154,10 @@
   ;; sp-transpose-hybrid-sexp
   ;; sp-push-hybrid-sexp
   ;; sp-slurp-hybrid-sexp
-  ;; sp-indent-adjust-sexp
-  ;; sp-dedent-adjust-sexp
+  ;; sp-indent-adjust-sexp, sp-dedent-adjust-sexp
 
 
-  ;; sp-highlight-current-sexp
-
+  
 
 
   ;; see https://github.com/Fuco1/smartparens/wiki/Tips-and-tricks#use-the-type-prefixes
@@ -136,6 +171,52 @@
 
   ;; sp-escape-wrapped-region, sp-escape-quotes-after-insert
 
+  ;; sp-forward-whitespace, sp-backward-whitespace
+
+  ;; sp-mark-sexp
+
+
+  ;; internal funcs?
+  ;; sp-delete-char, sp-backward-delete-char
+  ;; sp-kill-symbol, sp-delete-symbol, sp-backward-kill-symbol, sp-backward-delete-symbol
+  ;; sp-kill-word, sp-delete-word, sp-backward-kill-word, sp-backward-delete-word
+  ;; sp-delete-region
+  ;; sp-indent-defun
+  ;; sp-newline
+
+
+  
+  ;; this is from an old use-package config
+  ;; :bind (:map smartparens-mode-map
+  ;; 	      ("s-n" . sp-backward-up-sexp)
+  ;; 	      ("s-," . (lambda () (interactive) (sp-backward-sexp)))
+  ;; 	      ("s-." . (lambda () (interactive) (sp-forward-sexp 2) (sp-backward-sexp)))
+  ;; 	      ("s-m" . (lambda () (interactive)
+  ;; 	      		 (let ((end-of-thing    (sp-get (sp-get-thing) :end)))
+  ;; 	      		   (if (> end-of-thing (point))
+  ;; 	      		       (goto-char end-of-thing))
+  ;; 			   )))
+  ;; 	      ("H-a" . sp-splice-sexp)
+  ;; 	      ("H-s" . sp-splice-sexp-killing-forward)
+  ;; 	      ("H-d" . sp-splice-sexp-killing-backward)
+  ;; 	      ("H-f" . sp-splice-sexp-killing-around)
+  ;; 	      )
+  ;; ("s-," . sp-backward-parallel-sexp)
+  ;; ("s-." . (lambda () (interactive)
+  ;; 		 (let ((current (sp-get-thing)))
+  ;; 		   (goto-char (sp-get current :end))
+  ;; 		   (sp-forward-parallel-sexp)
+  ;; 		   (let ((next (sp-get-thing 'before)))
+  ;; 		       (goto-char (sp-get next :beg))
+  ;; 		     )
+  ;; 		   )
+  ;; 		 ))
+
+  ))
+(global-set-key (kbd "s-q") 'hydra-smartparens/body)
+
+
+
   ;; "Snippets"
   ;; (("y" yas-expand)
   ;;  ("y" yas-insert-snippet)
@@ -144,10 +225,6 @@
   ;;  ("y" yas-reload-all)
   ;;  ("y" ym-list-all-yasnippets)
   ;;  ("y" ym-list-all-yasnippets-official "official snippets"))
-
-
-  ))
-(global-set-key (kbd "s-q") 'hydra-smartparens/body)
 
 
 

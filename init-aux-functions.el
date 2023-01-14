@@ -11,3 +11,17 @@
   (interactive)
   (org-agenda nil "dt")
   )
+
+
+
+(defun ym/emacs-training ()
+  (interactive)
+  (let ((buf (get-buffer-create "ym/emacs-training-tmp-buf")))
+    (set-buffer-major-mode buf)
+    (with-current-buffer buf
+      (emacs-lisp-mode)
+      (insert-file-contents "~/werk/emacs-training.el")
+      )
+    (switch-to-buffer buf)
+    (delete-other-windows)
+    ))

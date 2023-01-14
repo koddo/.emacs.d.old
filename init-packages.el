@@ -154,91 +154,36 @@
   
   :config
   (require 'smartparens-config)   ; default configuration
+  (setq sp-navigate-reindent-after-up-in-string nil)
+  (setq sp-navigate-reindent-after-up nil)
+  (show-smartparens-mode 1)
 
-  ;; TODO: make show-paren-mode global
-  (require 'paren)   ; I prefer stock show-paren-mode over show-smartparen-mode because it's ultra-fast
-  (setq show-paren-delay 0.1)
-  (show-paren-mode t)
-  (setq show-paren-style 'parenthesis)
-  
-  ;; TODO autopair
-  ;; (progn (require 'autopair)   ; insert paired parenthesis
-  ;;      (autopair-global-mode)
-  ;;      (setq autopair-blink nil)
-  ;;      (setq autopair-skip-whitespace 'chomp))   ; ) ) => )) when closing
 
   
-  ;; https://stackoverflow.com/questions/34846531/show-parentheses-when-inside-them-emacs
-  ;; (define-advice show-paren-function (:around (fn) fix)
-  ;;   "Highlight enclosing parens."
-  ;;   (cond ((looking-at-p "\\s(") (funcall fn))
-  ;; 	  (t (save-excursion
-  ;; 	       (ignore-errors (backward-up-list))
-  ;; 	       (funcall fn)))))
-  ;; (advice-remove 'show-paren-function 'fix)
-
-  ;; a modified snippet from https://stackoverflow.com/questions/34846531/show-parentheses-when-inside-them-emacs/34861578#34861578
-  ;; TODO: rename the advice and make it toggleable through hydra
-  ;; (define-advice show-paren-function (:around (fn) fix)
-  ;;   "Highlight enclosing parens."
-  ;;   (cond ((looking-at-p "\\s(") (funcall fn))      ; \s( and \s) are open and close delimiter character
-  ;; 	  ((save-match-data (looking-back "\\s)" 1)) (funcall fn))   ; if performance is an issue, replace looking-back with char-before and 
-  ;; 	  (t (save-excursion
-  ;; 	       (ignore-errors (backward-up-list))
-  ;; 	       (funcall fn)))))
-
-
-  :bind (:map smartparens-mode-map
-
-	      ("s-n" . sp-backward-up-sexp)
-	      ("s-," . (lambda () (interactive) (sp-backward-sexp)))
-	      ("s-." . (lambda () (interactive) (sp-forward-sexp 2) (sp-backward-sexp)))
-	      ("s-m" . (lambda () (interactive)
-	      		 (let ((end-of-thing    (sp-get (sp-get-thing) :end)))
-	      		   (if (> end-of-thing (point))
-	      		       (goto-char end-of-thing))
-			   )))
-
-	      ("H-a" . sp-splice-sexp)
-	      ("H-s" . sp-splice-sexp-killing-forward)
-	      ("H-d" . sp-splice-sexp-killing-backward)
-	      ("H-f" . sp-splice-sexp-killing-around)
-	      )
-
+  ;; customize sp-show-pair-match-content-face if you want to highlight not only parens but also the content of the s-exp
+  ;; '(sp-show-pair-enclosing ((t (:inherit show-paren-match))))
+  
   )
 
 
+;; (require 'paren)   ; I prefer stock show-paren-mode over show-smartparen-mode because it's ultra-fast
+;; (setq show-paren-delay 0.1)
+;; (show-paren-mode t)
+;; (setq show-paren-style 'parenthesis)
 
-;; https://github.com/Fuco1/smartparens/wiki/Working-with-expressions
-
-;; cheatsheet
-;; if you realized you had a let form inside an if and realized you needed those bindings in the other branch of the if form as well.
-;; (if a (let [foo bar] b c))
-
-
-	      ;; ("s-," . sp-backward-parallel-sexp)
-	      ;; ("s-." . (lambda () (interactive)
-	      ;; 		 (let ((current (sp-get-thing)))
-	      ;; 		   (goto-char (sp-get current :end))
-	      ;; 		   (sp-forward-parallel-sexp)
-	      ;; 		   (let ((next (sp-get-thing 'before)))
-	      ;; 		       (goto-char (sp-get next :beg))
-	      ;; 		     )
-	      ;; 		   )
-	      ;; 		 ))
-
-
-	      ;; , sp-select-previous-thing
-
-	      ;; ("H-o" . sp-unwrap-sexp)
-	      ;; ("H-m" . sp-select-next-thing-exchange)
-	      ;; ("H-n" . sp-select-previous-thing)
-
-	      ;; select forward, backward
-	      ;;
-
-
-
+;; (progn (require 'autopair)   ; insert paired parenthesis
+;;      (autopair-global-mode)
+;;      (setq autopair-blink nil)
+;;      (setq autopair-skip-whitespace 'chomp))   ; ) ) => )) when closing
+;; here's a modified snippet from https://stackoverflow.com/questions/34846531/show-parentheses-when-inside-them-emacs/34861578#34861578
+;; rename the advice and make it toggleable through hydra
+;; (define-advice show-paren-function (:around (fn) fix)
+;;   "Highlight enclosing parens."
+;;   (cond ((looking-at-p "\\s(") (funcall fn))      ; \s( and \s) are open and close delimiter character
+;; 	  ((save-match-data (looking-back "\\s)" 1)) (funcall fn))   ; if performance is an issue, replace looking-back with char-before and 
+;; 	  (t (save-excursion
+;; 	       (ignore-errors (backward-up-list))
+;; 	       (funcall fn)))))
 
 ;; -------------------------------------------------------------------
 
