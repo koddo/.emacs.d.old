@@ -215,7 +215,9 @@
                    (setq deactivate-mark nil))))   ; leave the region highlighted after the copy
 (ym-define-key (kbd "s-v") #'yank)
 
-(transient-mark-mode 1)      ; no region when it is not highlighted
+(progn   ; no region when it is not highlighted
+  (transient-mark-mode 1)   
+  (setq mark-even-if-inactive nil))  ; this is important, otherwise we can cut and paste something accidentally
 (delete-selection-mode 1)    ; typed text replaces the selection if the selection is active
 (setq shift-select-mode 1)   ; shifted motion keys activate the mark momentarily
 

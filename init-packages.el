@@ -156,7 +156,8 @@
   (require 'smartparens-config)   ; default configuration
   (setq sp-navigate-reindent-after-up-in-string nil)
   (setq sp-navigate-reindent-after-up nil)
-  (show-smartparens-mode 1)
+  (smartparens-global-strict-mode 1)
+  (show-smartparens-global-mode 1)
 
 
   
@@ -492,7 +493,9 @@
 
 ;; -------------------------------------------------------------------
 
-
+(use-package beacon
+  :demand t
+  :config (beacon-mode))
 
 
 

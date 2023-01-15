@@ -30,6 +30,22 @@
   "smartparens"
   ("g" text-scale-increase "in")
   )
+
+
+(defun ym/highlight-enclosing-pairs ()
+  (interactive)
+  
+;; (define-advice show-paren-function (:around (fn) fix)
+;;   "Highlight enclosing parens."
+;;   (cond ((looking-at-p "\\s(") (funcall fn))      ; \s( and \s) are open and close delimiter character
+;; 	  ((save-match-data (looking-back "\\s)" 1)) (funcall fn))   ; if performance is an issue, replace looking-back with char-before and 
+;; 	  (t (save-excursion
+;; 	       (ignore-errors (backward-up-list))
+;; 	       (funcall fn)))))
+
+
+  )
+
 (pretty-hydra-define hydra-smartparens ()  ; :title "smartparens"
 
   ;; TODO: toggle show-parens-mode/show-smartparens-mode
@@ -40,179 +56,195 @@
   ;; sp-narrow-to-sexp
   
   
-  ("Move"
-   (
-    ;;; these are cool
-    ;;; the only thing I'd fix in them is they cycle through the list, e.g., (a| b c) -> (a b| c) -> (a b c|) and then back to the first one
-    ("l" sp-forward-parallel-sexp)
-    ("j" sp-backward-parallel-sexp)
+  ("Move" (
+	   ;; these are cool
+	   ;; the only thing I'd fix in them is they cycle through the list, e.g., (a| b c) -> (a b| c) -> (a b c|) and then back to the first one
+	   ;; TODO: stop the sp-forward-parallel-sexp and sp-backward-parallel-sexp navigation from cycling in lists
+	   ("l" sp-forward-parallel-sexp)
+	   ("j" sp-backward-parallel-sexp)
 
-    ("i" sp-backward-up-sexp)
-    ("k" sp-up-sexp)
+	   ("i" sp-backward-up-sexp)
+	   ("k" sp-up-sexp)
 
-    ;;; not used, because they combine going left/right and up, I 
-    ;; ("" sp-next-sexp)
-    ;; ("" sp-backward-sexp)
-    ;; ("" sp-forward-sexp)
-    ;; ("" sp-previous-sexp)
+	   ("q" sp-show-enclosing-pair)       ; TODO: move faces configuration from customize.el
 
+	   ("1" rainbow-mode "show hex colors" :toggle t )
+	   ("2" rainbow-delimiters-mode :toggle t)
+	   ("3" beacon-mode :toggle t)
+	   ;; sp-highlight-current-sexp -- useless for me
+	   ;; TODO: configure faces, see sp-show-pair-enclosing and sp-show-pair-match-content-face, and https://github.com/Fuco1/smartparens/wiki/User-interface
+	   ;; TODO: show three levels of enclosing pairs
 
-    ("q" sp-show-enclosing-pair)     ;; faces need configuration, see https://github.com/Fuco1/smartparens/wiki/User-interface
-    ;; sp-highlight-current-sexp -- useless for me
+	   ;; not used, because they combine going left/right and up, too much to me 
+	   ;; ("" sp-next-sexp)
+	   ;; ("" sp-backward-sexp)
+	   ;; ("" sp-forward-sexp)
+	   ;; ("" sp-previous-sexp)
 
+	   ;; not used, because these are for jumping between (a|   b) (a   |b), it's easier to just use arrow keys
+	   ;; ("" sp-skip-forward-to-symbol)
+	   ;; ("" sp-skip-backward-to-symbol)
+	   
+	   ;; not used, because these jump to these two positions: (|   ) and (    |)
+	   ;; ("" sp-beginning-of-sexp)
+	   ;; ("" sp-end-of-sexp)
+	   ;; ("" sp-beginning-of-next-sexp)
+	   ;; ("" sp-beginning-of-previous-sexp)
+	   ;; ("" sp-end-of-next-sexp)
+	   ;; ("" sp-end-of-previous-sexp)
 
+	   ;; not used, because it's easier to just move the cursor one position right, when I'm beforea paren, e.g., |(   ) -> (|   )
+	   ;; ("" sp-down-sexp)
+	   ;; ("" sp-backward-down-sexp)
 
-    ;;; not used, because these are for jumping between (a|   b) (a   |b), it's easier to just use arrow keys
-    ;; ("" sp-skip-forward-to-symbol)
-    ;; ("" sp-skip-backward-to-symbol)
-    
+	   ;; these are internal functions: sp-forward-symbol, sp-backward-symbol
+	   )
 
-    ;;; not used, because these jump to these two positions: (|   ) and (    |)
-    ;; ("" sp-beginning-of-sexp)
-    ;; ("" sp-end-of-sexp)
-    ;; ("" sp-beginning-of-next-sexp)
-    ;; ("" sp-beginning-of-previous-sexp)
-    ;; ("" sp-end-of-next-sexp)
-    ;; ("" sp-end-of-previous-sexp)
+   "Wrapping" (
+	       ("r" sp-rewrap-sexp)
+	       ("y" sp-unwrap-sexp)
+	       ("u" sp-backward-unwrap-sexp)
 
-    ;;; not used, because it's easier to just move the cursor one position right, when I'm beforea paren, e.g., |(   ) -> (|   )
-    ;; ("" sp-down-sexp)
-    ;; ("" sp-backward-down-sexp)
+	       ;; not used, because these three only work forward, and we can use selection anyway
+	       ;; ("(" sp-wrap-round)
+	       ;; ("{" sp-wrap-curly)
+	       ;; ("[" sp-wrap-square)
+	       ;; TODO: maybe add my own bindings like sp-wrap-round-backwards later
 
-    ;; these are internal functions: sp-forward-symbol, sp-backward-symbol
-    )
+	       ;; not used, because it's easier to rewrap than remembering this command
+	       ;; ("" sp-swap-enclosing-sexp)   ; should ask for a number
 
-  "Slurping & barfing"
-  (("" sp-forward-slurp-sexp)
-   ("" sp-backward-slurp-sexp)
-   ("" sp-forward-barf-sexp)
-   ("" sp-backward-barf-sexp)
+	       )
+   "Selecting" (
+		("w" sp-select-next-thing)
+		("W" sp-select-previous-thing)
+		;; these are the same as above, but exchange the point and the mark
+		;; ("" sp-select-next-thing-exchange)
+		;; ("" sp-select-previous-thing-exchange)
+		
+		("e" er/expand-region)
+		("E" er/contract-region)
+		)
 
-   ("" sp-add-to-next-sexp)
-   ("" sp-add-to-previous-sexp)
+   "Slurp, barf, extract, absorb, emit" (
+					 ("s" sp-forward-slurp-sexp)
+					 ("S" sp-backward-slurp-sexp)
+					 ("b" sp-forward-barf-sexp)
+					 ("B" sp-backward-barf-sexp)
 
-   ("" sp-extract-before-sexp)
-   ("" sp-extract-after-sexp)
-   )
+					 ;; these two are like slurp, when you add a thing to an s-exp, but it does more, which is too much to me, and it's easier to just use slurp
+					 ;; ("" sp-add-to-next-sexp)
+					 ;; ("" sp-add-to-previous-sexp)
 
-  "Wrapping"
-  (("" sp-rewrap-sexp)
-   ("" sp-unwrap-sexp)
-   ("" sp-backward-unwrap-sexp)
-   ("" sp-wrap-round)
-   ("" sp-wrap-curly)
-   ("" sp-wrap-square)
-   )
+					 ;; this is useful, but it indents too much
+					 ;; and forgets to remove a whitespace
+					 ;; and its understanding of at point is quirky, cursor must be exactly at a thing, not after
+					 ;; TODO: indent after extracting using sp-extract-before-sexp
+					 ("a" sp-extract-before-sexp)
+					 ("A" sp-extract-after-sexp)
 
-  "Sexp juggling"
-  (("" sp-split-sexp)
+					 ("z" sp-absorb-sexp)   ; a (f b) -> (f a b)
+					 ("Z" sp-emit-sexp)    ; (f a b) -> a (f b)
+					 )
+   "Sexp juggling" (
+		    ("v" sp-split-sexp)
+		    ("c" sp-join-sexp)
+		    ("" sp-raise-sexp)   ; raise next expr, (a |b c) -> b
 
-   ("" sp-raise-sexp)
-   ("" sp-join-sexp)
+		    ("x" sp-convolute-sexp)   ; (outer (inner target)) -> (inner (outer target))     ; https://hungyi.net/posts/convolute-lisp-sexp-with-smartparens/
 
-   ("" sp-absorb-sexp)
-   ("" sp-emit-sexp)
-   ("" sp-convolute-sexp)
-   ("" sp-swap-enclosing-sexp)   ; should ask for a number
+		    ;; ("m" sp-splice-sexp)  ; easier to use unwrap
+		    ;; sp-splice-sexp-killing-forward, sp-splice-sexp-killing-backward, sp-splice-sexp-killing-around   ; easier to cut and paste
 
-   ("" sp-splice-sexp)
-   ;; sp-splice-sexp-killing-forward, sp-splice-sexp-killing-backward, sp-splice-sexp-killing-around   ; = sp-raise-sexp
+		    ("." sp-transpose-sexp)            ; = drag forward/backward
+		    (","
+		     (lambda () (interactive) (sp-transpose-sexp -1))
+		     "sp-transpose-sexp backwards")
+		    )
 
-   ("" sp-transpose-sexp)    ; = drag forward/backward
-   )
+   "Destructive editing" (
+			  ;; not used, easier to do this manually
+			  ;; sp-comment -- in strict mode it moves the closing parenthesis on a new line
+			  ;; ( ;
+			  ;;    )
+			  ;; instead of ( ; )
 
-  "Destructive editing"
-  (
-   ;; sp-comment -- in strict mode it moves the closing parenthesis on a new line
-   ;; ( ;
-   ;;    )
-   ;; instead of ( ; )
+			  ;; ("" sp-change-inner :exit t)    ; (a| [b]) -> (a [|]), I do this manually
+			  ;; ("" sp-change-enclosing :exit t)   ; (a |b c) -> (|)
 
-   ("" sp-change-inner :exit t)
-   ("" sp-change-enclosing :exit t)
+			  ;; ("" sp-kill-sexp)   ; kill list forward, easier to do manually
+			  ;; ("" sp-backward-kill-sexp)
+			  ;; ("" sp-copy-sexp)
+			  ;; ("" sp-backward-copy-sexp)
+			  ;; sp--kill-or-copy-region -- internal
 
-   ("" sp-kill-sexp)   ; kill list forward, see docs
-   ("" sp-backward-kill-sexp)
-   ("" sp-copy-sexp)
-   ;; sp-backward-copy-sexp
-   ;; sp--kill-or-copy-region
-   ("" sp-clone-sexp)
-   ("" sp-kill-whole-line)
-   )
-
-  "Selecting"
-  (("" sp-select-next-thing)
-   ("" sp-select-previous-thing)
-   ("" er/expand-region)
-   ("" er/contract-region)
-   ;; sp-select-next-thing-exchange, sp-select-previous-thing-exchange
-   )
-
-
-  ;; see for examples: https://github.com/Fuco1/smartparens/wiki/Hybrid-S-expressions
-  ;; sp-kill-hybrid-sexp
-  ;; sp-transpose-hybrid-sexp
-  ;; sp-push-hybrid-sexp
-  ;; sp-slurp-hybrid-sexp
-  ;; sp-indent-adjust-sexp, sp-dedent-adjust-sexp
-
-
-  
-
-
-  ;; see https://github.com/Fuco1/smartparens/wiki/Tips-and-tricks#use-the-type-prefixes
-  ;; sp-prefix-tag-object
-  ;; sp-prefix-pair-object
-  ;; sp-prefix-symbol-object
-  ;; sp-prefix-save-excursion
-
-  ;; sp-restrict-to-pairs, sp-restrict-to-pairs-interactive
-  ;; sp-restrict-to-object
-
-  ;; sp-escape-wrapped-region, sp-escape-quotes-after-insert
-
-  ;; sp-forward-whitespace, sp-backward-whitespace
-
-  ;; sp-mark-sexp
+			  ("d" sp-clone-sexp)
+			  ("D" sp-kill-whole-line)
+			  )
 
 
-  ;; internal funcs?
-  ;; sp-delete-char, sp-backward-delete-char
-  ;; sp-kill-symbol, sp-delete-symbol, sp-backward-kill-symbol, sp-backward-delete-symbol
-  ;; sp-kill-word, sp-delete-word, sp-backward-kill-word, sp-backward-delete-word
-  ;; sp-delete-region
-  ;; sp-indent-defun
-  ;; sp-newline
+
+   ;; see for examples: https://github.com/Fuco1/smartparens/wiki/Hybrid-S-expressions
+   ;; sp-kill-hybrid-sexp
+   ;; sp-transpose-hybrid-sexp
+   ;; sp-push-hybrid-sexp
+   ;; sp-slurp-hybrid-sexp
+   ;; sp-indent-adjust-sexp, sp-dedent-adjust-sexp
+
+   ;; see https://github.com/Fuco1/smartparens/wiki/Tips-and-tricks#use-the-type-prefixes
+   ;; sp-prefix-tag-object
+   ;; sp-prefix-pair-object
+   ;; sp-prefix-symbol-object
+   ;; sp-prefix-save-excursion
+
+   ;; these are for restricting to moving across curly braces, for example
+   ;; sp-restrict-to-pairs, sp-restrict-to-pairs-interactive
+   ;; sp-restrict-to-object
+
+   ;; internal: sp-escape-wrapped-region, sp-escape-quotes-after-insert
+
+   ;; sp-forward-whitespace, sp-backward-whitespace
+
+   ;; sp-mark-sexp -- easier to just select text
+
+   ;; internal funcs?
+   ;; sp-delete-char, sp-backward-delete-char
+   ;; sp-kill-symbol, sp-delete-symbol, sp-backward-kill-symbol, sp-backward-delete-symbol
+   ;; sp-kill-word, sp-delete-word, sp-backward-kill-word, sp-backward-delete-word
+
+   ;; sp-delete-region
+   ;; sp-indent-defun
+   ;; sp-newline
 
 
-  
-  ;; this is from an old use-package config
-  ;; :bind (:map smartparens-mode-map
-  ;; 	      ("s-n" . sp-backward-up-sexp)
-  ;; 	      ("s-," . (lambda () (interactive) (sp-backward-sexp)))
-  ;; 	      ("s-." . (lambda () (interactive) (sp-forward-sexp 2) (sp-backward-sexp)))
-  ;; 	      ("s-m" . (lambda () (interactive)
-  ;; 	      		 (let ((end-of-thing    (sp-get (sp-get-thing) :end)))
-  ;; 	      		   (if (> end-of-thing (point))
-  ;; 	      		       (goto-char end-of-thing))
-  ;; 			   )))
-  ;; 	      ("H-a" . sp-splice-sexp)
-  ;; 	      ("H-s" . sp-splice-sexp-killing-forward)
-  ;; 	      ("H-d" . sp-splice-sexp-killing-backward)
-  ;; 	      ("H-f" . sp-splice-sexp-killing-around)
-  ;; 	      )
-  ;; ("s-," . sp-backward-parallel-sexp)
-  ;; ("s-." . (lambda () (interactive)
-  ;; 		 (let ((current (sp-get-thing)))
-  ;; 		   (goto-char (sp-get current :end))
-  ;; 		   (sp-forward-parallel-sexp)
-  ;; 		   (let ((next (sp-get-thing 'before)))
-  ;; 		       (goto-char (sp-get next :beg))
-  ;; 		     )
-  ;; 		   )
-  ;; 		 ))
+   
+   ;; this is from an old use-package config
+   ;; :bind (:map smartparens-mode-map
+   ;; 	      ("s-n" . sp-backward-up-sexp)
+   ;; 	      ("s-," . (lambda () (interactive) (sp-backward-sexp)))
+   ;; 	      ("s-." . (lambda () (interactive) (sp-forward-sexp 2) (sp-backward-sexp)))
+   ;; 	      ("s-m" . (lambda () (interactive)
+   ;; 	      		 (let ((end-of-thing    (sp-get (sp-get-thing) :end)))
+   ;; 	      		   (if (> end-of-thing (point))
+   ;; 	      		       (goto-char end-of-thing))
+   ;; 			   )))
+   ;; 	      ("H-a" . sp-splice-sexp)
+   ;; 	      ("H-s" . sp-splice-sexp-killing-forward)
+   ;; 	      ("H-d" . sp-splice-sexp-killing-backward)
+   ;; 	      ("H-f" . sp-splice-sexp-killing-around)
+   ;; 	      )
+   ;; ("s-," . sp-backward-parallel-sexp)
+   ;; ("s-." . (lambda () (interactive)
+   ;; 		 (let ((current (sp-get-thing)))
+   ;; 		   (goto-char (sp-get current :end))
+   ;; 		   (sp-forward-parallel-sexp)
+   ;; 		   (let ((next (sp-get-thing 'before)))
+   ;; 		       (goto-char (sp-get next :beg))
+   ;; 		     )
+   ;; 		   )
+   ;; 		 ))
 
-  ))
+   ))
 (global-set-key (kbd "s-q") 'hydra-smartparens/body)
 
 
