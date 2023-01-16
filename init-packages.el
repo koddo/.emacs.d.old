@@ -156,14 +156,11 @@
   (require 'smartparens-config)   ; default configuration
   (setq sp-navigate-reindent-after-up-in-string nil)
   (setq sp-navigate-reindent-after-up nil)
-  (smartparens-global-strict-mode 1)
+  (smartparens-global-mode 1)     ; used to be (smartparens-global-strict-mode 1), but I don't need it to be that strict
   (show-smartparens-global-mode 1)
-
-
   
   ;; customize sp-show-pair-match-content-face if you want to highlight not only parens but also the content of the s-exp
-  ;; '(sp-show-pair-enclosing ((t (:inherit show-paren-match))))
-  
+  ;; '(sp-show-pair-enclosing ((t (:inherit show-paren-match))))  
   )
 
 
@@ -493,10 +490,11 @@
 
 ;; -------------------------------------------------------------------
 
-(use-package beacon
-  :demand t
-  :config (beacon-mode))
+(use-package hl-anything-emacs
 
+  )
+
+;; -------------------------------------------------------------------
 
 
 

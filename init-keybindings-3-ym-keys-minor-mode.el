@@ -215,11 +215,24 @@
                    (setq deactivate-mark nil))))   ; leave the region highlighted after the copy
 (ym-define-key (kbd "s-v") #'yank)
 
-(progn   ; no region when it is not highlighted
-  (transient-mark-mode 1)   
-  (setq mark-even-if-inactive nil))  ; this is important, otherwise we can cut and paste something accidentally
-(delete-selection-mode 1)    ; typed text replaces the selection if the selection is active
+
+;; -------------------------------------------------------------------
+
+;; use shift for selection
+;; this is usual behaviour pretty much everywhere
+(transient-mark-mode 1)   
+(setq mark-even-if-inactive nil)     ; this is important, otherwise we can cut and paste something accidentally
 (setq shift-select-mode 1)   ; shifted motion keys activate the mark momentarily
+(delete-selection-mode 1)    ; typed text replaces the selection if the selection is active
+
+;; I want unshifted movements to always deactivate region
+;; without this fix it doesn't get deactivated even though the transient-mark-mode is on
+(defun ym/advice-handle-shift-selection (orig-fun &optional args)
+  (if (not this-command-keys-shift-translated)
+      (deactivate-mark)
+    (apply orig-fun args)))
+(advice-add 'handle-shift-selection :around 'ym/advice-handle-shift-selection)
+;; (advice-remove 'handle-shift-selection 'ym/advice-handle-shift-selection)
 
 ;; -------------------------------------------------------------------
 
