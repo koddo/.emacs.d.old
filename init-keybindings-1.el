@@ -46,7 +46,7 @@
 
   )
 
-(pretty-hydra-define hydra-smartparens ()  ; :title "smartparens"
+(pretty-hydra-define hydra-smartparens ()  ; :title "smartparens" :idle 0.5
 
   ;; TODO: toggle show-parens-mode/show-smartparens-mode
   ;; TODO: toggle smartparens-mode/smartparens-strict-mode
@@ -55,6 +55,11 @@
 
   ;; sp-narrow-to-sexp
   
+
+  ;; TODO: color things :pink and :blue, see https://github.com/abo-abo/hydra#foreign-keys
+
+  ;; TODO: let us use hydra funcs by name
+  ;; (ido-completing-read "test: " '("hello" "world"))
   
   ("Move" (
 	   ;; these are cool

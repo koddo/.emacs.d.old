@@ -123,7 +123,6 @@
    )
   )
 
-
 ;; -------------------------------------------------------------------
 
 
@@ -204,6 +203,9 @@
   )
 (use-package major-mode-hydra
   ;; includes pretty-hydra
+
+  :config
+  ;; https://github.com/jerrypnz/major-mode-hydra.el
   )
 
 ;; (use-package posframe)
@@ -376,15 +378,20 @@
   (defun avy-goto-parens ()
     (interactive)
     (let ((avy-command this-command))   ; for look up in avy-orders-alist
-      (avy-jump "\\[+\\|\\]\\|(+\\|)+")))
+      (avy-jump "[][{}()]+")   ; any sequence of parens, brackets, curly braces        ; was (avy-jump "\\[+\\|\\]+\\|(+\\|)+\\|{+\\|}+")
+      ))
+  
+
+
+  
   (add-to-list 'avy-orders-alist '(avy-goto-parens . avy-order-closest))
   ;; see keybindings.el
 
   (setq avy-keys
 	(list
-	 ?f ?d ?s ?a
+	 ?f ?d ?s      ; ?a -- looks too similar to ?d
 	 ?r ?e ?w          ; ?q -- I often can't distinguish q from g
-	 ?c ?x ?z   ; ?v -- y   ; ?b -- o
+	 ?v ?c ?x ?z       ; ?b -- o
 	 ?m ;; ?n
 
 
@@ -490,8 +497,14 @@
 
 ;; -------------------------------------------------------------------
 
-(use-package hl-anything-emacs
+(use-package bm
+  :demand t
+  :config
 
+
+  ;; TODO: configure bm
+  ;; https://readingworldmagazine.com/emacs/2019-10-20-emacs-bookmarks/
+  ;; https://github.com/joodland/bm
   )
 
 ;; -------------------------------------------------------------------
