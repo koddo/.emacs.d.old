@@ -389,15 +389,16 @@
 
   (setq avy-keys
 	(list
-	 ?f ?d ?s      ; ?a -- looks too similar to ?d
 	 ?r ?e ?w          ; ?q -- I often can't distinguish q from g
 	 ?v ?c ?x ?z       ; ?b -- o
 	 ?m ;; ?n
 
 
 	 ?j ?k ?l
+
+	 ?s ?d ?f      ; ?a -- looks too similar to ?d
 	 
-	 ?u ;; ?i=?l  ; ?o -- similar to a   ;; ?p -- vertical line is not visible enough
+	 ; ?u -- it's fine, but hard to reach after the semicolon         ; ?i=?l  ; ?o -- similar to a   ;; ?p -- vertical line is not visible enough
 	 ; ?h -- hard to reach          ; ?g -- similar to a
 	 ; ?y ?t -- hard to reach
 
