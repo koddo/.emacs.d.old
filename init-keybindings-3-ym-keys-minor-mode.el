@@ -373,7 +373,6 @@ there's a region, all lines that region covers will be duplicated."
 
 ;; -------------------------------------------------------------------
 
-(ym-define-key (kbd "s-/") #'comment-or-uncomment-region)
 
 ;; -------------------------------------------------------------------
 
@@ -432,7 +431,6 @@ there's a region, all lines that region covers will be duplicated."
 
 (define-key isearch-mode-map (kbd "s-;") 'avy-isearch)
 (ym-define-key (kbd "s-;") #'avy-goto-word-1)
-(ym-define-key (kbd "M-s-…") #'avy-goto-char-2)   ; == "M-s-;" -- this only looks like an underscore, but in fact it's some unicode symbol
 (ym-define-key (kbd "s-^") #'avy-goto-parens)   ; "S-s-;" -- this is not a usual ^, it's a unicode character
 
 ;; -------------------------------------------------------------------
@@ -447,4 +445,42 @@ there's a region, all lines that region covers will be duplicated."
     (push (cons t event) unread-command-events)))
 
 ;; -------------------------------------------------------------------
+
+(setq isearch-repeat-on-direction-change nil)   ; I like it to go into search mode first before searching
+(defun ym-search-selection-or-isearch (forward)
+  (interactive)
+  (if (not mark-active)
+      (if forward (isearch-forward) (isearch-backward))
+    (if forward
+	(if (< (point) (mark)) (exchange-point-and-mark))
+      (if (> (point) (mark)) (exchange-point-and-mark)))
+    (let* ((beg (point))
+	   (end (mark))
+	   (selection (buffer-substring-no-properties beg end)))
+      (deactivate-mark)
+      (isearch-mode forward nil nil nil)
+      (isearch-yank-string selection)
+      )))
+(defun ym-search-selection-or-isearch-forward ()   (interactive) (ym-search-selection-or-isearch t))
+(defun ym-search-selection-or-isearch-backward ()  (interactive) (ym-search-selection-or-isearch nil))
+(ym-define-key (kbd "s-s") 'ym-search-selection-or-isearch-forward)
+(ym-define-key (kbd "s-r") 'ym-search-selection-or-isearch-backward)
+(define-key isearch-mode-map (kbd "s-s") 'isearch-repeat-forward)
+(define-key isearch-mode-map (kbd "s-r") 'isearch-repeat-backward)
+
+;; isearch-forward-regexp
+
+
+;; -------------------------------------------------------------------
+
+
+
+;; -------------------------------------------------------------------
+
+
+
+
+
+
+
 

@@ -65,18 +65,13 @@
 (delete '(10 . exit-minibuffer) minibuffer-local-completion-map)   ; 10 = C-j
 (define-key isearch-mode-map [tab] (lambda () (interactive) (isearch-exit) (ym-keys-ijkl-move 'previous-line nil)))
 (define-key isearch-mode-map (kbd "S-TAB") (lambda () (interactive) (isearch-exit) (ym-keys-ijkl-move 'previous-line t)))
+(ym-define-key (kbd "C-S-<backspace>") 'ym-delete-line)
+(ym-define-key (kbd "M-S-<backspace>") 'kill-whole-line)
+(ym-define-key (kbd "C-SPC") (lambda () (interactive) (other-window 1)))
 (ym-define-key (kbd "C-1") 'delete-other-windows)
 (ym-define-key (kbd "C-2") 'split-window-vertically)
 (ym-define-key (kbd "C-3") 'split-window-horizontally)
 (ym-define-key (kbd "C-0") 'delete-window)
-(ym-define-key (kbd "C-f") 'ym-search-selection-or-isearch-forward)
-(ym-define-key (kbd "C-S-f") 'ym-search-selection-or-isearch-backward)
-(ym-define-key (kbd "C-M-f") 'isearch-forward-regexp)
-(ym-define-key (kbd "C-M-S-f") 'isearch-backward-regexp)
-(define-key isearch-mode-map (kbd "C-f") 'isearch-repeat-forward)
-(define-key isearch-mode-map (kbd "C-M-f") 'isearch-repeat-forward)
-(define-key isearch-mode-map (kbd "C-S-f") 'isearch-repeat-backward)
-(define-key isearch-mode-map (kbd "C-M-S-f") 'isearch-repeat-backward)
 (ym-define-key (kbd "C-s") 'save-buffer)   ; save with C-s
 (ym-define-key (kbd "C-r") 'revert-buffer)
 (ym-define-key (kbd "C-w") (lambda () (interactive) (kill-buffer (current-buffer))))
@@ -526,70 +521,7 @@
       (ido-dired)
     (dired default-directory)))
 
-(defun ym-go-to-beginning-of-code-or-line ()   ; http://emacswiki.org/emacs/BackToIndentationOrBeginning
-  "Move to the beginning of code or to the beginning of line."
-  (interactive)
-  (if (= (point) (save-excursion (back-to-indentation) (point)))
-      (beginning-of-line)
-    (back-to-indentation)))
 
-(defun ym-go-to-end-of-code-or-line (&optional arg)
-  "Move to the end of code or to the end of line."
-  (interactive "P")
-  (flet ((point-in-comment ()
-                           "Determine if the point is inside a comment"
-                           (interactive)
-                           (let ((syn (syntax-ppss)))
-                             (and (nth 8 syn)
-                                  (not (nth 3 syn))))))
-    (let ((eoc (save-excursion
-                 (move-end-of-line arg)
-                 (while (point-in-comment)
-                   (backward-char))
-                 (skip-chars-backward " \t")
-                 (point))))
-      (cond ((= (point) eoc)
-             (move-end-of-line arg))
-            (t
-             (move-end-of-line arg)
-             (while (point-in-comment)
-               (backward-char))
-             (skip-chars-backward " \t"))))))
-
-(defun ym-duplicate-current-line-or-region (arg)   ; got it from here: http://tuxicity.se/emacs/elisp/2010/03/11/duplicate-current-line-or-region-in-emacs.html
-  "Duplicates the current line or region ARG times.
-If there's no region, the current line will be duplicated. However, if
-there's a region, all lines that region covers will be duplicated."
-  (interactive "p")          ; also see if any problems: http://stackoverflow.com/questions/88399/how-do-i-duplicate-a-whole-line-in-emacs
-  (let (beg end (origin (point)))
-    (if (and mark-active (> (point) (mark)))
-        (exchange-point-and-mark))
-    (setq beg (line-beginning-position))
-    (if mark-active
-        (exchange-point-and-mark))
-    (if (and mark-active (= (point) (line-beginning-position)))
-        (forward-line -1))
-    (setq end (line-end-position))
-    (let ((region (buffer-substring-no-properties beg end)))
-      (dotimes (i arg)
-        (goto-char end)
-        (newline)
-        (insert region)
-        (setq end (point)))
-      (goto-char (+ origin (* (length region) arg) arg)))))
-
-
-(defun ym-search-selection-or-isearch (forward)
-  (interactive)
-  "search for selected text"
-  (let* ((beg (point))
-         (end (mark))
-         (selection (buffer-substring-no-properties beg end)))
-    (deactivate-mark)
-    (isearch-mode forward nil nil nil)
-    (isearch-yank-string selection)))
-(defun ym-search-selection-or-isearch-forward  () (interactive) (if mark-active (ym-search-selection-or-isearch t)   (isearch-forward)))
-(defun ym-search-selection-or-isearch-backward () (interactive) (if mark-active (ym-search-selection-or-isearch nil) (isearch-backward)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
