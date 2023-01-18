@@ -178,15 +178,8 @@
 ;; https://github.com/alezost/mwim.el
 (use-package mwim
   :config
-  (ym-define-key (kbd "s-u") #'mwim-beginning-of-code-or-line)
+  (ym-define-key (kbd "s-u") #'mwim-beginning-of-code-or-line)    ; I used to have custom functions for this, see git history
   (ym-define-key (kbd "s-o") #'mwim-end)
-  (defun ym-move-to-middle-of-line ()
-    (interactive)
-    (let* ((begin (mwim-code-beginning))
-	   (end (mwim-code-end))
-	   (middle (/ (+ end begin) 2)))
-      (goto-char middle)))
-  ;; (ym-define-key (kbd "s-,") #'ym-move-to-middle-of-line)
   )
 
 
@@ -214,6 +207,112 @@
                      (kill-ring-save beg end)
                    (setq deactivate-mark nil))))   ; leave the region highlighted after the copy
 (ym-define-key (kbd "s-v") #'yank)
+
+
+;; this is my clean implementation
+;; maybe rewrite other functions in this manner
+(defun ym-delete-current-line-or-region ()
+  (interactive)
+  (let* ((beg (save-excursion (if (and mark-active (> (point) (mark))) (exchange-point-and-mark))
+			      (move-beginning-of-line 1)
+			      (point)))
+	 (end (save-excursion (if (and mark-active (< (point) (mark))) (exchange-point-and-mark))
+			      (if (and mark-active (= (point) (line-beginning-position))) (forward-line -1))
+			      (move-beginning-of-line 2) (point)))
+	 (orig-col(current-column))
+	 )
+    (delete-region beg end)
+    (move-to-column orig-col)
+    ))
+(ym-define-key (kbd "s-S-<backspace>") #'ym-delete-current-line-or-region)
+
+;; this is my clean implementation
+;; maybe rewrite other functions in this manner
+(defun ym-delete-current-line-or-region ()
+  (interactive)
+  (let* ((beg (save-excursion (if (and mark-active (> (point) (mark))) (exchange-point-and-mark))
+			      (move-beginning-of-line 1)
+			      (point)))
+	 (end (save-excursion (if (and mark-active (< (point) (mark))) (exchange-point-and-mark))
+			      (if (and mark-active (= (point) (line-beginning-position))) (forward-line -1))
+			      (move-beginning-of-line 2) (point)))
+	 (orig-col(current-column))
+	 )
+    (kill-region beg end)
+    (move-to-column orig-col)
+    ))
+(ym-define-key (kbd "M-S-<backspace>") #'ym-delete-current-line-or-region)
+
+
+(defun ym/comment-or-uncomment-line-or-region ()
+  "Like comment-or-uncomment-region, but comment current line if there is no mark."
+  (interactive)
+  (if (not mark-active)
+      (comment-or-uncomment-region
+       (line-beginning-position) (line-end-position))
+    (if (< (point) (mark))
+        (comment-or-uncomment-region (save-excursion (beginning-of-line) (point))
+                                     (save-excursion (goto-char (mark))
+                                                     (if (<= (point) (progn (back-to-indentation) (point))) (forward-line -1))
+                                                     (line-end-position)))
+      (comment-or-uncomment-region (save-excursion (goto-char (mark)) (line-beginning-position))
+                                   (save-excursion (if (<= (point)
+                                                           (progn (back-to-indentation) (point)))
+                                                       (forward-line -1))
+                                                   (end-of-line) (point))))))
+(ym-define-key (kbd "s-/") #'ym/comment-or-uncomment-line-or-region)
+
+(defun ym-duplicate-current-line-or-region (arg)   ; got it from here: http://tuxicity.se/emacs/elisp/2010/03/11/duplicate-current-line-or-region-in-emacs.html
+  "Duplicates the current line or region ARG times.
+If there's no region, the current line will be duplicated. However, if
+there's a region, all lines that region covers will be duplicated."
+  (interactive "p")          ; also see if any problems: http://stackoverflow.com/questions/88399/how-do-i-duplicate-a-whole-line-in-emacs
+  (let (beg end (origin (point)))
+    (if (and mark-active (> (point) (mark)))
+        (exchange-point-and-mark))
+    (setq beg (line-beginning-position))
+    (if mark-active
+        (exchange-point-and-mark))
+    (if (and mark-active (= (point) (line-beginning-position)))
+        (forward-line -1))
+    (setq end (line-end-position))
+    (let ((region (buffer-substring-no-properties beg end)))
+      (dotimes (i arg)
+        (goto-char end)
+        (newline)
+        (insert region)
+        (setq end (point)))
+      (goto-char (+ origin (* (length region) arg) arg)))))
+(ym-define-key (kbd "s-d") #'ym-duplicate-current-line-or-region)
+
+(defun ym-duplicate-and-comment-current-line-or-region (arg)   ; got it from here: http://tuxicity.se/emacs/elisp/2010/03/11/duplicate-current-line-or-region-in-emacs.html
+  "Duplicates the current line or region ARG times.
+If there's no region, the current line will be duplicated. However, if
+there's a region, all lines that region covers will be duplicated."
+  (interactive "p")          ; also see if any problems: http://stackoverflow.com/questions/88399/how-do-i-duplicate-a-whole-line-in-emacs
+  (let (beg end (origin (point)))
+    (if (and mark-active (> (point) (mark)))
+        (exchange-point-and-mark))
+    (setq beg (line-beginning-position))
+    (if mark-active
+        (exchange-point-and-mark))
+    (if (and mark-active (= (point) (line-beginning-position)))
+        (forward-line -1))
+    (setq end (line-end-position))
+    (let ((region (buffer-substring-no-properties beg end)))
+      (comment-or-uncomment-region beg end)
+      (setq end (line-end-position))
+      (dotimes (i arg)
+        (goto-char end)
+        (newline)
+        (insert region)
+        (setq end (point)))
+      ;; (goto-char (+ origin (* (length region) arg) arg))
+      ;; goto-char is commented out for the time being
+      ;; maybe fix this: we don't actually know the length of the resulting commented region, so it jumps to an arbitrary position
+      ;; but on the other hand, it's not really important
+      )))
+(ym-define-key (kbd "s-D") #'ym-duplicate-and-comment-current-line-or-region)
 
 
 ;; -------------------------------------------------------------------
@@ -348,12 +447,4 @@
     (push (cons t event) unread-command-events)))
 
 ;; -------------------------------------------------------------------
-
-
-
-
-
-
-
-
 

@@ -41,87 +41,6 @@
 ;; -------------------------------------------------------------------
 
 
-
-;; -------------------------------------------------------------------
-;; russian keyboard
-;; C-ф -> C-a
-;; C-ы -> C-s
-;; C-в -> C-d
-;; C-а -> C-f
-;; etc
-(defun reverse-input-method (input-method)
-  "Build the reverse mapping of single letters from INPUT-METHOD."
-  (interactive
-   (list (read-input-method-name "Use input method (default current): ")))
-  (if (and input-method (symbolp input-method))
-      (setq input-method (symbol-name input-method)))
-  (let ((current current-input-method)
-        (modifiers '(nil (control) (meta) (control meta))))
-    (when input-method
-      (activate-input-method input-method))
-    (when (and current-input-method quail-keyboard-layout)
-      (dolist (map (cdr (quail-map)))
-        (let* ((to (car map))
-               (from (quail-get-translation
-                      (cadr map) (char-to-string to) 1)))
-          (when (and (characterp from) (characterp to))
-            (dolist (mod modifiers)
-              (define-key local-function-key-map
-                (vector (append mod (list from)))
-                (vector (append mod (list to)))))))))
-    (when input-method
-      (activate-input-method current))))
-(defadvice read-passwd (around ym-read-passwd act)
-  (let ((local-function-key-map nil))
-    ad-do-it))
-(reverse-input-method 'russian-computer)
-;; -------------------------------------------------------------------
-
-
-
-;; -------------------------------------------------------------------
-(defvar ym-keys-minor-mode-map (make-keymap) "ym-keys-minor-mode keymap.")
-(define-minor-mode ym-keys-minor-mode
-  "My minor mode for global keybindings."
-  :init-value t :lighter "" :keymap 'ym-keys-minor-mode-map)
-(add-hook 'minibuffer-setup-hook (lambda () (ym-keys-minor-mode 0)))
-(ym-keys-minor-mode 1)
-;; -------------------------------------------------------------------
-(defadvice load (after give-my-keybindings-priority)
-  "Try to ensure that my keybindings always have priority."
-  (if (not (eq (car (car minor-mode-map-alist)) 'ym-keys-minor-mode))
-      (let ((mykeys (assq 'ym-keys-minor-mode minor-mode-map-alist)))
-        (assq-delete-all 'ym-keys-minor-mode minor-mode-map-alist)
-        (add-to-list 'minor-mode-map-alist mykeys))))
-(ad-activate 'load)
-;; -------------------------------------------------------------------
-(defun ym-define-key (key func)   ; not sure if i really need to define keys in both maps, but just in case
-  (global-set-key key func)
-  (define-key ym-keys-minor-mode-map key func))
-(mapcar   ; get rid of unused keybindings
- (lambda (x) (ym-define-key (kbd (concat "C-" (list x))) nil))
- "abdefjklnopqrstuwyz;$'\\,./?<>-")   ; C-i and C-m are handled above, z, x, c, v, g, h untouched
-(mapcar
- (lambda (x) (ym-define-key (kbd (concat "M-" (list x))) nil))
- "abcdefghijklmnopqrstuvwyz;$'\\,./?<>-")   ; M-x untouched
-(mapcar
- (lambda (x) (ym-define-key (kbd (concat "M-C-" (list x))) nil))
- "abcdefghijklmnopqrstuvwyxz;$'\\,./?<>-")   ; full alphabet
-;; -------------------------------------------------------------------
-;; mark   shift   activate   set
-;; -      -       -          -
-;; +      -       -          -
-;; -      +       +          +
-;; +      +       +          -
-(defun ym-keys-ijkl-move (func shift-pressed)
-  (interactive)
-  (when (and
-         (not mark-active)
-         shift-pressed)
-    (cua-set-mark))
-  (setq mark-active shift-pressed)
-  (funcall func))
-;; -------------------------------------------------------------------
 (ym-define-key [tab] (lambda () (interactive) (ym-keys-ijkl-move 'previous-line nil)))   ; C-i
 (ym-define-key (kbd "S-TAB") (lambda () (interactive) (ym-keys-ijkl-move 'previous-line t)))   ; C-i with shift key pressed, useful for marking a region
 (ym-define-key (kbd "C-k") (lambda () (interactive) (ym-keys-ijkl-move 'next-line nil)))
@@ -146,9 +65,6 @@
 (delete '(10 . exit-minibuffer) minibuffer-local-completion-map)   ; 10 = C-j
 (define-key isearch-mode-map [tab] (lambda () (interactive) (isearch-exit) (ym-keys-ijkl-move 'previous-line nil)))
 (define-key isearch-mode-map (kbd "S-TAB") (lambda () (interactive) (isearch-exit) (ym-keys-ijkl-move 'previous-line t)))
-(ym-define-key (kbd "C-S-<backspace>") 'ym-delete-line)
-(ym-define-key (kbd "M-S-<backspace>") 'kill-whole-line)
-(ym-define-key (kbd "C-SPC") (lambda () (interactive) (other-window 1)))
 (ym-define-key (kbd "C-1") 'delete-other-windows)
 (ym-define-key (kbd "C-2") 'split-window-vertically)
 (ym-define-key (kbd "C-3") 'split-window-horizontally)
@@ -662,12 +578,6 @@ there's a region, all lines that region covers will be duplicated."
         (setq end (point)))
       (goto-char (+ origin (* (length region) arg) arg)))))
 
-(defun ym-delete-line ()
-  "Delete text from current position to end of line char."
-  (interactive)
-  (delete-region
-   (save-excursion (move-beginning-of-line 1) (point))
-   (save-excursion (move-beginning-of-line 2) (point))))
 
 (defun ym-search-selection-or-isearch (forward)
   (interactive)

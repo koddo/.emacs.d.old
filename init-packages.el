@@ -396,7 +396,7 @@
 
 	 ?j ?k ?l
 
-	 ?s ?d ?f      ; ?a -- looks too similar to ?d
+	 ?s ?d ?f     ; ?a -- looks too similar to ?d
 	 
 	 ; ?u -- it's fine, but hard to reach after the semicolon         ; ?i=?l  ; ?o -- similar to a   ;; ?p -- vertical line is not visible enough
 	 ; ?h -- hard to reach          ; ?g -- similar to a
