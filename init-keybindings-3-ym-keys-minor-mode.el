@@ -468,8 +468,6 @@ there's a region, all lines that region covers will be duplicated."
 (define-key isearch-mode-map (kbd "s-s") 'isearch-repeat-forward)
 (define-key isearch-mode-map (kbd "s-r") 'isearch-repeat-backward)
 
-;; isearch-forward-regexp
-
 
 ;; -------------------------------------------------------------------
 

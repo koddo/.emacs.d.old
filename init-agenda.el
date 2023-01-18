@@ -1,4 +1,14 @@
 
+;; -------------------------------------------------------------------
+
+;; http://emacs.stackexchange.com/questions/9433/how-to-make-org-prompt-for-a-timestamp-when-changing-state-of-a-todo
+(defun ym-org-todo-with-date-prompt (&optional arg)      ; e.g., done yesterday
+  (interactive "P")
+  (cl-letf ((my-current-time (org-read-date t t nil "when:" nil "-1d 23:59" nil))
+            ((symbol-function #'current-time)
+             #'(lambda () my-current-time)))
+    (org-todo arg)
+    ))
 
 
 ;; -------------------------------------------------------------------
