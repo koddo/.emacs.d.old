@@ -173,3 +173,14 @@
 ;;   )
 
 ;; -------------------------------------------------------------------
+
+(setq-default truncate-lines t)
+(global-visual-line-mode -1)
+;; in case if you're confused about the word-wrap variable, here's a clarification: Instead of setting this variable directly, most users should use Visual Line mode.
+
+;; toggle visual-line-mode per buffer via hydra
+;; some modes turn it on in hooks, like org-mode, because it's mostly text, not code
+
+
+
+

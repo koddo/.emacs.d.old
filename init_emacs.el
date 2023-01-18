@@ -1,5 +1,3 @@
-(setq-default truncate-lines t)
-(setq x-select-enable-clipboard t)
 (setq require-final-newline t)
 (setq next-line-add-newlines t)
 (setq vc-handled-backends nil)          ;; disable version control (vc) enabled by default, it slows down emacs, and i don't use it
@@ -36,45 +34,4 @@
 (setq scroll-conservatively 10000)
 (setq scroll-preserve-screen-position t)
 (setq mouse-wheel-scroll-amount '(1))
-;; -------------------------------------------------------------------
-;; show full filename path in mode line
-(setq ym-mode-line-filename-max-directory-length 30)
-(let ((index (position 'mode-line-buffer-identification mode-line-format)))
-  (if index
-      (let ((new-buffer-id
-             '(:eval
-               (let* ((in-dired-mode (eq 'dired-mode (with-current-buffer (current-buffer) major-mode)))
-                      (dir (ym-shorten-directory
-                            (cond
-                             (in-dired-mode default-directory)
-                             ((not buffer-file-name) "")
-                             (t (file-name-directory buffer-file-name)))
-                            ym-mode-line-filename-max-directory-length))
-                      (bufname (buffer-name)))
-                 (propertize (concat
-                              (propertize dir 'font-lock-face ym-mode-line-directory-font)
-                              (when (not in-dired-mode) (propertize bufname 'font-lock-face ym-mode-line-file-name-font)))
-                             'help-echo (buffer-file-name))))))
-        (setcar (nthcdr index mode-line-format)   ; replace mode-line-buffer-identification with '(:eval ...) above
-                new-buffer-id))
-    (message "Notice: somebody already had changed mode line")))
-;; reset mode-line: (setcar (nthcdr 7 mode-line-format) 'mode-line-buffer-identification)
-(defun ym-shorten-directory (dir max-length)
-  "Show up to `max-length' characters of a directory name `dir'."
-  (let ((path (reverse (split-string (abbreviate-file-name dir) "/")))
-        (output ""))
-    (when (and path (equal "" (car path)))
-      (setq path (cdr path)))
-    (while (and path
-                ;; (< (+ (length output)) (- max-length 4))   ; 4 chars in ".../"
-                (< (+ 1 (length output) (length (car path))) (- max-length 4))
-                )
-      (setq output (concat (car path) "/" output))
-      (setq path (cdr path)))
-    (when (and path (equal "" (car path)))
-      (setq output (concat (car path) "/" output))
-      (setq path (cdr path))
-      )
-    (when path
-      (setq output (concat ".../" output)))
-    output))
+
