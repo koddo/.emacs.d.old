@@ -228,7 +228,7 @@
 
 ;; this is my clean implementation
 ;; maybe rewrite other functions in this manner
-(defun ym-delete-current-line-or-region ()
+(defun ym-kill-current-line-or-region ()
   (interactive)
   (let* ((beg (save-excursion (if (and mark-active (> (point) (mark))) (exchange-point-and-mark))
 			      (move-beginning-of-line 1)
@@ -241,7 +241,24 @@
     (kill-region beg end)
     (move-to-column orig-col)
     ))
-(ym-define-key (kbd "M-S-<backspace>") #'ym-delete-current-line-or-region)
+(ym-define-key (kbd "M-S-<backspace>") #'ym-kill-current-line-or-region)
+
+;; this is my clean implementation
+;; maybe rewrite other functions in this manner
+(defun ym-copy-current-line-or-region ()
+  (interactive)
+  (let* ((beg (save-excursion (if (and mark-active (> (point) (mark))) (exchange-point-and-mark))
+			      (move-beginning-of-line 1)
+			      (point)))
+	 (end (save-excursion (if (and mark-active (< (point) (mark))) (exchange-point-and-mark))
+			      (if (and mark-active (= (point) (line-beginning-position))) (forward-line -1))
+			      (move-beginning-of-line 2) (point)))
+	 (orig-col(current-column))
+	 )
+    (kill-ring-save beg end)
+    (move-to-column orig-col)
+    ))
+(ym-define-key (kbd "C-S-<backspace>") #'ym-copy-current-line-or-region)
 
 
 (defun ym/comment-or-uncomment-line-or-region ()
@@ -470,6 +487,7 @@ there's a region, all lines that region covers will be duplicated."
 
 
 ;; -------------------------------------------------------------------
+
 
 
 

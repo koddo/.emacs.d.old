@@ -36,21 +36,6 @@
 (setq org-agenda-tags-column -110)
 (setq org-complete-tags-always-offer-all-agenda-tags t)
 ;; -------------------------------------------------------------------
-(setq org-agenda-time-grid '((daily today)
-                             "----------------"
-                             (900 1000 1100 1200 1300 1400 1500 1600
-                                  1700 1800 1900 2000 2100 2200 2300 2359)))
-;; (setq org-agenda-time-grid '((daily today)
-;;                              "----------------"
-;;                              (800 1000 1200 1400 1600 1800 2000 2200 2350)))
-;; (defun ym-org-agenda-sort-habits (a b)
-;;   (let ((ha (get-text-property 0 'todo-state a))
-;;         (hb (get-text-property 0 'todo-state b)))
-;;     (when (and ha hb)
-;;         (cond ((string> ha hb) +1)
-;;               ((string< ha hb) -1)
-;;               ((string= ha hb) nil)))))
-;; (setq org-agenda-cmp-user-defined 'ym-org-agenda-sort-habits)
 (setq org-agenda-sorting-strategy
       '(
         (agenda time-up habit-down

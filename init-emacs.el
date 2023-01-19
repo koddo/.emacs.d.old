@@ -23,12 +23,12 @@
 (column-number-mode t)
 
 (setq scroll-error-top-bottom t)  ;; point moves to the beginning or the end of the buffer (depending on scrolling direction) when no more scrolling possible
-(setq next-line-add-newlines t)
 ;; maybe someday try to fix hl-line-mode at the end of buffer: https://emacs.stackexchange.com/questions/24311/eval-buffer-works-init-does-not-hl-line-fix
 
 ;; for warning-suppress-types later in init
 (require 'warnings)
 
+(setq use-dialog-box nil)
 
 ;; -------------------------------------------------------------------
 
@@ -37,6 +37,20 @@
 (setq scroll-conservatively 10000)
 (setq auto-window-vscroll nil)
 
+(set-scroll-bar-mode 'right)
+(setq scroll-step 1)
+(setq scroll-conservatively 10000)
+(setq scroll-preserve-screen-position t)
+(setq mouse-wheel-scroll-amount '(1))
+
+
+;; -------------------------------------------------------------------
+
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+(require 'whitespace)
+(setq whitespace-style '(tabs tab-mark)) ; show tabs
+(setq global-whitespace-mode 1)
 
 ;; -------------------------------------------------------------------
 
@@ -76,6 +90,9 @@
 
 ;; TODO (ym-add-to-list-dired-omit-extensions '(".o" ".a"))
 
+(require   'uniquify)  ; buffer names are uniquified with parts of directory name, for ex.: name|folder
+(setq       uniquify-buffer-name-style 'reverse)
+
 
 ;; -------------------------------------------------------------------
 
@@ -83,6 +100,10 @@
 (recentf-mode 1)
 (setq recentf-max-saved-items 200)
 
+(save-place-mode 1)
+
+(setq history-length 25)
+(savehist-mode 1)
 
 ;; -------------------------------------------------------------------
 ;; auto-save, backup, and lockfiles
@@ -180,6 +201,35 @@
 
 ;; toggle visual-line-mode per buffer via hydra
 ;; some modes turn it on in hooks, like org-mode, because it's mostly text, not code
+
+
+;; -------------------------------------------------------------------
+
+(setq      comint-buffer-maximum-size 5000) ; truncate the shell buffer
+(add-hook 'comint-output-filter-functions 'comint-truncate-buffer) ; to a certain maximum number of lines
+
+;; -------------------------------------------------------------------
+
+(put 'downcase-region 'disabled nil)
+(put   'upcase-region 'disabled nil)
+
+;; -------------------------------------------------------------------
+
+(setq require-final-newline t)   ; t means when saving; other options are 'visit, 'visit-save, 'ask, nil
+(setq next-line-add-newlines t)       ; TODO: make it add a new line so there's always a newline after cursor
+
+;; -------------------------------------------------------------------
+
+;; disable version control enabled by default, it slows down emacs, and i don't use it
+;; this probably breaks some functions like vc-annotate and vc-diff
+(setq vc-handled-backends nil)
+
+;; (use-package magit
+;;   :config
+
+;;   )
+
+;; -------------------------------------------------------------------
 
 
 
