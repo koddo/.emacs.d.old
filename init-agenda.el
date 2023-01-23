@@ -102,8 +102,6 @@
       nil
       )
 
-(when (file-directory-p "~/werk")
-  (setq org-agenda-files '("~/werk")))
 
 (when (file-directory-p "~/werk")
   (setq org-agenda-files '("~/werk"))
@@ -220,9 +218,9 @@
 	(my-read-watch-list (lambda (tag)   ; e.g., "read" or "watch"
 			      (let ((my-read-watch-list-tags (concat
 							      "-" tag "ing"
-							      "-" tag "ing1"
-							      "-" tag "ing2"
-							      "-" tag "ing3"
+							      ;; "-" tag "ing1"
+							      ;; "-" tag "ing2"
+							      ;; "-" tag "ing3"
 							      ;; "-" tag "ing4"
 							      )))  ; e.g., "-reading-reading1-reading2-reading3-reading4")
 				`(
@@ -233,15 +231,15 @@
 				  (tags ,(concat "+" tag "ing-done-cancelled")      ; e.g., "+reading-done-cancelled"
 					((org-agenda-overriding-header ,(concat tag "ing"))
 					 ))
-				  (tags ,(concat "+" tag "ing1-done-cancelled")
-					((org-agenda-overriding-header ,(concat tag "ing1"))
-					 ))
-				  (tags ,(concat "+" tag "ing2-done-cancelled")
-					((org-agenda-overriding-header ,(concat tag "ing2"))
-					 ))
-				  (tags ,(concat "+" tag "ing3-done-cancelled")
-					((org-agenda-overriding-header ,(concat tag "ing3"))
-					 ))
+				  ;; (tags ,(concat "+" tag "ing1-done-cancelled")
+				  ;;   ((org-agenda-overriding-header ,(concat tag "ing1"))
+				  ;;    ))
+				  ;; (tags ,(concat "+" tag "ing2-done-cancelled")
+				  ;;   ((org-agenda-overriding-header ,(concat tag "ing2"))
+				  ;;    ))
+				  ;; (tags ,(concat "+" tag "ing3-done-cancelled")
+				  ;;   ((org-agenda-overriding-header ,(concat tag "ing3"))
+				  ;;    ))
 				  ;; (tags ,(concat "+" tag "ing4-done-cancelled")
 				  ;; 	((org-agenda-overriding-header ,(concat tag "ing4"))
 				  ;; 	 ))
@@ -287,28 +285,27 @@
 			            (let ((org-agenda-files '("~/werk"))
                               (my-read-watch-list-tags (concat
 							                            "-" tag "ing"
-							                            "-" tag "ing1"
-							                            "-" tag "ing2"
-							                            "-" tag "ing3"
+							                            ;; "-" tag "ing1"
+							                            ;; "-" tag "ing2"
+							                            ;; "-" tag "ing3"
 							                            ;; "-" tag "ing4"
 							                            )))  ; e.g., "-reading-reading1-reading2-reading3-reading4")
 			              `(
-				            (todo "" (
-					                  (org-agenda-files nil)
-					                  (org-agenda-overriding-header "-=*=- this title gets replaced -=*=-")
-					                  ))
 				            (tags ,(concat "+" tag "ing-done-cancelled")      ; e.g., "+reading-done-cancelled"
 				                  ((org-agenda-overriding-header ,(concat tag "ing"))
 				                   ))
-				            (tags ,(concat "+" tag "ing1-done-cancelled")
-				                  ((org-agenda-overriding-header ,(concat tag "ing1"))
-				                   ))
-				            (tags ,(concat "+" tag "ing2-done-cancelled")
-				                  ((org-agenda-overriding-header ,(concat tag "ing2"))
-				                   ))
-				            (tags ,(concat "+" tag "ing3-done-cancelled")
-				                  ((org-agenda-overriding-header ,(concat tag "ing3"))
-				                   ))
+				            (tags ,(concat "+TIMESTAMP_IA<=\"<+0d>\"+" tag "-done-cancelled" my-read-watch-list-tags "|" "-TIMESTAMP_IA={.}+" tag "-done-cancelled" my-read-watch-list-tags)
+					              ((org-agenda-overriding-header ,tag)
+					               ))
+				            ;; (tags ,(concat "+" tag "ing1-done-cancelled")
+				            ;;       ((org-agenda-overriding-header ,(concat tag "ing1"))
+				            ;;        ))
+				            ;; (tags ,(concat "+" tag "ing2-done-cancelled")
+				            ;;       ((org-agenda-overriding-header ,(concat tag "ing2"))
+				            ;;        ))
+				            ;; (tags ,(concat "+" tag "ing3-done-cancelled")
+				            ;;       ((org-agenda-overriding-header ,(concat tag "ing3"))
+				            ;;        ))
 				            ;; (tags ,(concat "+" tag "ing4-done-cancelled")
 				            ;;       ((org-agenda-overriding-header ,(concat tag "ing4"))
 				            ;;        ))
