@@ -18,6 +18,10 @@
 (setq org-log-repeat nil)   ; disable :LAST_REPEAT:
 (setq org-todo-repeat-to-state t)   ; habit -> done -> habit, not todo
 
+(add-hook 'org-capture-mode-hook
+          (lambda ()
+            (setq-local org-complete-tags-always-offer-all-agenda-tags t)))  
+
 ;; (setq org-agenda-log-mode-items '(state))
 ;; (setq org-log-refile 'time)
 ;; (setq org-log-states-order-reversed nil)
@@ -97,6 +101,9 @@
       ;; (regexp-opt '("st" "sa"))
       nil
       )
+
+(when (file-directory-p "~/werk")
+  (setq org-agenda-files '("~/werk")))
 
 (when (file-directory-p "~/werk")
   (setq org-agenda-files '("~/werk"))

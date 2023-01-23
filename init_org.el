@@ -10,24 +10,10 @@
 (setq org-deadline-warning-days 100000)
 (setq org-agenda-skip-scheduled-if-deadline-is-shown 'not-today)
 ;; -------------------------------------------------------------------
-(setq org-directory "~/workspace")
-(setq ym-org-agenda-file "~/workspace/.org.agenda.org.gpg")
-(setq org-default-notes-file "~/workspace/.org.notes.org")
-(setq ym-org-birthdays-file "~/workspace/.org.birthdays.org")
-(setq ym-org-journal-file "~/workspace/.org.journal.org.gpg")
-(setq ym-ledger-file "~/workspace/.org.finances.ledger.gpg")
-(setq ym-work-file "~/workspace/Work.org.gpg")
-(setq org-agenda-files (list ym-org-agenda-file ym-work-file org-directory))
 (setq ym-org-clock-buffer-name "*Org Clock Summary*")
 (setq ym-org-contacts-view-buffer-name "*Org Contacts*")
 (setq ym-org-problems-count-view-buffer-name "*Org Problems Count*")
 (setq org-archive-location ".org.archive.org.gpg::")
-;; -------------------------------------------------------------------
-(setq org-refile-targets '((org-agenda-files . (:tag . "PROJECT"))))
-(setq org-refile-use-outline-path nil)
-(setq org-outline-path-complete-in-steps nil)
-(setq org-tags-exclude-from-inheritance '("PROJECT"))   ; TODO: remove TASKS from list
-(setq org-reverse-note-order t)
 ;; -------------------------------------------------------------------
 (setq org-agenda-tags-column -110)
 (setq org-complete-tags-always-offer-all-agenda-tags t)
