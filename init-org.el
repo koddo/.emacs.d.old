@@ -27,7 +27,7 @@
   (setq org-refile-targets '((org-agenda-files :maxlevel . 3)))
   (setq org-preview-latex-image-directory ".ltximg/")
 
-  (setq org-startup-folded 'showall)   ; only fold the :PROPERTIES: drawer
+  (setq org-startup-folded nil)   ; nil means only fold the :PROPERTIES: drawer
 
   (setq org-goto-interface 'outline-path-completion)
   (setq org-outline-path-complete-in-steps nil)
@@ -37,7 +37,16 @@
   (setq org-agenda-sticky t)
 
   (add-hook 'org-mode-hook #'visual-line-mode)
-  
+  (setq org-startup-with-inline-images t)
+
+  ;; number of blank lines between trees when folded
+  ;; default is 2
+  ;; set to -1 to preserve all whitespace
+  ;; mine is set to 0 to have more content on screen
+  (setq org-cycle-separator-lines 0)
+
+
+  (setq org-hide-leading-stars t)   ; customize the org-hide face for this, set it to light gray
   )
 
 

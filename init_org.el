@@ -1,8 +1,4 @@
 ;; -------------------------------------------------------------------
-(setq org-startup-with-inline-images t)
-(setq org-cycle-separator-lines 0)
-(setq org-hide-leading-stars t)
-(setq org-startup-folded 'content)
 (setq org-empty-line-terminates-plain-lists t)
 (setq org-list-demote-modify-bullet '(("+" . "-") ("-" . "+")))
 (setq org-support-shift-select t)
