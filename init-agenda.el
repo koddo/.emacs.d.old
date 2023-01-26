@@ -228,9 +228,9 @@
 					    (org-agenda-files nil)
 					    (org-agenda-overriding-header "-=*=- this title gets replaced -=*=-")
 					    ))
-				  (tags ,(concat "+" tag "ing-done-cancelled")      ; e.g., "+reading-done-cancelled"
-					((org-agenda-overriding-header ,(concat tag "ing"))
-					 ))
+				  ;; (tags ,(concat "+" tag "ing-done-cancelled")      ; e.g., "+reading-done-cancelled"
+				  ;;   ((org-agenda-overriding-header ,(concat tag "ing"))
+				  ;;    ))
 				  ;; (tags ,(concat "+" tag "ing1-done-cancelled")
 				  ;;   ((org-agenda-overriding-header ,(concat tag "ing1"))
 				  ;;    ))
@@ -291,9 +291,9 @@
 							                            ;; "-" tag "ing4"
 							                            )))  ; e.g., "-reading-reading1-reading2-reading3-reading4")
 			              `(
-				            (tags ,(concat "+" tag "ing-done-cancelled")      ; e.g., "+reading-done-cancelled"
-				                  ((org-agenda-overriding-header ,(concat tag "ing"))
-				                   ))
+				            ;; (tags ,(concat "+" tag "ing-done-cancelled")      ; e.g., "+reading-done-cancelled"
+				            ;;       ((org-agenda-overriding-header ,(concat tag "ing"))
+				            ;;        ))
 				            (tags ,(concat "+TIMESTAMP_IA<=\"<+0d>\"+" tag "-done-cancelled" my-read-watch-list-tags "|" "-TIMESTAMP_IA={.}+" tag "-done-cancelled" my-read-watch-list-tags)
 					              ((org-agenda-overriding-header ,tag)
 					               ))
@@ -394,7 +394,7 @@
 		     ))
 	      ))
 	    ("xq" "try-read-watch-listen"
-	     ,(funcall my-read-watch-list-altogether '("try" "read" "watch" "listen"))
+	     ,(funcall my-read-watch-list-altogether '("try" "read" "watch" "listen" "blog"))
 	     )
 	    ("xw" "watch"
 	     ,(funcall my-read-watch-list "watch")
@@ -407,6 +407,9 @@
 	     )
 	    ("xt" "try"
 	     ,(funcall my-read-watch-list "try")
+	     )
+	    ("xb" "blog"
+	     ,(funcall my-read-watch-list "blog")
 	     )
 
 

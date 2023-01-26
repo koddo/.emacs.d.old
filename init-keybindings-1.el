@@ -392,6 +392,11 @@
 		     (delete-other-windows)
 		     )
 	       "try")
+	      ("b" (lambda () (interactive)
+		     (org-agenda nil "xb")
+		     (delete-other-windows)
+		     )
+	       "blog")
 	      
 	      ;; ("7" (lambda () (interactive)
 	      ;; 	      (org-ql-search (org-agenda-files) '(and (tags "try") (not (tags "english" "spanish" "humor"))) :sort 'date)
