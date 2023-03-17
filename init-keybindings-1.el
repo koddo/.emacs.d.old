@@ -111,9 +111,9 @@
 	       ("u" sp-backward-unwrap-sexp)
 
 	       ;; not used, because these three only work forward, and we can use selection anyway
-	       ;; ("(" sp-wrap-round)
-	       ;; ("{" sp-wrap-curly)
-	       ;; ("[" sp-wrap-square)
+	       ("(" sp-wrap-round)
+	       ("{" sp-wrap-curly)
+	       ("[" sp-wrap-square)
 	       ;; TODO: maybe add my own bindings like sp-wrap-round-backwards later
 
 	       ;; not used, because it's easier to rewrap than remembering this command

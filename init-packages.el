@@ -517,5 +517,133 @@
 
 ;; -------------------------------------------------------------------
 
+;; disable version control enabled by default, it slows down emacs, and i don't use it
+;; this probably breaks some functions like vc-annotate and vc-diff
+;; TODO: read the faq, disabling the built-in version control is no longer recommended
+;; https://magit.vc/manual/magit/Should-I-disable-VC_003f.html
+
+
+(setq vc-handled-backends nil)
+
+(use-package compat)    ; temporarily here, see https://github.com/magit/magit/issues/4836
+
+(use-package magit
+  :config
+
+
+  (add-hook 'magit-section-movement-hook 'magit-status-maybe-update-blob-buffer)
+
+  ;; https://magit.vc/manual/magit/Action-Confirmation.html
+  ;; stage-all-changes
+  
+(defun kisaragi/magit-log-visit-changed-file ()
+  "Visit a changed file of revision under point in `magit-log-mode'.
+
+Uses `general-simulate-key', so `general-simulate-RET' will
+become defined after invocation."
+  (interactive)
+  (general-simulate-key "RET")
+  ;; visit the commit
+  (general-simulate-RET)
+  ;; move to first changed file in diff buffer
+  (setf (point) (point-min))
+  (search-forward "|" nil t)
+  ;; open the revision
+  (general-simulate-RET))
+
+
+
+  ;; (setq magit-git-debug nil)   ; useful for checking out the actual commands behind the views
+
+  )
+
+
+(add-to-list 'magit-repository-directories '("~/.emacs.d.old" . 0))
+(add-to-list 'magit-repository-directories '("~/werk" . 0))
+(add-to-list 'magit-repository-directories '("~/workspaces" . 1))
+;; (setq magit-repository-directories nil)
+;; (setq magit-git-debug nil)
+
+(setq magit-repolist-columns
+      '(
+        ;; ("Name" 25 magit-repolist-column-ident nil)
+        ("Version" 30 magit-repolist-column-version
+         ((:sort magit-repolist-version<)))
+        ("B<U" 3 magit-repolist-column-unpulled-from-upstream
+         (
+          ;; (:right-align t)
+          (:sort <)))
+        ("B>U" 3 magit-repolist-column-unpushed-to-upstream
+         (
+          ;; (:right-align t)
+          (:sort <)))
+        (" " 3 magit-repolist-column-flag nil)
+        (" " 12 magit-repolist-column-branch ((:right-align t)))
+        ("Path" 300 magit-repolist-column-path nil))
+      )
+
+;; (setq magit-repolist-column-flag-alist )
+
+;; -------------------------------------------------------------------
+
+(use-package cider
+  :config
+
+  ;; This file is project local. Apparently, you don't need to set it in .dir-locals.el
+  (setq cider-repl-history-file ".cider-repl-history")
+  )
+
+
+;; -------------------------------------------------------------------
+
+(use-package git-gutter
+  :config
+  ;; (add-hook 'ruby-mode-hook 'git-gutter-mode)
+  ;; (add-hook 'python-mode-hook 'git-gutter-mode)
+
+  :custom
+  (git-gutter:update-interval 1)         ; the default is 0, which means update on file save
+  (git-gutter:lighter " gg")
+  (git-gutter:ask-p nil)    ; revert hunks without confirmation, this is safe, as there's undo
+
+  ;; (custom-set-variables
+  ;;  '(git-gutter:modified-sign "  ") ;; two space
+  ;;  '(git-gutter:added-sign "++")    ;; multiple character is OK
+  ;;  '(git-gutter:deleted-sign "--"))
+  ;; (set-face-background 'git-gutter:modified "purple") ;; background color
+  ;; (set-face-foreground 'git-gutter:added "green")
+  ;; (set-face-foreground 'git-gutter:deleted "red")
+  )
+
+(use-package git-gutter-fringe
+  :config
+  (define-fringe-bitmap 'git-gutter-fr:added [#b00111100] nil nil '(center repeated))
+  (define-fringe-bitmap 'git-gutter-fr:modified [#b01100110] nil nil '(center repeated))    ; can also be [#b01100110 #b00000000]
+  (define-fringe-bitmap 'git-gutter-fr:deleted [#b00111100] nil nil '(center repeated))
+  (set-face-foreground 'git-gutter-fr:added    "green")
+  (set-face-foreground 'git-gutter-fr:modified "purple")
+  (set-face-foreground 'git-gutter-fr:deleted  "red")
+
+  ;; bitmaps can be drawn this way:
+  ;; (fringe-helper-define 'git-gutter-fr:added nil
+  ;;                     "...XX..."
+  ;;                     "...XX..."
+  ;;                     "...XX..."
+  ;;                     "XXXXXXXX"
+  ;;                     "XXXXXXXX"
+  ;;                     "...XX..."
+  ;;                     "...XX..."
+  ;;                     "...XX...")
+  )
+
+;; -------------------------------------------------------------------
+
+(use-package nix-mode)
+
+
+;; -------------------------------------------------------------------
+
+
+
 
 

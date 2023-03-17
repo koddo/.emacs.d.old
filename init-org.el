@@ -47,7 +47,16 @@
 
 
   (setq org-hide-leading-stars t)   ; customize the org-hide face for this, set it to light gray
+
+  (setq   ; from https://emacs.stackexchange.com/questions/18877/how-to-indent-without-the-two-extra-spaces-at-the-beginning-of-code-blocks-in-or
+   ;; org-src-fontify-natively t
+   ;; org-src-window-setup 'current-window
+   ;; org-src-strip-leading-and-trailing-blank-lines t
+   org-src-preserve-indentation t
+   ;; org-src-tab-acts-natively t
+   )
   )
+  
 
 
 ;; TODO: why can't I do (require 'org-checklist) without this?
@@ -191,3 +200,49 @@
 
 
 ;; TODO: markdown-mode
+
+
+
+
+;; strike-though text color in org-mode
+(setq org-emphasis-alist         ; from https://stackoverflow.com/questions/13190195/org-mode-strike-through-color
+      (cons '("+" '(:strike-through t :foreground "gray"))
+            (cl-delete "+" org-emphasis-alist :key 'car :test 'equal)))
+
+(use-package org-appear
+  :hook (org-mode . org-appear-mode)
+  :custom
+  (org-appear-autoemphasis  t)
+  (org-appear-autolinks t)
+  :config
+  (setq org-hide-emphasis-markers t)
+  (defun org-insert-literal-character (c)       ; from https://stackoverflow.com/questions/15324852/how-do-i-escape-slash-in-org-mode/75398146#75398146
+    "Insert a literal character at point."
+    (interactive "cWhat character?")
+    (insert ?\u200B c ?\u200B))
+  ;; (define-key org-mode-map (kbd "C-c i l") 'org-insert-literal-character)
+  )
+
+
+
+;; taken from https://hungyi.net/posts/group-emacs-commands-single-undo/
+;; (defmacro with-single-undo (&rest body)
+;;   "Execute BODY as a single undo step."
+;;   `(let ((marker (prepare-change-group)))
+;;      (unwind-protect ,@body
+;;        (undo-amalgamate-change-group marker))))
+
+;; wrapping lines with +- and -+
+;; spaces at the beginning of line is common in code
+;; a space after the plus breaks the strike-through
+;; hence minuses
+(defun m/strike-through-org-region (beg end)
+  (interactive "r")
+  (when mark-active
+    (save-match-data
+      (save-excursion
+        (replace-regexp "^\\(.*\\)$" "+-\\1-+" nil beg end)
+        ))))
+
+
+

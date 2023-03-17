@@ -1,4 +1,4 @@
-;; (server-start)
+(server-start)
 
 ;; -------------------------------------------------------------------
 
@@ -220,14 +220,16 @@
 
 ;; -------------------------------------------------------------------
 
-;; disable version control enabled by default, it slows down emacs, and i don't use it
-;; this probably breaks some functions like vc-annotate and vc-diff
-(setq vc-handled-backends nil)
+;; tramp
 
-;; (use-package magit
-;;   :config
+;; TODO: let it reuse ssh connections
+;; https://stackoverflow.com/questions/56105716/magit-over-tramp-re-use-ssh-connection
+;; https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html#Frequently-Asked-Questions
+;; TRAMP does not use default ssh ControlPath
 
-;;   )
+;; -------------------------------------------------------------------
+
+
 
 ;; -------------------------------------------------------------------
 
