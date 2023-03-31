@@ -106,6 +106,8 @@
 
 (use-package rx)
 
+;; -------------------------------------------------------------------
+
 (use-package dired+
   :config
   (custom-set-variables
@@ -132,64 +134,19 @@
     (dired-omit-mode 1)
     (dired-hide-details-mode 1)))
   (define-key dired-mode-map "(" 'ym/dired-toggle-hide-and-omit)
+
+  ;; (require 'ls-lisp) ;; ignore case when listing directory
+  ;; (setq ls-lisp-ignore-case t)
+  ;; (setq ls-lisp-use-insert-directory-program nil)
+  ;; (setq ls-lisp-use-string-collate nil)
+
  )
-
-
-;; (require 'dired)
-;; (require 'dired-x)
-;; (require 'dired+)
-
-;; (custom-set-variables
-;;  ;; custom-set-variables was added by Custom.
-;;  ;; If you edit it by hand, you could mess it up, so be careful.
-;;  ;; Your init file should contain only one such instance.
-;;  ;; If there is more than one, they won't work right.
-;;  '(dired-omit-extensions '() nil nil "Customized by me")
-;;  '(dired-omit-files (rx (or
-;;                          (seq bol "." eol) 
-;;                          (seq bol "." (not (any "."))) 
-;;                          ))
-;;                     nil nil "Customized by me"))
-
-;; (add-hook 'dired-mode-hook 'dired-omit-mode)
-;; (add-hook 'dired-mode-hook 'dired-hide-details-mode)
-
-;; (add-hook 'dired-mode-hook 'auto-revert-mode)   ; watch filesystem for changes
-
-;; (setq dired-omit-extensions '())
-;; (setq dired-omit-files (rx (or
-;;                             (seq bol "." eol) 
-;;                             (seq bol "." (not (any "."))) 
-;;                             )
-;;                            ))
-;; (defun ym/dired-toggle-hide-and-omit ()
-;;   (interactive)
-;;   (if dired-omit-mode
-;;       (progn (dired-omit-mode -1)
-;;              (dired-hide-details-mode -1))
-;;     (dired-omit-mode 1)
-;;     (dired-hide-details-mode 1)))
-;; (define-key dired-mode-map "(" 'ym/dired-toggle-hide-and-omit)
-
-
-
-
-;; (defun ym-add-to-list-dired-omit-extensions (extensions-list)
-;;   (mapc (lambda (ext) (add-to-list 'dired-omit-extensions ext))
-;;         extensions-list))
-;; (require 'ls-lisp) ;; ignore case when listing directory
-;; (setq ls-lisp-ignore-case t)
-;; (setq ls-lisp-use-insert-directory-program nil)
-;; (setq ls-lisp-use-string-collate nil)
 
 (require 'wdired)
 (setq wdired-confirm-overwrite t)
 
-;; TODO (ym-add-to-list-dired-omit-extensions '(".o" ".a"))
-
 (require   'uniquify)  ; buffer names are uniquified with parts of directory name, for ex.: name|folder
 (setq       uniquify-buffer-name-style 'reverse)
-
 
 ;; -------------------------------------------------------------------
 
