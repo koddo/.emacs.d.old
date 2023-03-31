@@ -60,9 +60,9 @@ Version 2017-03-12"
 			                :base00 "white"     ; Default Background
 			                :base01 "grey88"     ; Lighter Background (Used for status bars)
 			                :base02 "#d8d8d8"    ; Selection Background
-			                :base03 "grey60"     ; Comments, Invisibles, Line Highlighting
+			                :base03 "grey70"     ; Comments, Invisibles, Line Highlighting
 			                :base04 "#585858"    ; Dark Foreground (Used for status bars)
-			                :base05 "grey25"     ; Default Foreground, Caret, Delimiters, Operators
+			                :base05 "grey10"     ; Default Foreground, Caret, Delimiters, Operators
 			                :base06 "#282828"    ; Light Foreground (Not often used)
 			                :base07 "#181818"    ; Light Background (Not often used)
 			                :base08 "#ab4642"    ; Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
@@ -74,12 +74,28 @@ Version 2017-03-12"
 			                :base0E "#ba8baf"    ; Keywords, Storage, Selector, Markup Italic, Diff Changed
 			                :base0F "#a16946"    ; Deprecated, Opening/Closing Embedded Language Tags, e.g. <?php ?>
 			                ))
-    (base16-theme-define 'ym-base16-theme ym-base16-colors)
-    (enable-theme 'ym-base16-theme)
+    ;; (base16-theme-define 'ym-base16-theme ym-base16-colors)
 
     ;; (disable-theme 'deeper-blue)
     ;; (load-theme 'ym-base16-theme t)
     )
+
+  
+ 
+  (setq ym-base16-colors-darker
+        (-map-indexed (lambda (ii cc)
+                        (if (and (> ii 18) (<= ii 30)
+                                 (cl-oddp ii))
+                            (apply 'color-rgb-to-hex `(,@(color-name-to-rgb (color-darken-name cc 18)) 2))
+                          cc))
+                      ym-base16-colors))
+  (base16-theme-define 'ym-base16-theme ym-base16-colors-darker)
+  (enable-theme 'ym-base16-theme)
+  ;; (print ym-base16-colors-darker)
+  
+  ;; (defun asdf (cc)
+  ;;   (apply 'color-rgb-to-hex `(,@(color-name-to-rgb (color-darken-name cc 18)) 2)))
+  ;; (asdf "#925684")
   
 
   ;; temporarily fixing this: https://github.com/belak/base16-emacs/issues/114
@@ -157,6 +173,11 @@ Containing LEFT, and RIGHT aligned respectively."
        ;; (vc-mode vc-mode)
        "  " mode-line-modes mode-line-misc-info mode-line-end-spaces)
      ))))
+
+
+;; tab-bar behaviour and appearance: https://github.com/daviwil/emacs-from-scratch/blob/82f03806d90eb356b815cf514d10b6d863a2cbdc/show-notes/Emacs-Tips-06.org
+;; tab-bar menu, and other arbitrary info in tab-bar: https://karthinks.com/software/a-tab-bar-menu-in-emacs/
+;; https://lambdaland.org/posts/2022-07-20_adding_a_clock_to_emacs/
 
 (set-face-attribute 'tab-bar nil
                     :foreground "red"
