@@ -163,10 +163,35 @@
 ;; (ym-define-key (kbd "s-l") (lambda () (interactive) (ym-keys-ijkl-move 'forward-char nil)))
 ;; (ym-define-key (kbd "s-L") (lambda () (interactive) (ym-keys-ijkl-move 'forward-char t)))
 
-(ym-define-key (kbd "s-i") (lambda () (interactive "^") (previous-line)))
-(ym-define-key (kbd "s-k") (lambda () (interactive "^") (next-line)))
-(ym-define-key (kbd "s-j") (lambda () (interactive "^") (backward-char)))
-(ym-define-key (kbd "s-l") (lambda () (interactive "^") (forward-char)))
+(ym-define-key (kbd "s-i") 'previous-line)
+(ym-define-key (kbd "s-k") 'next-line)
+(ym-define-key (kbd "s-j") 'backward-char)
+(ym-define-key (kbd "s-l") 'forward-char)
+
+(ym-define-key (kbd "H-i") 'windmove-up)
+(ym-define-key (kbd "H-k") 'windmove-down)
+(ym-define-key (kbd "H-j") 'windmove-left)
+(ym-define-key (kbd "H-l") 'windmove-right)
+
+
+(ym-define-key (kbd "s-*") (lambda () (interactive)
+                             (let ((ratio-from-top (max 1 (/ (1- (window-height (selected-window))) 3))))
+                                 (recenter ratio-from-top))))
+(ym-define-key (kbd "s-&") (lambda () (interactive "^") (scroll-up-command   3)))
+(ym-define-key (kbd "s-(") (lambda () (interactive "^") (scroll-down-command 3)))
+(ym-define-key (kbd "H-s-*") (kbd "s-*"))
+(ym-define-key (kbd "H-s-&") (kbd "s-&"))
+(ym-define-key (kbd "H-s-(") (kbd "s-("))
+
+(ym-define-key (kbd "H-s-i") 'scroll-down-command)
+(ym-define-key (kbd "H-s-k") 'scroll-up-command)
+
+;; (ym-define-key (kbd "s-*") (lambda () (interactive "^") (previous-line 24)))
+;; (ym-define-key (kbd "s-,") (lambda () (interactive "^") (next-line 24)))
+;; (ym-define-key (kbd "H-s-i") (lambda () (interactive "^") (previous-line 24)))
+;; (ym-define-key (kbd "H-s-k") (lambda () (interactive "^") (next-line 24)))
+;; (ym-define-key (kbd "H-s-j") (lambda () (interactive "^") (backward-char 4)))
+;; (ym-define-key (kbd "H-s-l") (lambda () (interactive "^") (forward-char 4)))
 
 (ym-define-key (kbd "s-b") #'ido-switch-buffer)
 (ym-define-key (kbd "s-B") #'ibuffer)
@@ -382,21 +407,7 @@ there's a region, all lines that region covers will be duplicated."
 
 ;; -------------------------------------------------------------------
 
-;; (require 'windmove)
-;; (global-set-key (kbd "<left>") 'windmove-left)
-;; (global-set-key (kbd "<right>") 'windmove-right)
-;; (global-set-key (kbd "<up>") 'windmove-up)
-;; (global-set-key (kbd "<down>") 'windmove-down)
 
-;; -------------------------------------------------------------------
-
-
-;; -------------------------------------------------------------------
-
-;; (use-package ace-window
-;;   :config
-;;   (global-set-key (kbd "M-o") 'ace-window)
-;;   )
 
 ;; -------------------------------------------------------------------
 
@@ -421,10 +432,6 @@ there's a region, all lines that region covers will be duplicated."
       (interactive)
       (ignore-errors
         (funcall fn)))))
-;; (global-set-key [s-left] (ignore-error-wrapper 'windmove-left))
-;; (global-set-key [s-right] (ignore-error-wrapper 'windmove-right))
-;; (global-set-key [s-up] (ignore-error-wrapper 'windmove-up))
-;; (global-set-key [s-down] (ignore-error-wrapper 'windmove-down))
 
 ;; -------------------------------------------------------------------
 

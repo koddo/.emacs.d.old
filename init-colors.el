@@ -1,3 +1,6 @@
+;; -*- lexical-binding: t; -*-
+
+
 ;; (rainbow-mode)
 
 (use-package rainbow-mode
@@ -54,36 +57,135 @@ Version 2017-03-12"
 
   (progn
     (setq ym-base16-colors (list
-			    :base00 "white"      ; Default Background
-			    :base01 "grey90"     ; Lighter Background (Used for status bars)
-			    :base02 "#d8d8d8"    ; Selection Background
-			    :base03 "grey60"     ; Comments, Invisibles, Line Highlighting
-			    :base04 "#585858"    ; Dark Foreground (Used for status bars)
-			    :base05 "grey25"     ; Default Foreground, Caret, Delimiters, Operators
-			    :base06 "#282828"    ; Light Foreground (Not often used)
-			    :base07 "#181818"    ; Light Background (Not often used)
-			    :base08 "#ab4642"    ; Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
-			    :base09 "#dc9656"    ; Integers, Boolean, Constants, XML Attributes, Markup Link Url
-			    :base0A "#cca770"    ; Classes, Markup Bold, Search Text Background
-			    :base0B "#a1b56c"    ; Strings, Inherited Class, Markup Code, Diff Inserted
-			    :base0C "#86c1b9"    ; Support, Regular Expressions, Escape Characters, Markup Quotes
-			    :base0D "#7cafc2"    ; Functions, Methods, Attribute IDs, Headings
-			    :base0E "#ba8baf"    ; Keywords, Storage, Selector, Markup Italic, Diff Changed
-			    :base0F "#a16946"    ; Deprecated, Opening/Closing Embedded Language Tags, e.g. <?php ?>
-			    ))
+			                :base00 "white"     ; Default Background
+			                :base01 "grey88"     ; Lighter Background (Used for status bars)
+			                :base02 "#d8d8d8"    ; Selection Background
+			                :base03 "grey60"     ; Comments, Invisibles, Line Highlighting
+			                :base04 "#585858"    ; Dark Foreground (Used for status bars)
+			                :base05 "grey25"     ; Default Foreground, Caret, Delimiters, Operators
+			                :base06 "#282828"    ; Light Foreground (Not often used)
+			                :base07 "#181818"    ; Light Background (Not often used)
+			                :base08 "#ab4642"    ; Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
+			                :base09 "#dc9656"    ; Integers, Boolean, Constants, XML Attributes, Markup Link Url
+			                :base0A "#cca770"    ; Classes, Markup Bold, Search Text Background
+			                :base0B "#a1b56c"    ; Strings, Inherited Class, Markup Code, Diff Inserted
+			                :base0C "#86c1b9"    ; Support, Regular Expressions, Escape Characters, Markup Quotes
+			                :base0D "#7cafc2"    ; Functions, Methods, Attribute IDs, Headings
+			                :base0E "#ba8baf"    ; Keywords, Storage, Selector, Markup Italic, Diff Changed
+			                :base0F "#a16946"    ; Deprecated, Opening/Closing Embedded Language Tags, e.g. <?php ?>
+			                ))
     (base16-theme-define 'ym-base16-theme ym-base16-colors)
     (enable-theme 'ym-base16-theme)
 
     ;; (disable-theme 'deeper-blue)
     ;; (load-theme 'ym-base16-theme t)
     )
+  
 
   ;; temporarily fixing this: https://github.com/belak/base16-emacs/issues/114
   ;; font-lock-comment-delimiter-face should be base03, not base02
   (set-face-attribute 'font-lock-comment-delimiter-face nil :foreground (plist-get ym-base16-colors :base03))
+
+
+  ;; ;; https://terminal.sexy/
+  ;; (use-package base16-theme
+  ;;   :config
+  ;;   (load-theme 'base16-default-light t)
+  ;;   ;; (load-theme 'base16-grayscale-light t)
+  ;;   )
+
   )
 
+(set-face-attribute 'mode-line-buffer-id nil
+                    :foreground "black"
+                    :distant-foreground "white"
+                    ;; :background "grey"
+                    )
+(set-face-attribute 'mode-line nil
+                    :foreground "grey60"
+                    :box (list
+                          :color "grey22"
+                          :line-width '(0 . 9)
+                          )
+                    :background "grey22"
+                    )
+(set-face-attribute 'mode-line-inactive nil
+                    :foreground "grey60"
+                    :box (list
+                          :color "grey22"
+                          :line-width '(1 . 2)
+                          )
+                    :background "grey90"
+                    )
 
+
+
+;; (setq-default mode-line-format
+;;               (let* ((left-side '("%e" mode-line-front-space mode-line-mule-info mode-line-client mode-line-modified mode-line-remote mode-line-frame-identification mode-line-buffer-identification "   "))
+;;                      (right-side '(mode-line-position
+;;                                    (vc-mode vc-mode)
+;;                                    "  " mode-line-modes mode-line-misc-info mode-line-end-spaces))
+;;                      (r-length (length (format-mode-line right-side)))
+;;                      (padding (lambda () (propertize " " 'display `(space :align-to (- right ,r-length))))))
+;;                 `(,left-side
+;;                   (:eval (padding))
+;;                   ,right-side
+;;                   ))
+;;               )
+
+(defun ym/align-mode-line (left right)
+  "Return a string of `window-width' length.
+Containing LEFT, and RIGHT aligned respectively."
+  (let ((available-width
+         (- (window-total-width)
+            (+ (length (format-mode-line left))
+               (length (format-mode-line right))))))
+    (append left
+            (list (format (format "%%%ds" available-width) ""))
+            right)))
+
+(setq-default
+ mode-line-format
+ '((:eval
+    (ym/align-mode-line
+     ;; Left.
+     '("%e" mode-line-front-space mode-line-mule-info mode-line-client mode-line-modified mode-line-remote mode-line-frame-identification mode-line-buffer-identification)
+
+     ;; Right.
+     '("   "
+       "%l:%c"         ; instead of mode-line-position
+       ;; (vc-mode vc-mode)
+       "  " mode-line-modes mode-line-misc-info mode-line-end-spaces)
+     ))))
+
+(set-face-attribute 'tab-bar nil
+                    :foreground "red"
+                    :box nil
+                    ;; (list
+                    ;;       :color "grey22"
+                    ;;       :line-width '(0 . 9)
+                    ;;       )
+                    :background "grey80"
+                    )
+
+(set-face-attribute 'tab-bar-tab nil
+                    :foreground "white"
+                    :box (list
+                          :color "grey20"
+                          :line-width '(10 . 8)
+                          )
+                    :background "grey22"                    
+                    )
+(set-face-attribute 'tab-bar-tab-inactive nil
+                    :foreground "grey80"
+                    :box (list
+                          :color "grey50"
+                          :line-width '(10 . 0)
+                          )
+                    :background "grey50"                    
+                    )
+;; tab-bar-tab-group-current
+;; tab-bar-tab-group-inactive
 
 ;; to customize further, first do M-x describe-text-properties, then the following
 (set-face-attribute 'org-special-keyword nil :foreground (plist-get ym-base16-colors :base03))

@@ -1,4 +1,28 @@
+
+
+;; -------------------------------------------------------------------
+
 (server-start)
+
+;; -------------------------------------------------------------------
+
+(set-frame-name "emacs")
+;; frame-title-format
+
+;; (make-frame '((name . "main")))
+
+;; -------------------------------------------------------------------
+
+(use-package diminish)
+
+;; to rename minor modes see https://github.com/myrjola/diminish.el
+;; to diminish a major mode, (setq mode-name "whatever") in the mode hook
+;; e.g., (add-hook 'lisp-mode-hook (lambda () (setq mode-name "λ")))
+
+(setq eldoc-echo-area-use-multiline-p nil)
+(diminish 'eldoc-mode)
+
+;; maybe try https://github.com/radian-software/blackout instead
 
 ;; -------------------------------------------------------------------
 
@@ -22,7 +46,7 @@
 (line-number-mode t)
 (column-number-mode t)
 
-(setq scroll-error-top-bottom t)  ;; point moves to the beginning or the end of the buffer (depending on scrolling direction) when no more scrolling possible
+(setq scroll-error-top-bottom nil)  ;; point moves to the beginning or the end of the buffer (depending on scrolling direction) when no more scrolling possible
 ;; maybe someday try to fix hl-line-mode at the end of buffer: https://emacs.stackexchange.com/questions/24311/eval-buffer-works-init-does-not-hl-line-fix
 
 ;; for warning-suppress-types later in init
@@ -35,22 +59,37 @@
 ;; (add-hook 'before-save-hook 'delete-trailing-whitespace)
 (setq scroll-step 1)
 (setq scroll-conservatively 10000)
-(setq auto-window-vscroll nil)
-
 (set-scroll-bar-mode 'right)
-(setq scroll-step 1)
-(setq scroll-conservatively 10000)
 (setq scroll-preserve-screen-position t)
+
+(setq auto-window-vscroll nil)   ; ?
+
+
+
 (setq mouse-wheel-scroll-amount '(1))
 
+
+
+
+(setq scroll-preserve-screen-position t)
+
+;; also https://www.emacswiki.org/emacs/SmoothScrolling
+
+;; (use-package golden-ratio-scroll-screen)
+;; golden-ratio-scroll-highlight-line-face
+;; (setq golden-ratio-scroll-highlight-delay (cons 0 0))   ; just a tiny flash is enough
 
 ;; -------------------------------------------------------------------
 
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
+
 (require 'whitespace)
-(setq whitespace-style '(tabs tab-mark)) ; show tabs
-(setq global-whitespace-mode 1)
+(setq whitespace-style
+      ;; '(tabs tab-mark space-mark)
+      '(face tabs spaces trailing lines space-before-tab newline indentation empty space-after-tab space-mark tab-mark newline-mark missing-newline-at-eof)
+      )
+;; toggle with M-x global-whitespace-mode	
 
 ;; -------------------------------------------------------------------
 
@@ -115,6 +154,7 @@
 (setq auto-save-no-message t)   ; not sure if it has effect in other modes, but leaving it
 
 (use-package super-save
+  :diminish super-save-mode
   :config
 
   (auto-save-visited-mode 1)   ; it's a built-in mode, I found the super-save-auto-save-when-idle less usable, because it polluted messages
@@ -139,6 +179,7 @@
 
 ;; isearch extension that shows number of matches and current match index
 (use-package anzu
+  :diminish anzu-mode
   :config
   (setq anzu-search-threshold 1000)
   (global-anzu-mode +1)
@@ -231,8 +272,6 @@
 
 
 
+
 ;; -------------------------------------------------------------------
-
-
-
 

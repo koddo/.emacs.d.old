@@ -8,3 +8,15 @@
 (setq org-download-screenshot-method "xfce4-screenshooter --region --save %s"   ; "gnome-screenshot -a -f %s" ; for macos: "screencapture -i %s"
       org-download-edit-cmd "open -a Krita %s"   ; TODO: move to preinit
       org-download-backend "wget \"%s\" -O \"%s\"")
+
+
+
+
+
+
+
+
+
+
+
+

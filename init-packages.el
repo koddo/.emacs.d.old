@@ -9,10 +9,6 @@
 ;; -------------------------------------------------------------------
 
 
-(use-package diminish)
-;; to rename minor modes see https://github.com/myrjola/diminish.el
-;; to diminish a major mode, (setq mode-name "whatever") in the mode hook
-;; e.g., (add-hook 'lisp-mode-hook (lambda () (setq mode-name "λ")))
 
 
 ;; -------------------------------------------------------------------
@@ -22,16 +18,30 @@
 (use-package undo-tree
   :diminish undo-tree-mode
   :config
+  (setq undo-tree-auto-save-history nil)
   (global-undo-tree-mode)
-  )
+  
+  (progn
+    (defun ym/suppress-message--undo-tree-undo (undo-tree-undo &rest args)
+      (let ((message-log-max nil)              ; from https://emacs.stackexchange.com/questions/59942/is-it-possible-suppress-save-message-for-undo-tree
+            (inhibit-message t))
+        (apply undo-tree-undo args)))
+    (advice-add 'undo-tree-undo :around 'ym/suppress-message--undo-tree-undo))
+  ;; (progn
+  ;;   (defun ym/suppress-message--undo-tree-save-history (undo-tree-save-history &rest args)
+  ;;     (let ((message-log-max nil)              ; from https://emacs.stackexchange.com/questions/59942/is-it-possible-suppress-save-message-for-undo-tree
+  ;;           (inhibit-message t))
+  ;;       (apply undo-tree-save-history args)))
+  ;;   (advice-add 'undo-tree-save-history :around 'ym/suppress-message--undo-tree-save-history))
 
+  )
 
 ;; -------------------------------------------------------------------
 
 
 (use-package emojify
   :config
-   ;; (remove-hook 'emojify-inhibit-functions #'emojify-in-org-tags-p)
+  ;; (remove-hook 'emojify-inhibit-functions #'emojify-in-org-tags-p)
   )
 
 
@@ -39,11 +49,17 @@
 
 
 ;; https://github.com/emacsorphanage/popwin
-(use-package popwin
-  :config
-  (popwin-mode 1)
-  )
+;; (use-package popwin
+;;   :config
+;;   (popwin-mode 1)
+;;   )
+;; it's buggy, leaves cursor in minibuffer
 
+(use-package popper
+  :config
+  (popper-mode +1)
+  (add-to-list 'popper-reference-buffers "\\*rg\\*")
+  )
 
 ;; -------------------------------------------------------------------
 
@@ -150,7 +166,7 @@
 
 (use-package smartparens
   :demand t
-  
+  :diminish smartparens-mode smartparens-global-mode show-smartparens-mode show-smartparens-global-mode
   :config
   (require 'smartparens-config)   ; default configuration
   (setq sp-navigate-reindent-after-up-in-string nil)
@@ -184,15 +200,15 @@
 
 ;; -------------------------------------------------------------------
 
-(use-package helpful
-  :config
-  (global-set-key (kbd "C-h f") #'helpful-callable)
-  (global-set-key (kbd "C-h v") #'helpful-variable)
-  (global-set-key (kbd "C-h k") #'helpful-key)
-  (global-set-key (kbd "C-c C-d") #'helpful-at-point)
-  (global-set-key (kbd "C-h F") #'helpful-function)
-  (global-set-key (kbd "C-h C") #'helpful-command)
-  )
+;; (use-package helpful
+;;   :config
+;;   (global-set-key (kbd "C-h f") #'helpful-callable)
+;;   (global-set-key (kbd "C-h v") #'helpful-variable)
+;;   (global-set-key (kbd "C-h k") #'helpful-key)
+;;   (global-set-key (kbd "C-c C-d") #'helpful-at-point)
+;;   (global-set-key (kbd "C-h F") #'helpful-function)
+;;   (global-set-key (kbd "C-h C") #'helpful-command)
+;;   )
 
 ;; -------------------------------------------------------------------
 
@@ -218,7 +234,40 @@
 ;; https://sachachua.com/blog/2021/04/emacs-hydra-allow-completion-when-i-can-t-remember-the-command-name/
 ;; https://sachachua.com/dotemacs/index.html#hydra-completion
 
-;; -------------------------------------------------------------------
+
+
+
+
+(defun my/hydra-format-head (h)
+  (let ((key-binding (elt h 0))
+        (hint (elt h 2))
+        (cmd (and (elt h 1) (prin1-to-string (elt h 1)))))
+    (if cmd
+        (format "%s (%s) - %s" hint key-binding cmd)
+      (format "%s (%s)" hint key-binding))))
+
+(defun my/hydra-current-heads-as-candidates ()
+  (let ((base (replace-regexp-in-string "/body$" "" (symbol-name hydra-curr-body-fn))))
+    (mapcar (lambda (h)
+              (cons (my/hydra-format-head h) (hydra--head-name h (intern base))))
+            (symbol-value (intern (concat base "/heads"))))))
+
+(defun my/hydra-execute-extended (prefixarg &optional command-name typed)
+  (declare (interactive-only command-execute))
+  (interactive (let ((execute-extended-command--last-typed nil)
+                     (candidates (my/hydra-current-heads-as-candidates)))
+                 (hydra-keyboard-quit)
+                 (list current-prefix-arg
+                       (completing-read "Cmd: " candidates)
+                       execute-extended-command--last-typed)))
+  (let* ((candidates (my/hydra-current-heads-as-candidates))
+         (bind (assoc-default command-name candidates 'string=)))
+    (cond
+     ((null bind) nil)
+     ((hydra--callablep bind) (call-interactively bind)))))
+
+(with-eval-after-load 'hydra
+  (define-key hydra-base-map (kbd "tab") #'my/hydra-execute-extended))
 
 ;; -------------------------------------------------------------------
 
@@ -274,15 +323,56 @@
 ;; TODO: remove duplicates in buflist
 ;; )
 
+
+
+(setq projectile-switch-project-action #'projectile-dired)
+(projectile-discover-projects-in-directory "~/workspaces")
+;; projectile-add-known-project
+
+
+;; (use-package perspective)
+;; (use-package persp-mode)
+;; (use-package persp-projectile)
+
+
 ;; -------------------------------------------------------------------
 
 
-(use-package treemacs)
+(use-package treemacs
+  :config
+  (setq treemacs-no-png-images t)
+)
 (use-package treemacs-projectile
   :after treemacs projectile)
 (use-package treemacs-magit
   :after treemacs magit)
-(use-package lsp-treemacs)
+
+;; (use-package all-the-icons
+;;   :if (display-graphic-p))
+;; (use-package treemacs-all-the-icons
+;;   :after treemacs
+;;   )
+;; (treemacs-load-theme "all-the-icons")
+;; ;; (use-package lsp-treemacs)
+
+;; (use-package doom-modeline
+;;   :init (doom-modeline-mode 1)
+;;   :config
+;;   (setq mode-line-percent-position nil
+;;         doom-modeline-workspace-name nil
+;;         )
+;;   )
+
+;; (use-package doom-themes
+;;   :config
+;;   ;; (load-theme 'doom-one-light t)
+;;   (load-theme 'doom-tomorrow-day t)
+  
+;;   )
+
+;; (custom-set-faces
+;;  `(fringe ((t (:background "grey90")))))
+
 
 
 ;; -------------------------------------------------------------------
@@ -290,9 +380,9 @@
 (use-package yasnippet
   :config
   (setq yas-snippet-dirs
-	(list (concat
-	       (file-name-as-directory user-emacs-directory)
-	       "yasnippets")))
+	    (list (concat
+	           (file-name-as-directory user-emacs-directory)
+	           "yasnippets")))
   (yas-reload-all)
 
   ;; TODO: bind yas-expand
@@ -304,17 +394,17 @@
     (erase-buffer)
     (dolist (dir dirs)
       (dolist (filename (directory-files-recursively dir "" nil))
-	(insert "---------------------------------------------------------")
-	(newline)
-	(insert filename)
-	(newline)
-	(insert-file-contents filename)
-	(end-of-buffer)   ; any better way to jump after the insertion?
-	(newline)
-	(newline)
-	(newline)
-	(newline)
-	))
+	    (insert "---------------------------------------------------------")
+	    (newline)
+	    (insert filename)
+	    (newline)
+	    (insert-file-contents filename)
+	    (end-of-buffer)   ; any better way to jump after the insertion?
+	    (newline)
+	    (newline)
+	    (newline)
+	    (newline)
+	    ))
     (beginning-of-buffer)
     (view-mode)
     )
@@ -351,7 +441,12 @@
 
 ;; -------------------------------------------------------------------
 
+
 (use-package buffer-move)
+;; buf-move-up
+;; buf-move-down
+;; buf-move-left
+;; buf-move-right
 
 ;; -------------------------------------------------------------------
 
@@ -388,23 +483,23 @@
   ;; see keybindings.el
 
   (setq avy-keys
-	(list
-	 ?r ?e ?w          ; ?q -- I often can't distinguish q from g
-	 ?v ?c ?x ?z       ; ?b -- o
-	 ?m ;; ?n
+	    (list
+	     ?r ?e ?w          ; ?q -- I often can't distinguish q from g
+	     ?v ?c ?x ?z       ; ?b -- o
+	     ?m ;; ?n
 
 
-	 ?j ?k ?l
+	     ?j ?k ?l
 
-	 ?s ?d ?f     ; ?a -- looks too similar to ?d
-	 
-	 ; ?u -- it's fine, but hard to reach after the semicolon         ; ?i=?l  ; ?o -- similar to a   ;; ?p -- vertical line is not visible enough
-	 ; ?h -- hard to reach          ; ?g -- similar to a
-	 ; ?y ?t -- hard to reach
+	     ?s ?d ?f     ; ?a -- looks too similar to ?d
+	     
+                                        ; ?u -- it's fine, but hard to reach after the semicolon         ; ?i=?l  ; ?o -- similar to a   ;; ?p -- vertical line is not visible enough
+                                        ; ?h -- hard to reach          ; ?g -- similar to a
+                                        ; ?y ?t -- hard to reach
 
-	 ; ?, ?. -- these don't work for some reason
-	 )
-  	)
+                                        ; ?, ?. -- these don't work for some reason
+	     )
+  	    )
 
   (setq avy-background nil)
   (setq avy-highlight-first nil)
@@ -416,9 +511,9 @@
   (add-to-list 'avy-orders-alist '(avy-goto-word-1 . avy-order-closest))
 
   (dolist (x '(avy-lead-face
-	       avy-lead-face-0
-	       avy-lead-face-1
-	       avy-lead-face-2))
+	           avy-lead-face-0
+	           avy-lead-face-1
+	           avy-lead-face-2))
     (set-face-attribute x nil :foreground "white" :background "#dc9656"))
   ;; (set-face-attribute 'avy-background-face nil :foreground "grey90" :background "grey98")
 
@@ -426,12 +521,12 @@
   ;; TODO:this should be a pull request with adding an option for excluding current point
   (defun avy-jump-advice-exclude-current-point (orig-func &rest args)
     (let* ((between-inclusive (lambda (val low high) (and (<= low val) (<= val high))))
-	   (current-point (point))
-	   (oldpred (plist-get :pred args))
-	   (pred (lambda ()
-		   (and
-		    (let ((candidate (point))) (or (< candidate current-point) (> candidate (+ 3 current-point))))   ; +3 should be enough: with avy-goto-word-1 it's +1, with avy-goto-char-2 it's +2
-		    (or (null oldpred) (funcall oldpred))))))
+	       (current-point (point))
+	       (oldpred (plist-get :pred args))
+	       (pred (lambda ()
+		           (and
+		            (let ((candidate (point))) (or (< candidate current-point) (> candidate (+ 3 current-point))))   ; +3 should be enough: with avy-goto-word-1 it's +1, with avy-goto-char-2 it's +2
+		            (or (null oldpred) (funcall oldpred))))))
       (apply orig-func (append args (list :pred pred)))))
   (advice-add 'avy-jump :around #'avy-jump-advice-exclude-current-point)
 
@@ -440,7 +535,7 @@
   ;; This fix makes all cursors filled temporarily.
   (defun avy-jump-advice-cursor-background-fix (orig-func &rest args)
     (let ((old-color (face-attribute 'cursor :background))
-	  (old-type cursor-in-non-selected-windows))
+	      (old-type cursor-in-non-selected-windows))
       (set-cursor-color "white")
       (setq-default cursor-in-non-selected-windows 'box)
       (apply orig-func args)
@@ -536,53 +631,59 @@
   ;; https://magit.vc/manual/magit/Action-Confirmation.html
   ;; stage-all-changes
   
-(defun kisaragi/magit-log-visit-changed-file ()
-  "Visit a changed file of revision under point in `magit-log-mode'.
+  (defun kisaragi/magit-log-visit-changed-file ()
+    "Visit a changed file of revision under point in `magit-log-mode'.
 
 Uses `general-simulate-key', so `general-simulate-RET' will
 become defined after invocation."
-  (interactive)
-  (general-simulate-key "RET")
-  ;; visit the commit
-  (general-simulate-RET)
-  ;; move to first changed file in diff buffer
-  (setf (point) (point-min))
-  (search-forward "|" nil t)
-  ;; open the revision
-  (general-simulate-RET))
+    (interactive)
+    (general-simulate-key "RET")
+    ;; visit the commit
+    (general-simulate-RET)
+    ;; move to first changed file in diff buffer
+    (setf (point) (point-min))
+    (search-forward "|" nil t)
+    ;; open the revision
+    (general-simulate-RET))
 
+
+  (defun ym/magit-repolist-column--date-last-touched (_)
+    "20230329"
+    )
+  ;; M-x tabulated-list-sort
 
 
   ;; (setq magit-git-debug nil)   ; useful for checking out the actual commands behind the views
 
+
+
+  (add-to-list 'magit-repository-directories '("~/.emacs.d.old" . 0))
+  (add-to-list 'magit-repository-directories '("~/werk" . 0))
+  (add-to-list 'magit-repository-directories '("~/workspaces" . 1))
+  ;; (setq magit-repository-directories nil)
+  ;; (setq magit-git-debug nil)
+
+  (setq magit-repolist-columns
+        '(
+          (" " 10 ym/magit-repolist-column--date-last-touched nil)
+          ("Version" 30 magit-repolist-column-version
+           ((:sort magit-repolist-version<)))
+          ("B<U" 3 magit-repolist-column-unpulled-from-upstream
+           (
+            ;; (:right-align t)
+            (:sort <)))
+          ("B>U" 3 magit-repolist-column-unpushed-to-upstream
+           (
+            ;; (:right-align t)
+            (:sort <)))
+          (" " 3 magit-repolist-column-flag nil)
+          (" " 12 magit-repolist-column-branch ((:right-align t)))
+          ("Path" 300 magit-repolist-column-path nil)
+          ))
+
+  ;; (setq magit-repolist-column-flag-alist )
+
   )
-
-
-(add-to-list 'magit-repository-directories '("~/.emacs.d.old" . 0))
-(add-to-list 'magit-repository-directories '("~/werk" . 0))
-(add-to-list 'magit-repository-directories '("~/workspaces" . 1))
-;; (setq magit-repository-directories nil)
-;; (setq magit-git-debug nil)
-
-(setq magit-repolist-columns
-      '(
-        ;; ("Name" 25 magit-repolist-column-ident nil)
-        ("Version" 30 magit-repolist-column-version
-         ((:sort magit-repolist-version<)))
-        ("B<U" 3 magit-repolist-column-unpulled-from-upstream
-         (
-          ;; (:right-align t)
-          (:sort <)))
-        ("B>U" 3 magit-repolist-column-unpushed-to-upstream
-         (
-          ;; (:right-align t)
-          (:sort <)))
-        (" " 3 magit-repolist-column-flag nil)
-        (" " 12 magit-repolist-column-branch ((:right-align t)))
-        ("Path" 300 magit-repolist-column-path nil))
-      )
-
-;; (setq magit-repolist-column-flag-alist )
 
 ;; -------------------------------------------------------------------
 
@@ -591,6 +692,7 @@ become defined after invocation."
 
   ;; This file is project local. Apparently, you don't need to set it in .dir-locals.el
   (setq cider-repl-history-file ".cider-repl-history")
+  (setq cider-eldoc-display-context-dependent-info t)
   )
 
 
@@ -642,6 +744,111 @@ become defined after invocation."
 
 
 ;; -------------------------------------------------------------------
+
+;; install https://addons.mozilla.org/en-US/firefox/addon/ghosttext/
+;; https://github.com/fregante/GhostText
+
+(use-package atomic-chrome)
+;; (atomic-chrome-start-server)
+
+(use-package code-cells)
+(use-package jupyter)
+
+;; -------------------------------------------------------------------
+
+(use-package web-mode)
+
+
+;; -------------------------------------------------------------------
+
+(use-package highlight)
+
+
+;; -------------------------------------------------------------------
+
+(use-package key-chord
+  :config
+  ;; (key-chord-mode 1)
+  (setq key-chord-one-key-delay 0.15)
+  (setq key-chord-two-keys-delay 0.01)
+  ;; (key-chord-define-global "qq"     "cool")
+  ;; (key-chord-define-global "kl"     "cool")
+  ;; (key-chord-define-global " a"     "cool")
+  ;; (key-chord-define-global "((" 'sp-wrap-round)
+  ;; (key-chord-define c++-mode-map ";;"  "\C-e;")
+  )
+
+(use-package key-seq
+  ;; (key-seq-define-global ";a" "cool")
+  ;; (key-seq-define text-mode-map "qf" 'flyspell-buffer)
+  ;; (key-chord-mode 1)
+  )
+;; https://www.johndcook.com/blog/2015/02/01/rare-bigrams/
+;; https://www.reddit.com/r/emacs/comments/22hzx7/what_are_your_keychord_abbreviations/ 
+
+;; btw, ordered chords: https://github.com/vlevit/key-seq.el
+;; e.g., for ';j'
+
+;; ("[f" . "{")
+;; ("]f" . "}")
+
+
+
+;; -------------------------------------------------------------------
+
+(use-package copy-as-format)
+
+;; -------------------------------------------------------------------
+(use-package ignoramus)
+(ignoramus-setup)
+;; (ignoramus-setup '(pcomplete shell ido))
+
+
+;; -------------------------------------------------------------------
+
+(use-package olivetti)
+
+
+;; -------------------------------------------------------------------
+
+(tab-bar-mode)
+
+;; instead of winner-mode
+(tab-bar-history-mode)
+
+;; tab-bar-history-back
+;; tab-bar-history-forward
+
+
+;; -------------------------------------------------------------------
+
+;; (use-package minions)
+(use-package manage-minor-mode-table)
+
+
+
+;; -------------------------------------------------------------------
+
+;; c++
+(setq-default c-basic-offset 4)
+
+
+;; (use-package eldoc
+;;   :straight nil
+;;   :diminish
+;;   :config
+;;   ;; (eldoc-mode -1)
+;;   )
+
+(use-package eldoc-box)
+
+;; -------------------------------------------------------------------
+
+
+
+
+;; -------------------------------------------------------------------
+
 
 
 
