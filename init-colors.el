@@ -92,6 +92,7 @@ Version 2017-03-12"
   (base16-theme-define 'ym-base16-theme ym-base16-colors-darker)
   (enable-theme 'ym-base16-theme)
   ;; (print ym-base16-colors-darker)
+  ;; (:base00 "white" :base01 "grey88" :base02 "#d8d8d8" :base03 "grey70" :base04 "#585858" :base05 "grey10" :base06 "#282828" :base07 "#181818" :base08 "#ab4642" :base09 "#b16724" :base0A "#a57a3a" :base0B "#718342" :base0C "#4f9b91" :base0D "#47839a" :base0E "#925684" :base0F "#a16946")
   
   ;; (defun asdf (cc)
   ;;   (apply 'color-rgb-to-hex `(,@(color-name-to-rgb (color-darken-name cc 18)) 2)))
