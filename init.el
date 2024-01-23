@@ -45,9 +45,9 @@
 
 (load-file (expand-file-name "init-preinit-softlink.el" user-emacs-directory))
 
+(load-file (expand-file-name "init-org.el" user-emacs-directory))
 (load-file (expand-file-name "init-emacs.el" user-emacs-directory))
 (load-file (expand-file-name "init-packages.el" user-emacs-directory))
-(load-file (expand-file-name "init-org.el" user-emacs-directory))
 (load-file (expand-file-name "init-agenda.el" user-emacs-directory))
 (load-file (expand-file-name "init-habits.el" user-emacs-directory))
 (load-file (expand-file-name "init-keybindings-3-ym-keys-minor-mode.el" user-emacs-directory))

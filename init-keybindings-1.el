@@ -360,7 +360,7 @@
 		      (org-agenda nil "x2")
 		      (delete-other-windows)
 		      )
-		"full")
+		    "full")
 	       ("3" (lambda () (interactive)
 		      (org-agenda nil "x3")
 		      (delete-other-windows)

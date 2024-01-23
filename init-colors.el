@@ -62,7 +62,7 @@ Version 2017-03-12"
 			                :base02 "#d8d8d8"    ; Selection Background
 			                :base03 "grey70"     ; Comments, Invisibles, Line Highlighting
 			                :base04 "#585858"    ; Dark Foreground (Used for status bars)
-			                :base05 "grey10"     ; Default Foreground, Caret, Delimiters, Operators
+			                :base05 "grey20"     ; Default Foreground, Caret, Delimiters, Operators
 			                :base06 "#282828"    ; Light Foreground (Not often used)
 			                :base07 "#181818"    ; Light Background (Not often used)
 			                :base08 "#ab4642"    ; Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
@@ -86,7 +86,7 @@ Version 2017-03-12"
         (-map-indexed (lambda (ii cc)
                         (if (and (> ii 18) (<= ii 30)
                                  (cl-oddp ii))
-                            (apply 'color-rgb-to-hex `(,@(color-name-to-rgb (color-darken-name cc 18)) 2))
+                            (apply 'color-rgb-to-hex `(,@(color-name-to-rgb (color-darken-name cc 25)) 2))
                           cc))
                       ym-base16-colors))
   (base16-theme-define 'ym-base16-theme ym-base16-colors-darker)
@@ -183,7 +183,7 @@ Containing LEFT, and RIGHT aligned respectively."
 (set-face-attribute 'tab-bar nil
                     :foreground "red"
                     :box nil
-                    ;; (list
+                    ;; :box (list
                     ;;       :color "grey22"
                     ;;       :line-width '(0 . 9)
                     ;;       )
@@ -193,18 +193,19 @@ Containing LEFT, and RIGHT aligned respectively."
 (set-face-attribute 'tab-bar-tab nil
                     :foreground "white"
                     :box (list
-                          :color "grey20"
+                          :color "grey55"
                           :line-width '(10 . 8)
                           )
-                    :background "grey22"                    
+                    :background "grey55"                    
                     )
+
 (set-face-attribute 'tab-bar-tab-inactive nil
-                    :foreground "grey80"
+                    :foreground "grey36"
                     :box (list
-                          :color "grey50"
+                          :color "grey72"
                           :line-width '(10 . 0)
                           )
-                    :background "grey50"                    
+                    :background "grey72"                    
                     )
 ;; tab-bar-tab-group-current
 ;; tab-bar-tab-group-inactive
@@ -296,8 +297,18 @@ Containing LEFT, and RIGHT aligned respectively."
 (defface ym/org-double-backslash-newline-highlight '((t :foreground "grey80")) "double backslash at eol")
 ;; (set-face-attribute 'org-double-slash-newline-highlight nil :foreground "grey80")
 
-
-
+(dolist (x '(avy-lead-face
+	         avy-lead-face-0
+	         avy-lead-face-1
+	         avy-lead-face-2))
+  (set-face-attribute x nil :foreground "white" :background "#dc9656")
+  ;; (set-face-attribute x nil :foreground "white" :background "#e5b180")
+  ;; (set-face-attribute x nil :foreground "white" :background "#eecbaa")
+  )
+;; (set-face-attribute 'avy-background-face nil :foreground "grey90" :background "grey98")
+;; (dolist (buf (buffer-list))
+;;    (when (get-buffer-window buf 'visible) (....<STUFF>...))
 
 ;; (defface ym/habits-face '((t :family "Monaco" :height 80)) "")
+
 

@@ -459,7 +459,7 @@
 
 ;; -------------------------------------------------------------------
 
-(use-package multiple-cursors)
+;; (use-package multiple-cursors)
 
 ;; -------------------------------------------------------------------
 
@@ -484,14 +484,19 @@
 
   (setq avy-keys
 	    (list
-	     ?r ?e ?w          ; ?q -- I often can't distinguish q from g
+         ?j ?k ?l
+	     ?s ?d ?f     ; ?a -- looks too similar to ?d
+
+
+         ?r ?e ?w          ; ?q -- I often can't distinguish q from g
+
 	     ?v ?c ?x ?z       ; ?b -- o
 	     ?m ;; ?n
 
 
-	     ?j ?k ?l
-
-	     ?s ?d ?f     ; ?a -- looks too similar to ?d
+         ;; ?1 ?2 ?3 ?4
+         ;; ?5 ?6
+         ;; ?7 ?8 ?9 ?0
 	     
                                         ; ?u -- it's fine, but hard to reach after the semicolon         ; ?i=?l  ; ?o -- similar to a   ;; ?p -- vertical line is not visible enough
                                         ; ?h -- hard to reach          ; ?g -- similar to a
@@ -505,17 +510,12 @@
   (setq avy-highlight-first nil)
   (setq avy-all-windows t) ; 'all-frames
   (setq avy-style 'at-full)
+  ;; (setq avy-style 'de-bruijn)
   (setq avy-single-candidate-jump nil)
+  ;; (setq avy-timeout-seconds 0.3)
 
   (add-to-list 'avy-orders-alist '(avy-goto-char-2 . avy-order-closest))
-  (add-to-list 'avy-orders-alist '(avy-goto-word-1 . avy-order-closest))
-
-  (dolist (x '(avy-lead-face
-	           avy-lead-face-0
-	           avy-lead-face-1
-	           avy-lead-face-2))
-    (set-face-attribute x nil :foreground "white" :background "#dc9656"))
-  ;; (set-face-attribute 'avy-background-face nil :foreground "grey90" :background "grey98")
+  ;; (add-to-list 'avy-orders-alist '(avy-goto-word-1 . avy-order-closest))
 
   ;; https://github.com/abo-abo/avy/issues/268
   ;; TODO:this should be a pull request with adding an option for excluding current point
@@ -530,18 +530,21 @@
       (apply orig-func (append args (list :pred pred)))))
   (advice-add 'avy-jump :around #'avy-jump-advice-exclude-current-point)
 
-  ;; When I have multiple windows, the cursor in other windows is hollow,
-  ;; which means that if it's on one of the targets, they both become white and I can't read the letter.
-  ;; This fix makes all cursors filled temporarily.
-  (defun avy-jump-advice-cursor-background-fix (orig-func &rest args)
-    (let ((old-color (face-attribute 'cursor :background))
-	      (old-type cursor-in-non-selected-windows))
-      (set-cursor-color "white")
-      (setq-default cursor-in-non-selected-windows 'box)
+  ;; https://emacs.stackexchange.com/questions/74840/hide-cursor-and-marks-in-all-windows-while-using-avy-or-ace-window/76656#76656
+  ;; This snippet works under the assumption the cursor type is same everywhere. It uses setq-default for buffer-local variables cursor-in-non-selected-windows and cursor-in-non-selected-windows.
+  ;; When the inactive cursor is on one of the avy targets,
+  ;; the overlay and cursor colors mix and the avy sequence gets hard to read.
+  (defun avy-jump-advice--hide-cursor-temporarily (orig-func &rest args)
+    (let ((ct  cursor-type)
+	      (ctn cursor-in-non-selected-windows))
+      (setq-default cursor-in-non-selected-windows nil)
+      (setq-default cursor-type nil)
       (apply orig-func args)
-      (setq-default cursor-in-non-selected-windows old-type)
-      (set-cursor-color old-color)))
-  (advice-add 'avy-jump :around #'avy-jump-advice-cursor-background-fix)   ; just in case: (advice-remove 'avy-jump #'avy-jump-cursor-background-fix-advice)
+      (setq-default cursor-type ct)
+      (setq-default cursor-in-non-selected-windows ctn)))
+  (advice-add 'avy-jump :around #'avy-jump-advice--hide-cursor-temporarily)
+  ;; just in case: (advice-remove 'avy-jump #'avy-jump-advice--hide-cursor-temporarily)
+
 
   ;; (defun avy-subdiv (n b)
   ;; "Distribute N in B terms in a balanced way."
@@ -658,6 +661,7 @@ become defined after invocation."
 
 
   (add-to-list 'magit-repository-directories '("~/.emacs.d.old" . 0))
+  (add-to-list 'magit-repository-directories '("~/.setuplets" . 0))
   (add-to-list 'magit-repository-directories '("~/werk" . 0))
   (add-to-list 'magit-repository-directories '("~/workspaces" . 1))
   ;; (setq magit-repository-directories nil)
@@ -844,7 +848,78 @@ become defined after invocation."
 
 ;; -------------------------------------------------------------------
 
+(use-package dabbrev
+  ;; Swap M-/ and C-M-/
+  :bind (("M-/" . dabbrev-completion)
+         ("C-M-/" . dabbrev-expand))
+  ;; Other useful Dabbrev configurations.
+  :custom
+  (dabbrev-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))
 
+(use-package corfu
+  ;; Optional customizations
+  ;; :custom
+  ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  ;; (corfu-auto t)                 ;; Enable auto completion
+  ;; (corfu-separator ?\s)          ;; Orderless field separator
+  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
+  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+
+  ;; Enable Corfu only for certain modes.
+  ;; :hook ((prog-mode . corfu-mode)
+  ;;        (shell-mode . corfu-mode)
+  ;;        (eshell-mode . corfu-mode))
+
+  ;; Recommended: Enable Corfu globally.
+  ;; This is recommended since Dabbrev can be used globally (M-/).
+  ;; See also `corfu-exclude-modes'.
+  :init
+  (global-corfu-mode)
+
+  :bind
+  (:map corfu-map ("SPC" . corfu-insert-separator))
+  )
+
+(use-package orderless
+  :init
+  ;; Configure a custom style dispatcher (see the Consult wiki)
+  ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
+  ;;       orderless-component-separator #'orderless-escapable-split-on-space)
+  (setq completion-styles '(orderless flex)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles . (partial-completion))))))
+
+ 
+;; (setq path-to-ctags "/opt/local/bin/ctags")
+
+;; -------------------------------------------------------------------
+
+(use-package ggtags
+
+  )
+
+;; -------------------------------------------------------------------
+
+(use-package direnv
+ :config
+ (direnv-mode))
+
+
+;; -------------------------------------------------------------------
+
+(use-package embark
+  :ensure t
+  :bind
+  (("C-." . embark-act)
+   ("C-;" . embark-dwim)
+   ("C-h B" . embark-bindings))
+
+  :init
+  (setq prefix-help-command #'embark-prefix-help-command))
 
 
 ;; -------------------------------------------------------------------

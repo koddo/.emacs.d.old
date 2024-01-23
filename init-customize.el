@@ -3,12 +3,14 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(dired-omit-extensions 'nil nil nil "Customized by me")
+ '(dired-omit-files (rx (or (seq bol "." eol) (seq bol "." (not (any "."))))) nil nil "Customized by me"))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(header-line ((t (:inherit nil :background "grey70" :foreground "grey20"))))
  '(org-habit-alert-face ((t (:background "white"))))
  '(org-habit-alert-future-face ((t (:background "white"))))
  '(org-habit-clear-face ((t (:background "white"))))
@@ -26,3 +28,5 @@
  '(rainbow-delimiters-depth-6-face ((t (:foreground "black"))))
  '(sp-show-pair-enclosing ((t (:inherit show-paren-match))))
  '(sp-show-pair-match-content-face ((t nil)) t))
+
+

@@ -455,6 +455,8 @@ there's a region, all lines that region covers will be duplicated."
 
 (define-key isearch-mode-map (kbd "s-;") 'avy-isearch)
 (ym-define-key (kbd "s-;") #'avy-goto-word-1)
+;; (ym-define-key (kbd "s-;") #'avy-goto-word-2)
+;; (ym-define-key (kbd "s-;") #'avy-goto-char-timer)
 (ym-define-key (kbd "s-^") #'avy-goto-parens)   ; "S-s-;" -- this is not a usual ^, it's a unicode character
 
 ;; -------------------------------------------------------------------

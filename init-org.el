@@ -4,6 +4,7 @@
 
 
 (use-package org
+  ; :straight (:type built-in)     ; otherwise I get "Org version mismatch", because org is now shipped with emacs, and having both built-in and dev version at the same time breaks things
   :mode (("\\.org$" . org-mode))
   :ensure org-plus-contrib
 
