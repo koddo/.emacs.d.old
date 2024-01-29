@@ -164,24 +164,27 @@
 ;; -------------------------------------------------------------------
 
 
-(use-package smartparens
-  :demand t
-  :diminish smartparens-mode smartparens-global-mode show-smartparens-mode show-smartparens-global-mode
-  :config
-  (require 'smartparens-config)   ; default configuration
-  (setq sp-navigate-reindent-after-up-in-string nil)
-  (setq sp-navigate-reindent-after-up nil)
-  (smartparens-global-mode 1)     ; used to be (smartparens-global-strict-mode 1), but I don't need it to be that strict
-  (show-smartparens-global-mode 1)
+;; (use-package smartparens
+;;   :demand t
+;;   :diminish smartparens-mode smartparens-global-mode show-smartparens-mode show-smartparens-global-mode
+;;   :config
+;;   (require 'smartparens-config)   ; default configuration
+;;   (setq sp-navigate-reindent-after-up-in-string nil)
+;;   (setq sp-navigate-reindent-after-up nil)
+;;   ;; (smartparens-global-mode 1)     ; used to be (smartparens-global-strict-mode 1), but I don't need it to be that strict
+;;   ;; (show-smartparens-global-mode 1)
   
-  ;; customize sp-show-pair-match-content-face if you want to highlight not only parens but also the content of the s-exp
-  ;; '(sp-show-pair-enclosing ((t (:inherit show-paren-match))))  
-  )
+;;   ;; customize sp-show-pair-match-content-face if you want to highlight not only parens but also the content of the s-exp
+;;   ;; '(sp-show-pair-enclosing ((t (:inherit show-paren-match))))  
+;;   )
 
 
 ;; (require 'paren)   ; I prefer stock show-paren-mode over show-smartparen-mode because it's ultra-fast
+;; (setq show-paren-delay 0)
 ;; (setq show-paren-delay 0.1)
-;; (show-paren-mode t)
+;; (setq show-paren-delay 0.01)
+;; (show-paren-mode 1)
+;; (show-paren-mode -1)
 ;; (setq show-paren-style 'parenthesis)
 
 ;; (progn (require 'autopair)   ; insert paired parenthesis
@@ -199,6 +202,7 @@
 ;; 	       (funcall fn)))))
 
 ;; -------------------------------------------------------------------
+
 
 ;; (use-package helpful
 ;;   :config
@@ -923,6 +927,39 @@ become defined after invocation."
 
 
 ;; -------------------------------------------------------------------
+
+(use-package puni
+  :hook ((prog-mode sgml-mode nxml-mode tex-mode eval-expression-minibuffer-setup) . puni-mode))
+
+(electric-pair-mode t)
+
+
+
+
+
+;; -------------------------------------------------------------------
+
+(use-package minimap
+  :config
+  (setq minimap-recenter-type 'middle)
+  )
+
+
+
+;; -------------------------------------------------------------------
+
+(use-package beacon
+  ;; it highlights the cursor when you scroll, usefull for presentations
+  )
+
+;; -------------------------------------------------------------------
+
+
+;; -------------------------------------------------------------------
+
+
+
+
 
 
 

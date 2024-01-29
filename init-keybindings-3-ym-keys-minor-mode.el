@@ -168,15 +168,13 @@
 (ym-define-key (kbd "s-j") 'backward-char)
 (ym-define-key (kbd "s-l") 'forward-char)
 
-(ym-define-key (kbd "H-i") 'windmove-up)
-(ym-define-key (kbd "H-k") 'windmove-down)
-(ym-define-key (kbd "H-j") 'windmove-left)
-(ym-define-key (kbd "H-l") 'windmove-right)
+;; (ym-define-key (kbd "H-i") 'windmove-up)
+;; (ym-define-key (kbd "H-k") 'windmove-down)
+;; (ym-define-key (kbd "H-j") 'windmove-left)
+;; (ym-define-key (kbd "H-l") 'windmove-right)
 
 
-(ym-define-key (kbd "s-*") (lambda () (interactive)
-                             (let ((ratio-from-top (max 1 (/ (1- (window-height (selected-window))) 3))))
-                                 (recenter ratio-from-top))))
+
 (ym-define-key (kbd "s-&") (lambda () (interactive "^") (scroll-up-command   3)))
 (ym-define-key (kbd "s-(") (lambda () (interactive "^") (scroll-down-command 3)))
 (ym-define-key (kbd "H-s-*") (kbd "s-*"))
@@ -420,7 +418,7 @@ there's a region, all lines that region covers will be duplicated."
 
 ;; -------------------------------------------------------------------
 
-(ym-define-key (kbd "s-p") 'projectile-command-map)
+;; (ym-define-key (kbd "s-p") 'projectile-command-map)
 
 ;; -------------------------------------------------------------------
 

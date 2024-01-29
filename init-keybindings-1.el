@@ -253,6 +253,105 @@
 (global-set-key (kbd "s-q") 'hydra-smartparens/body)
 
 
+(pretty-hydra-define hydra-puni ()  ; :title "puni" :idle 0.5
+
+  ;; TODO: toggle on/off
+
+  ;; sp-narrow-to-sexp
+  
+  ;; TODO: let us use hydra funcs by name
+  ;; (ido-completing-read "test: " '("hello" "world"))
+
+  ;; TODO: toggle rainbow-mode
+  ;; TODO: toggle beacon-mode
+
+
+  ;; TODO: reindent after
+  
+  ("Move" (
+	   ("l" puni-forward-sexp)
+	   ("j" puni-backward-sexp)
+
+	   ("i" puni-beginning-of-sexp)
+	   ("k" puni-end-of-sexp)
+
+       ;; TODO: bind puni-backward-delete-char to backspace
+       
+       ;; puni-forward-delete-char
+       ;; puni-backward-delete-char
+       ;; puni-forward-kill-word
+       ;; puni-backward-kill-word
+       ;; puni-kill-line
+       ;; puni-backward-kill-line
+
+       ;; (setq puni-confirm-when-delete-unbalanced-active-region nil)
+       ;; puni-kill-active-region
+       ;; puni-force-delete
+	   )
+
+   "Wrapping" (
+	           ("" ym/rewrap--imp)
+	           ("(" puni-wrap-round)
+	           ("{" puni-wrap-curly)
+	           ("[" puni-wrap-square)
+	           ("<" puni-wrap-angle)
+	           ("" ym/wrap-with-arg--imp)
+
+               )
+	       
+   "Selecting" (
+                ;; puni-expand-region is fine, but these are better:
+		        ("e" er/expand-region)
+		        ("E" er/contract-region)
+		        ("m" exchange-point-and-mark)
+
+                ;; no need for these:
+                ;; puni-mark-sexp-at-point
+                ;; puni-mark-list-around-point
+                ;; puni-mark-sexp-around-point
+                ;; puni-squeeze = expand region and cut
+                )
+
+   "Slurp, barf, extract, absorb, emit" (
+                                         ;; TODO: (setq puni-blink-for-slurp-barf ?)
+                                         
+					                     ("s" puni-slurp-forward)
+					                     ("S" puni-slurp-backward)
+					                     ("b" puni-barf-forward)
+					                     ("B" puni-barf-backward)
+					                     )
+   "Sexp juggling" (
+                    ("r" puni-splice)     ; = unwrap
+	                ("y" puni-split)
+                    ("" my-join-sexp--imp)
+		            ("" puni-raise)   ; raise next expr, (a |b c) -> b
+
+		            ("x" puni-convolute)   ; (outer (inner target)) -> (inner (outer target))     ; https://hungyi.net/posts/convolute-lisp-sexp-with-smartparens/
+                    ;; TODO: indent after convolute
+                    
+		            ("" puni-transpose)
+		            ("" puni-drag-forward--imp)
+		            ("" puni-drag-backward--imp)
+
+                    ("" ym/absorb--imp)
+                    ("" ym/emit--imp)
+                    ("" ym/extract--imp)
+
+                    ("" ym/clone-sexp--imp)
+		            )
+
+   "More" (
+           ("" eval-sexp--imp)
+           ("" eval-defun--imp)
+           ("" eval-after--imp)
+           ("" eval-etc--imp)
+           ("" see-symex-control--imp)
+           )
+
+   ))
+(global-set-key (kbd "s-w") 'hydra-puni/body)
+
+
 
   ;; "Snippets"
   ;; (("y" yas-expand)
@@ -292,7 +391,7 @@
     ("b" buf-move-right)
     )
    ))
-(global-set-key (kbd "H-w") 'hydra-window/body)
+(global-set-key (kbd "s-p") 'hydra-window/body)
 
 (pretty-hydra-define hydra-drill ()
   ("asdfasdf"

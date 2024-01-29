@@ -4,18 +4,16 @@
 ;; -------------------------------------------------------------------
 
 
-(use-package beacon
-  :demand t
-  ;; it highlights the cursor when you scroll, usefull for presentations
-  )
-
-
 
 
 (use-package crux
   )
 
 
+
+;; this package shows org-links like clickable links everywhere
+;; [[http://ya.ru][yandex]]
+(use-package orglink)
 
 
 

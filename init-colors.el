@@ -55,61 +55,68 @@ Version 2017-03-12"
   :config
   (deftheme ym-base16-theme)
 
-  (progn
-    (setq ym-base16-colors (list
-			                :base00 "white"     ; Default Background
-			                :base01 "grey88"     ; Lighter Background (Used for status bars)
-			                :base02 "#d8d8d8"    ; Selection Background
-			                :base03 "grey70"     ; Comments, Invisibles, Line Highlighting
-			                :base04 "#585858"    ; Dark Foreground (Used for status bars)
-			                :base05 "grey20"     ; Default Foreground, Caret, Delimiters, Operators
-			                :base06 "#282828"    ; Light Foreground (Not often used)
-			                :base07 "#181818"    ; Light Background (Not often used)
-			                :base08 "#ab4642"    ; Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
-			                :base09 "#dc9656"    ; Integers, Boolean, Constants, XML Attributes, Markup Link Url
-			                :base0A "#cca770"    ; Classes, Markup Bold, Search Text Background
-			                :base0B "#a1b56c"    ; Strings, Inherited Class, Markup Code, Diff Inserted
-			                :base0C "#86c1b9"    ; Support, Regular Expressions, Escape Characters, Markup Quotes
-			                :base0D "#7cafc2"    ; Functions, Methods, Attribute IDs, Headings
-			                :base0E "#ba8baf"    ; Keywords, Storage, Selector, Markup Italic, Diff Changed
-			                :base0F "#a16946"    ; Deprecated, Opening/Closing Embedded Language Tags, e.g. <?php ?>
-			                ))
-    ;; (base16-theme-define 'ym-base16-theme ym-base16-colors)
+  (setq ym-base16-colors (list
+			              :base00 "white"     ; Default Background
+			              :base01 "grey88"     ; Lighter Background (Used for status bars)
+			              :base02 "#d8d8d8"    ; Selection Background
+			              :base03 "grey70"     ; Comments, Invisibles, Line Highlighting
+			              :base04 "#585858"    ; Dark Foreground (Used for status bars)
+			              :base05 "grey20"     ; Default Foreground, Caret, Delimiters, Operators
+			              :base06 "#282828"    ; Light Foreground (Not often used)
+			              :base07 "#181818"    ; Light Background (Not often used)
+			              :base08 "#ab4642"    ; Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
+			              :base09 "#dc9656"    ; Integers, Boolean, Constants, XML Attributes, Markup Link Url
+			              :base0A "#cca770"    ; Classes, Markup Bold, Search Text Background
+			              :base0B "#a1b56c"    ; Strings, Inherited Class, Markup Code, Diff Inserted
+			              :base0C "#86c1b9"    ; Support, Regular Expressions, Escape Characters, Markup Quotes
+			              :base0D "#7cafc2"    ; Functions, Methods, Attribute IDs, Headings
+			              :base0E "#ba8baf"    ; Keywords, Storage, Selector, Markup Italic, Diff Changed
+			              :base0F "#a16946"    ; Deprecated, Opening/Closing Embedded Language Tags, e.g. <?php ?>
+			              ))
+  (setq ym-base16-colors-darker    ; from :base09 to :base0E
+        (let ((percent-darker 30))
+          (-map-indexed (lambda (ii cc)
+                          (if
+                              (and (> ii 18) (<= ii 30)
+                                   (cl-oddp ii))
+                              (apply 'color-rgb-to-hex `(,@(color-name-to-rgb (color-darken-name cc percent-darker)) 2))
+                            cc))
+                        ym-base16-colors)))
 
-    ;; (disable-theme 'deeper-blue)
-    ;; (load-theme 'ym-base16-theme t)
-    )
-
-  
- 
-  (setq ym-base16-colors-darker
-        (-map-indexed (lambda (ii cc)
-                        (if (and (> ii 18) (<= ii 30)
-                                 (cl-oddp ii))
-                            (apply 'color-rgb-to-hex `(,@(color-name-to-rgb (color-darken-name cc 25)) 2))
-                          cc))
-                      ym-base16-colors))
   (base16-theme-define 'ym-base16-theme ym-base16-colors-darker)
   (enable-theme 'ym-base16-theme)
-  ;; (print ym-base16-colors-darker)
-  ;; (:base00 "white" :base01 "grey88" :base02 "#d8d8d8" :base03 "grey70" :base04 "#585858" :base05 "grey10" :base06 "#282828" :base07 "#181818" :base08 "#ab4642" :base09 "#b16724" :base0A "#a57a3a" :base0B "#718342" :base0C "#4f9b91" :base0D "#47839a" :base0E "#925684" :base0F "#a16946")
+
+  (progn 
+    ;; (print ym-base16-colors-darker)
+    ;; (:base00 "white" :base01 "grey88" :base02 "#d8d8d8" :base03 "grey70" :base04 "#585858" :base05 "grey10" :base06 "#282828" :base07 "#181818" :base08 "#ab4642" :base09 "#b16724" :base0A "#a57a3a" :base0B "#718342" :base0C "#4f9b91" :base0D "#47839a" :base0E "#925684" :base0F "#a16946")
+    
+    ;; (defun asdf (cc)
+    ;;   (apply 'color-rgb-to-hex `(,@(color-name-to-rgb (color-darken-name cc 18)) 2)))
+    ;; (asdf "#925684")
+    )
+
+
+
   
-  ;; (defun asdf (cc)
-  ;;   (apply 'color-rgb-to-hex `(,@(color-name-to-rgb (color-darken-name cc 18)) 2)))
-  ;; (asdf "#925684")
-  
-
-  ;; temporarily fixing this: https://github.com/belak/base16-emacs/issues/114
-  ;; font-lock-comment-delimiter-face should be base03, not base02
-  (set-face-attribute 'font-lock-comment-delimiter-face nil :foreground (plist-get ym-base16-colors :base03))
-
-
   ;; ;; https://terminal.sexy/
   ;; (use-package base16-theme
   ;;   :config
   ;;   (load-theme 'base16-default-light t)
   ;;   ;; (load-theme 'base16-grayscale-light t)
   ;;   )
+
+  (let* ((comments-colors-togglable '("grey90" "grey70" "grey30"))
+         (current-comments-color (face-attribute 'font-lock-comment-face :foreground))
+         (next-color-in-list (cadr (member current-comments-color comments-colors-togglable)))
+         (new-comments-color (if next-color-in-list
+                                 next-color-in-list
+                               (car comments-colors-togglable)))
+         )
+    (set-face-attribute 'font-lock-comment-face nil :foreground new-comments-color)
+    ;; temporarily fixing this: https://github.com/belak/base16-emacs/issues/114
+    ;; font-lock-comment-delimiter-face should be base03, not base02
+    (set-face-attribute 'font-lock-comment-delimiter-face nil :foreground new-comments-color)
+    )
 
   )
 
@@ -310,5 +317,65 @@ Containing LEFT, and RIGHT aligned respectively."
 ;;    (when (get-buffer-window buf 'visible) (....<STUFF>...))
 
 ;; (defface ym/habits-face '((t :family "Monaco" :height 80)) "")
+
+
+
+
+
+
+;; -------------------------------------------------------------------
+;; highlith the active window
+;; or the other way around, dim all inactive windows
+
+;; when you have one buffer in multiple windows, use indirect buffers: clone-indirect-buffer-other-window?
+
+;; https://emacs.stackexchange.com/questions/24630/is-there-a-way-to-change-color-of-active-windows-fringe
+;; https://stackoverflow.com/questions/47456134/emacs-lisp-hooks-for-detecting-change-of-active-buffer
+(defun highlight-selected-window ()
+  "Highlight selected window with a different background color."
+  (walk-windows (lambda (w)
+                  (unless (eq w (selected-window))
+                    (with-current-buffer (window-buffer w)
+                      (buffer-face-set '(:background "#f1f1f1"))))))
+  (buffer-face-set 'default))
+(add-hook 'buffer-list-update-hook 'highlight-selected-window)
+(add-hook 'window-configuration-change-hook 'highlight-selected-window)
+
+;; see an alternative:
+;; a package that apparently does the same
+;; https://github.com/mina86/auto-dim-other-buffers.el
+
+;; -------------------------------------------------------------------
+
+;; highlight minibuffer prompt, because large monitor
+
+(set-face-attribute 'minibuffer-prompt nil :background "light green" :foreground "black")
+
+
+;; the foloowing is an attempt to highlight the whole minibuffer, but it failed
+
+;; TODO: this kind of works, but fix this: the face gets reset back to default after auto-save-visited-mode kicks in after 5 seconds
+;; (defun my-minibuffer-setup-hook ()
+;;   (buffer-face-set :background "yellow"))
+;; (add-hook 'minibuffer-setup-hook 'my-minibuffer-setup-hook)
+
+;;; this doesn't work for me for some reason
+;; (dolist (buf (buffer-list))
+;;   (when (string-match-p " \*Minibuf-[0-9]+\*" (buffer-name buf))
+;;     (message (buffer-name buf))
+;;     (with-current-buffer (get-buffer buf)
+;;       (set (make-local-variable 'face-remapping-alist)
+;;          (copy-tree'((default :background "green")))))))
+;; (dolist (buf (buffer-list))
+;;   (when (string-match-p " \*Minibuf-[0-9]+\*" (buffer-name buf))
+;;     (message (buffer-name buf))
+;;     (with-current-buffer (get-buffer buf)
+;;       (buffer-face-set :background "yellow")
+;;       )))
+
+;; -------------------------------------------------------------------
+
+
+
 
 
