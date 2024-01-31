@@ -188,13 +188,12 @@
 ;;   :hook (after-init . hydra-posframe-enable)
 ;;   )
 
+;; -------------------------------------------------------------------
+
 ;; completion for hydras:
 ;; https://sachachua.com/blog/2021/04/emacs-hydra-allow-completion-when-i-can-t-remember-the-command-name/
 ;; https://sachachua.com/dotemacs/index.html#hydra-completion
-
-
-
-
+;; https://www.reddit.com/r/emacs/comments/123l17j/completions_of_functions_in_hydra_when_you_forget/
 
 (defun my/hydra-format-head (h)
   (let ((key-binding (elt h 0))
@@ -225,7 +224,20 @@
      ((hydra--callablep bind) (call-interactively bind)))))
 
 (with-eval-after-load 'hydra
-  (define-key hydra-base-map (kbd "tab") #'my/hydra-execute-extended))
+  (define-key hydra-base-map (kbd "<tab>") #'my/hydra-execute-extended))
+
+;; -------------------------------------------------------------------
+
+;; jump to definition of hydra
+
+(defun ym/go-to-definition-of-hydra ()
+  (interactive)
+  (hydra-keyboard-quit)
+  (find-function hydra-curr-body-fn)
+  )
+
+(with-eval-after-load 'hydra
+  (define-key hydra-base-map (kbd "M-s-u") #'ym/go-to-definition-of-hydra))
 
 ;; -------------------------------------------------------------------
 
@@ -343,7 +355,11 @@
 	           "yasnippets")))
   (yas-reload-all)
 
-  ;; TODO: bind yas-expand
+  ;; unbind tab -- I use yas-insert-snippet, not expand
+  (define-key yas-minor-mode-map (kbd "<tab>") nil)
+  (define-key yas-minor-mode-map (kbd "TAB") nil)
+
+  (yas-global-mode 1)
 
   ;; there's also grep-edit.el, which could be used to modify snippets in its buffer, instead of doing C-x C-f at their paths here, but the difference is not worth it at the moment
   (cl-defun ym-list-all-yasnippets (&optional (dirs yas-snippet-dirs))
@@ -371,6 +387,7 @@
     (ym-list-all-yasnippets '("~/.emacs.d.new/straight/repos/yasnippet-snippets/snippets/"))
     )
   )
+
 
 ;; -------------------------------------------------------------------
 
@@ -806,15 +823,32 @@ become defined after invocation."
 
 ;; -------------------------------------------------------------------
 
+;; (setq tab-always-indent t)
+(setq tab-always-indent 'complete)
+;; c-tab-always-indent has to be set separately
+
+;; (global-set-key (kbd "M-i") #'completion-at-point)
+
+
+
 (use-package dabbrev
   ;; Swap M-/ and C-M-/
-  :bind (("M-/" . dabbrev-completion)
-         ("C-M-/" . dabbrev-expand))
-  ;; Other useful Dabbrev configurations.
-  :custom
-  (dabbrev-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))
+  ;; :bind (("M-/" . dabbrev-completion)
+  ;;        ("C-M-/" . dabbrev-expand))
+  :config
+  (add-to-list 'dabbrev-ignored-buffer-regexps "\\` ")
+  (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode))
+
+
 
 (use-package corfu
+  :straight (corfu :files (:defaults "extensions/*")
+                   :includes (
+                              ;; corfu-info
+                              corfu-popupinfo
+                              ))     ; this is the way to add these packages, see https://www.reddit.com/r/emacs/comments/z6sk1f/how_to_update_corfudoc_to_the_new_corfuinfo/
+  
   ;; Optional customizations
   ;; :custom
   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
@@ -837,28 +871,74 @@ become defined after invocation."
   ;; See also `corfu-exclude-modes'.
   :init
   (global-corfu-mode)
-
+  (corfu-popupinfo-mode)
+  
   :bind
-  (:map corfu-map ("SPC" . corfu-insert-separator))
+  (:map corfu-map
+        ("SPC" . corfu-insert-separator))
   )
+
+;; setq-local
+
 
 (use-package orderless
   :init
   ;; Configure a custom style dispatcher (see the Consult wiki)
   ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
   ;;       orderless-component-separator #'orderless-escapable-split-on-space)
-  (setq completion-styles '(orderless flex)
+  (setq completion-styles '(orderless basic)   ; try '(orderless flex), it ignores spaces, but it can't be used to look for middle first, beginning second
         completion-category-defaults nil
         completion-category-overrides '((file (styles . (partial-completion))))))
 
- 
+
+(use-package cape
+  ;; Bind dedicated completion commands
+  ;; Alternative prefix keys: C-c p, M-p, M-+, ...
+  :bind (("C-c p p" . completion-at-point) ;; capf
+         ("C-c p t" . complete-tag)        ;; etags
+         ("C-c p d" . cape-dabbrev)        ;; or dabbrev-completion
+         ("C-c p h" . cape-history)
+         ("C-c p f" . cape-file)
+         ("C-c p k" . cape-keyword)
+         ("C-c p s" . cape-elisp-symbol)
+         ("C-c p e" . cape-elisp-block)
+         ("C-c p a" . cape-abbrev)
+         ("C-c p l" . cape-line)
+         ("C-c p w" . cape-dict)
+         ("C-c p :" . cape-emoji)
+         ("C-c p \\" . cape-tex)
+         ("C-c p _" . cape-tex)
+         ("C-c p ^" . cape-tex)
+         ("C-c p &" . cape-sgml)
+         ("C-c p r" . cape-rfc1345))
+  :init
+  ;; Add to the global default value of `completion-at-point-functions' which is
+  ;; used by `completion-at-point'.  The order of the functions matters, the
+  ;; first function returning a result wins.  Note that the list of buffer-local
+  ;; completion functions takes precedence over the global list.
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-elisp-block)
+  ;;(add-to-list 'completion-at-point-functions #'cape-history)
+  (add-to-list 'completion-at-point-functions #'cape-keyword)
+  ;;(add-to-list 'completion-at-point-functions #'cape-tex)
+  ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
+  ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
+  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
+  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
+  (add-to-list 'completion-at-point-functions #'cape-elisp-symbol)
+  ;;(add-to-list 'completion-at-point-functions #'cape-line)
+)
+
+
+
+
 ;; (setq path-to-ctags "/opt/local/bin/ctags")
 
-;; -------------------------------------------------------------------
+;; https://gist.github.com/kborling/13f2300e60ae4878d5d96f5f4d041664#file-init-el-L414
 
-(use-package ggtags
 
-  )
+
 
 ;; -------------------------------------------------------------------
 
@@ -950,6 +1030,12 @@ become defined after invocation."
 
 ;; -------------------------------------------------------------------
 
+(use-package dumb-jump
+  :config
+  (add-to-list 'xref-backend-functions 'dumb-jump-xref-activate t)   ; to the end of list, which means fall back to dumb-jump when there are no better options
+  ;; (setq dumb-jump-force-searcher 'rg)   ; tries searches in this order: git-grep, ag, rg, grep
+  ;; (dumb-jump-debug t)   ; try to jump and see *messages*
+  )
 
 ;; -------------------------------------------------------------------
 

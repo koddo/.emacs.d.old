@@ -105,18 +105,20 @@ Version 2017-03-12"
   ;;   ;; (load-theme 'base16-grayscale-light t)
   ;;   )
 
-  (let* ((comments-colors-togglable '("grey90" "grey70" "grey30"))
-         (current-comments-color (face-attribute 'font-lock-comment-face :foreground))
-         (next-color-in-list (cadr (member current-comments-color comments-colors-togglable)))
-         (new-comments-color (if next-color-in-list
-                                 next-color-in-list
-                               (car comments-colors-togglable)))
-         )
-    (set-face-attribute 'font-lock-comment-face nil :foreground new-comments-color)
-    ;; temporarily fixing this: https://github.com/belak/base16-emacs/issues/114
-    ;; font-lock-comment-delimiter-face should be base03, not base02
-    (set-face-attribute 'font-lock-comment-delimiter-face nil :foreground new-comments-color)
-    )
+  (defun ym/toggle-color-of-comments ()
+    (interactive)
+    (let* ((comments-colors-togglable '("grey90" "grey70" "grey30"))
+           (current-comments-color (face-attribute 'font-lock-comment-face :foreground))
+           (next-color-in-list (cadr (member current-comments-color comments-colors-togglable)))
+           (new-comments-color (if next-color-in-list
+                                   next-color-in-list
+                                 (car comments-colors-togglable)))
+           )
+      (set-face-attribute 'font-lock-comment-face nil :foreground new-comments-color)
+      ;; temporarily fixing this: https://github.com/belak/base16-emacs/issues/114
+      ;; font-lock-comment-delimiter-face should be base03, not base02
+      (set-face-attribute 'font-lock-comment-delimiter-face nil :foreground new-comments-color)
+      ))
 
   )
 
@@ -333,11 +335,18 @@ Containing LEFT, and RIGHT aligned respectively."
 ;; https://stackoverflow.com/questions/47456134/emacs-lisp-hooks-for-detecting-change-of-active-buffer
 (defun highlight-selected-window ()
   "Highlight selected window with a different background color."
-  (walk-windows (lambda (w)
-                  (unless (eq w (selected-window))
+  (let ((hydra-window lv-wnd))        ; this is the hydra echo area, see https://github.com/abo-abo/hydra/blob/master/lv.el
+   (walk-windows (lambda (w)
+                  (cond
+                   ((eq w (selected-window))
+                    (buffer-face-set 'default))
+                   ((eq w hydra-window)
                     (with-current-buffer (window-buffer w)
-                      (buffer-face-set '(:background "#f1f1f1"))))))
-  (buffer-face-set 'default))
+                      (buffer-face-set '(:background "gray"))))
+                   (t   ; other windows
+                    (with-current-buffer (window-buffer w)
+                      (buffer-face-set '(:background "#f1f1f1"))))
+                   )))))
 (add-hook 'buffer-list-update-hook 'highlight-selected-window)
 (add-hook 'window-configuration-change-hook 'highlight-selected-window)
 

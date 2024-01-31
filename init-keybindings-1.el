@@ -26,10 +26,10 @@
 
 
 
-(defhydra hydra-smartparens ()
-  "smartparens"
-  ("g" text-scale-increase "in")
-  )
+;; (defhydra hydra-smartparens ()
+;;   "smartparens"
+;;   ("g" text-scale-increase "in")
+;;   )
 
 
 (defun ym/highlight-enclosing-pairs ()
@@ -449,7 +449,7 @@
 
 
 
-(pretty-hydra-define hydra-agenda ( :exit t)
+(pretty-hydra-define hydra-agenda (:exit t)
   ("asdfasdf" (("1" (lambda () (interactive)
 		      (org-agenda nil "x1")
 		      (delete-other-windows)
