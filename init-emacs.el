@@ -1,5 +1,8 @@
 ;; -*- lexical-binding: t; -*-
 
+(defmacro comment (&rest body)
+  "Comment out one or more s-expressions."
+  nil)
 
 ;; -------------------------------------------------------------------
 
@@ -286,6 +289,14 @@
 ;; -------------------------------------------------------------------
 
 (setq ediff-split-window-function 'split-window-horizontally)
+
+
+;; -------------------------------------------------------------------
+
+(setq switch-to-buffer-obey-display-actions t)
+(setq switch-to-buffer-in-dedicated-window 'pop)
+
+;; -------------------------------------------------------------------
 
 
 ;; -------------------------------------------------------------------

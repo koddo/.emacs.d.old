@@ -190,7 +190,10 @@
 
 ;; -------------------------------------------------------------------
 
-;; completion for hydras:
+;; completion for hydras
+;; this is my slightly modified version of Sacha Chua's code
+;; made completions look like "f: follow mode"
+
 ;; https://sachachua.com/blog/2021/04/emacs-hydra-allow-completion-when-i-can-t-remember-the-command-name/
 ;; https://sachachua.com/dotemacs/index.html#hydra-completion
 ;; https://www.reddit.com/r/emacs/comments/123l17j/completions_of_functions_in_hydra_when_you_forget/
@@ -199,15 +202,20 @@
   (let ((key-binding (elt h 0))
         (hint (elt h 2))
         (cmd (and (elt h 1) (prin1-to-string (elt h 1)))))
-    (if cmd
-        (format "%s (%s) - %s" hint key-binding cmd)
-      (format "%s (%s)" hint key-binding))))
+    (format "%s: %s" key-binding hint)
+    ;; (if cmd
+    ;;     (format "%s (%s) - %s" hint key-binding cmd)
+    ;;   (format "%s (%s)" hint key-binding))
+    ))
 
 (defun my/hydra-current-heads-as-candidates ()
-  (let ((base (replace-regexp-in-string "/body$" "" (symbol-name hydra-curr-body-fn))))
+  (let* ((base (replace-regexp-in-string "/body$" "" (symbol-name hydra-curr-body-fn)))
+         (heads-plist (symbol-value (intern (concat base "/heads-plist"))))
+         (heads-plist-values (cl-loop for (key value) on heads-plist by 'cddr collect value))
+         (heads (apply #'append heads-plist-values)))
     (mapcar (lambda (h)
               (cons (my/hydra-format-head h) (hydra--head-name h (intern base))))
-            (symbol-value (intern (concat base "/heads"))))))
+            heads)))      ; fixed: used to be (symbol-value (intern (concat base "/heads"))), but instead of /heads-plisp it somehow doesn't contain hints, they all are nil
 
 (defun my/hydra-execute-extended (prefixarg &optional command-name typed)
   (declare (interactive-only command-execute))
@@ -238,6 +246,52 @@
 
 (with-eval-after-load 'hydra
   (define-key hydra-base-map (kbd "M-s-u") #'ym/go-to-definition-of-hydra))
+
+;; -------------------------------------------------------------------
+
+;; from https://github.com/abo-abo/hydra/issues/268
+;; delay showing of hydra while when we do something like navigating windows or moving buffers
+;; without this code the hydra is shown after the very first keypress
+
+;; usage: ("j" (csb-wrap-ignore-error 'user-error (windmove-left)) "windmove-left")
+
+(defun timer-reset (timer-sym secs fun)
+  (let ((timer (and (boundp timer-sym) (symbol-value timer-sym))))
+    (if (timerp timer)
+        (cancel-timer timer)
+      (setq timer (set timer-sym (timer-create))))
+    (timer-set-time
+     timer
+     (timer-relative-time (current-time) secs))
+    (timer-set-function timer fun)
+    (timer-activate timer)))
+
+(defun csb-hide ()
+  (hydra-set-property 'hydra-window :verbosity 0))
+
+(defun csb-show ()
+  (hydra-set-property 'hydra-window :verbosity 1)
+  (let ((hydra-active (eq hydra-curr-map hydra-window/keymap)))
+      (when hydra-active
+      (hydra-window/body))))
+
+(defmacro csb-wrap (&rest body)
+  `(progn
+     ,@body
+     (csb-hide)
+     (timer-reset 'csb-timer 0.7 'csb-show)))
+
+(defmacro csb-wrap-ignore-error (condition &rest body)
+  `(progn
+     (ignore-error ,condition ,@body)
+     (csb-hide)
+     (timer-reset 'csb-timer 0.7 'csb-show)))
+
+(defmacro csb-wrap-ignore-all-errors (&rest body)
+  `(progn
+     (ignore-errors ,@body)
+     (csb-hide)
+     (timer-reset 'csb-timer 0.7 'csb-show)))
 
 ;; -------------------------------------------------------------------
 
@@ -311,7 +365,7 @@
 (use-package treemacs
   :config
   (setq treemacs-no-png-images t)
-)
+  )
 (use-package treemacs-projectile
   :after treemacs projectile)
 (use-package treemacs-magit
@@ -337,7 +391,7 @@
 ;;   :config
 ;;   ;; (load-theme 'doom-one-light t)
 ;;   (load-theme 'doom-tomorrow-day t)
-  
+
 ;;   )
 
 ;; (custom-set-faces
@@ -425,12 +479,37 @@
 
 ;; -------------------------------------------------------------------
 
+(use-package markdown-mode)
+
+;; -------------------------------------------------------------------
+
 ;; python
 
 ;; traad, rope for refactoring
 ;; jedi
 
 ;; LSP?
+
+
+;; display plots and images in ipython
+;; https://github.com/astoff/comint-mime
+
+
+;; polymode for markdown and python is somewhat similar to org-mode+babel for everything else
+(use-package polymode)
+(use-package poly-markdown)
+
+;; https://www.masteringemacs.org/article/polymode-multiple-major-modes-how-to-use-sql-python-in-one-buffer
+;; to configure it for evaluating python, try this: https://emacs.stackexchange.com/questions/74478/evaluate-single-python-code-blocks-in-a-quarto-file-like-in-r-studio-or-jupyter
+
+;; difference between the built-in python mode and the python-mode package: https://www.reddit.com/r/emacs/comments/sshhdi/difference_between_inbuild_python_and_pythonmode/
+;; tldr: the built-in python mode is fine
+(use-package python-mode)
+
+
+;; System Crafters -- Python Development Configuration
+;; https://www.youtube.com/watch?v=jPXIP46BnNA
+;; https://systemcrafters.net/emacs-ide/python-development-config/
 
 ;; -------------------------------------------------------------------
 
@@ -664,6 +743,11 @@ become defined after invocation."
 
   )
 
+;; from reddit: "Mine is just the default nil. I don't use any of the packages. But I prefer magit to be fullscreen and to restore back to where I was on quit:"
+(setq magit-display-buffer-function 'magit-display-buffer-fullframe-status-topleft-v1)
+(setq magit-bury-buffer-function 'magit-restore-window-configuration)
+
+
 ;; -------------------------------------------------------------------
 
 (use-package cider
@@ -680,7 +764,6 @@ become defined after invocation."
 (use-package git-gutter
   :config
   ;; (add-hook 'ruby-mode-hook 'git-gutter-mode)
-  ;; (add-hook 'python-mode-hook 'git-gutter-mode)
 
   :custom
   (git-gutter:update-interval 1)         ; the default is 0, which means update on file save
@@ -727,11 +810,11 @@ become defined after invocation."
 ;; install https://addons.mozilla.org/en-US/firefox/addon/ghosttext/
 ;; https://github.com/fregante/GhostText
 
-(use-package atomic-chrome)
+;; (use-package atomic-chrome)
 ;; (atomic-chrome-start-server)
 
-(use-package code-cells)
-(use-package jupyter)
+;; (use-package code-cells)
+;; (use-package jupyter)
 
 ;; -------------------------------------------------------------------
 
@@ -778,6 +861,7 @@ become defined after invocation."
 (use-package copy-as-format)
 
 ;; -------------------------------------------------------------------
+
 (use-package ignoramus)
 (ignoramus-setup)
 ;; (ignoramus-setup '(pcomplete shell ido))
@@ -928,7 +1012,7 @@ become defined after invocation."
   ;;(add-to-list 'completion-at-point-functions #'cape-dict)
   (add-to-list 'completion-at-point-functions #'cape-elisp-symbol)
   ;;(add-to-list 'completion-at-point-functions #'cape-line)
-)
+  )
 
 
 
@@ -943,8 +1027,8 @@ become defined after invocation."
 ;; -------------------------------------------------------------------
 
 (use-package direnv
- :config
- (direnv-mode))
+  :config
+  (direnv-mode))
 
 
 ;; -------------------------------------------------------------------
@@ -1021,7 +1105,6 @@ become defined after invocation."
   )
 
 
-
 ;; -------------------------------------------------------------------
 
 (use-package beacon
@@ -1037,7 +1120,145 @@ become defined after invocation."
   ;; (dumb-jump-debug t)   ; try to jump and see *messages*
   )
 
+
 ;; -------------------------------------------------------------------
+
+;; (use-package json-mode)    ; jsons-print-path doesn't work
+
+
+(use-package jsonian)
+;; jsonian-path
+
+
+
+;; see also
+;; https://github.com/DamienCassou/json-navigator
+
+;; -------------------------------------------------------------------
+
+(use-package which-key
+  :ensure t
+  :config
+  (which-key-mode))
+
+;; -------------------------------------------------------------------
+
+;; (use-package edwina
+;;   :ensure t
+;;   :config
+;;   (setq display-buffer-base-action '(display-buffer-below-selected))
+;;   ;; I don't enable edwina-mode, I just use M-x edwina-arrange when needed
+;;   )
+
+;; Always open popups in the active window.
+;; The back button through winner-undo is available.
+;; There's a package named current-window-only for this, but this is much simpler.
+(setq display-buffer-alist '((".*"
+                              (display-buffer-same-window))))
+
+;; -------------------------------------------------------------------
+
+;; clone in order to prevent reusing buffers
+
+(defun jue-clone-buffer ()
+  "jue clone current buffer. Useful to have multiple help buffers."
+  (interactive)
+  (rename-buffer (generate-new-buffer-name
+                  (concat (buffer-name) " -- "                 ; create name from old name and
+                          (save-excursion                   ; use first word in buffer for new name
+                            (goto-char 0)
+                            (thing-at-point 'symbol t))))
+                 t))                                      ; show cloned buffer now
+
+;; write the same for occur using occur-rename-buffer
+;; for rg clone?
+
+
+
+
+
+(comment
+ (progn
+   (split-window-horizontally)
+   (other-window 1)
+   (split-window-horizontally)
+   (other-window 1)
+   (split-window-vertically)
+   (other-window 1)
+   (split-window-vertically)
+   (other-window 1)
+   (balance-windows)
+   )
+
+
+ (window-in-direction 'down)   ; https://www.gnu.org/software/emacs/manual/html_node/elisp/Windows-and-Frames.html
+ (window-full-height-p)
+ 
+
+ (mapcar
+  (lambda (w)
+    (with-current-buffer (window-buffer w)
+      (format "[[%s::%d]]"
+              (if (buffer-file-name)
+                  (file-relative-name buffer-file-name (projectile-project-root))
+                (window-buffer w))
+              (save-restriction (widen) (line-number-at-pos)))))
+  (window-list))
+
+ (car (seq-filter
+       (lambda (w)
+         (and (window-at-side-p w 'bottom)
+              (window-at-side-p w 'right)))
+       (window-list)))
+
+
+ (split-window-vertically (floor (* 0.68 (window-height))))
+
+ 
+ (setq display-buffer-alist '((popper-display-control-p          ; the original value
+                               (popper-select-popup-at-bottom))))
+
+ (setq display-buffer-alist '((popper-display-control-p
+                               (display-buffer-no-window))
+                              (".*"
+                               (display-buffer-same-window))))
+ 
+ (setq display-buffer-alist '(("\\*Help\\*"
+                               (display-buffer-in-side-window)
+                               (side . right)
+                               (slot . 99999999)
+                               )))
+
+ (defun my-switch-to-buffer-list (buffer alist)
+   ;; (split-window-below)
+   (select-window
+    ;; (display-buffer-below-selected buffer alist)
+    (display-buffer-use-some-window buffer alist)
+    ))
+ (setq display-buffer-alist '((".*" (my-switch-to-buffer-list))))
+ (setq display-buffer-alist '((popper-display-control-p          ; the original value
+                               (my-switch-to-buffer-list))))
+
+ ;; see https://www.masteringemacs.org/article/demystifying-emacs-window-manager
+ ;; see https://e17i.github.io/articles-emacs-display-1/
+ )
+
+
+
+;; (advice-add 'split-window-right :after #'balance-windows)
+
+;; -------------------------------------------------------------------
+
+(use-package org-transclusion)
+
+;; -------------------------------------------------------------------
+
+(use-package smartscan
+  )
+
+;; -------------------------------------------------------------------
+
+
 
 
 

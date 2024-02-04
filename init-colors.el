@@ -3,8 +3,6 @@
 
 ;; (rainbow-mode)
 
-(use-package rainbow-mode
-  )
 
 ;; taken from stackoverflow
 (defun ym/what-face (pos)
@@ -22,30 +20,16 @@
 (setq-default cursor-in-non-selected-windows t)   ;;  displays a cursor related to the usual cursor type
 ;; cursor color is set by base16, it used to be (set-cursor-color "#000")
 
-(defun xah-syntax-color-hex ()
-  "Syntax color text of the form 「#ff1100」 and 「#abc」 in current buffer.
-URL `http://ergoemacs.org/emacs/emacs_CSS_colors.html'
-Version 2017-03-12"
-  (interactive)
-  (font-lock-add-keywords
-   nil
-   '(("#[[:xdigit:]]\\{3\\}"
-      (0 (put-text-property
-          (match-beginning 0)
-          (match-end 0)
-          'face (list :background
-                      (let* (
-                             (ms (match-string-no-properties 0))
-                             (r (substring ms 1 2))
-                             (g (substring ms 2 3))
-                             (b (substring ms 3 4)))
-                        (concat "#" r r g g b b))))))
-     ("#[[:xdigit:]]\\{6\\}"
-      (0 (put-text-property
-          (match-beginning 0)
-          (match-end 0)
-          'face (list :background (match-string-no-properties 0)))))))
-  (font-lock-flush))
+
+
+
+
+;; -------------------------------------------------------------------
+
+;; Colorize color names in buffers, like #0000ff or blue
+(use-package rainbow-mode)
+
+;; -------------------------------------------------------------------
 
 ;; http://chriskempson.com/projects/base16/
 ;; https://github.com/belak/base16-emacs
@@ -74,7 +58,7 @@ Version 2017-03-12"
 			              :base0F "#a16946"    ; Deprecated, Opening/Closing Embedded Language Tags, e.g. <?php ?>
 			              ))
   (setq ym-base16-colors-darker    ; from :base09 to :base0E
-        (let ((percent-darker 30))
+        (let ((percent-darker 33))
           (-map-indexed (lambda (ii cc)
                           (if
                               (and (> ii 18) (<= ii 30)
@@ -121,6 +105,8 @@ Version 2017-03-12"
       ))
 
   )
+
+
 
 (set-face-attribute 'mode-line-buffer-id nil
                     :foreground "black"
@@ -243,7 +229,7 @@ Containing LEFT, and RIGHT aligned respectively."
 
 (use-package rainbow-delimiters
   :config
-  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+  ;; (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
   (setq rainbow-delimiters-max-face-count 6)
   (custom-set-faces
    ;; custom-set-faces was added by Custom.
@@ -258,6 +244,12 @@ Containing LEFT, and RIGHT aligned respectively."
    '(rainbow-delimiters-depth-6-face ((t (:foreground "black"))))
    )
   )
+
+
+
+
+
+
 
 
 
@@ -337,16 +329,19 @@ Containing LEFT, and RIGHT aligned respectively."
   "Highlight selected window with a different background color."
   (let ((hydra-window lv-wnd))        ; this is the hydra echo area, see https://github.com/abo-abo/hydra/blob/master/lv.el
    (walk-windows (lambda (w)
-                  (cond
-                   ((eq w (selected-window))
+                  (cond 
+                   ((or    ; a bit of redundancy here
+                     (eq w (selected-window))
+                     (eq (window-buffer w) (window-buffer (selected-window))))
                     (buffer-face-set 'default))
                    ((eq w hydra-window)
                     (with-current-buffer (window-buffer w)
                       (buffer-face-set '(:background "gray"))))
-                   (t   ; other windows
+                   (t
                     (with-current-buffer (window-buffer w)
                       (buffer-face-set '(:background "#f1f1f1"))))
-                   )))))
+                   )))
+   ))
 (add-hook 'buffer-list-update-hook 'highlight-selected-window)
 (add-hook 'window-configuration-change-hook 'highlight-selected-window)
 
@@ -381,6 +376,46 @@ Containing LEFT, and RIGHT aligned respectively."
 ;;     (with-current-buffer (get-buffer buf)
 ;;       (buffer-face-set :background "yellow")
 ;;       )))
+
+;; -------------------------------------------------------------------
+
+;; Douglas Crockford once suggested syntax highlighting based on scope, this is the closest thing so far
+(use-package prism       ; there's also https://github.com/Fanael/rainbow-delimiters, but it doesn't work for python
+  :config
+  (setq prism-comments nil)
+  (setq prism-parens t)
+  (prism-set-colors :num 16
+    ;; :desaturations (cl-loop for i from 0 below 16 collect (* i 2.5))
+    ;; :lightens (cl-loop for i from 0 below 16 collect (* i 2.5))
+    :desaturations '(0) :lightens '(0)  ; don't lower, keep the contrast high
+    :colors (list
+             "black"
+             "medium blue"
+             "dark violet"
+             "firebrick"
+             "forest green"
+             )
+
+    ;; try color-saturate-name, color-saturate-hsl
+    :parens-fn (lambda (color)
+                 (prism-blend color "white" 0.5))
+    
+    ;; :strings-fn (lambda (color)
+    ;;               (prism-blend color "white" 0.5))
+    )
+
+   ;; there's a function/macro used to return the face for a point at a given depth. Change that function and the face will change. Then you'd probably need to refontify the whole visible portion of the buffer whenever the point moves to a position at a different logical depth.
+  )
+
+;; (use-package highlight-function-calls
+;;   :config
+;;   (setq highlight-function-calls-macro-calls nil)
+;;   (setq highlight-function-calls-special-forms nil)
+;;   ;; (add-hook 'emacs-lisp-mode-hook 'highlight-function-calls-mode)
+;;   )
+
+
+
 
 ;; -------------------------------------------------------------------
 

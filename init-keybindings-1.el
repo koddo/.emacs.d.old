@@ -364,24 +364,42 @@
 
 
 
-(pretty-hydra-define hydra-window ()
-  ("move"
-   (("j" windmove-left)
-    ("k" windmove-down)
-    ("i" windmove-up)
-    ("l" windmove-right)
-    ("w" winner-undo)
-    ("w" winner-redo)
-    ("v" visual-line-mode :toggle t)
-    ("f" (lambda () (interactive)
-	   (follow-mode t))
-     "follow-mode 2")
 
+(pretty-hydra-define hydra-window (:idle 0.7
+                                         :after-exit (hydra-set-property 'hydra-window :verbosity 1)
+                                         )
+  ("move"
+   (
+    ("j" (csb-wrap-ignore-error 'user-error (windmove-left)) "windmove-left")     ; user-error -- "no window to the left"
+    ("k" (csb-wrap-ignore-error 'user-error (windmove-down)) "windmove-down")
+    ("i" (csb-wrap-ignore-error 'user-error (windmove-up)) "windmove-up")
+    ("l" (csb-wrap-ignore-error 'user-error (windmove-right)) "windmove-right")
+    ;; ("j" windmove-left)
+    ;; ("k" windmove-down)
+    ;; ("i" windmove-up)
+    ;; ("l" windmove-right)
+    (" " winner-undo)
+    (" " winner-redo)
+    (" " tab-bar-history-backward)
+    (" " tab-bar-history-forward)
+    (" " visual-line-mode :toggle t)
+    (" " (lambda () (interactive)
+	       (follow-mode t))
+     "follow-mode 2" :exit t)
+    (" "
+     (lambda () (interactive) (message "test of empty keybinding"))
+     "test")
     )
-  "window"
+   "window"
    (("1" delete-other-windows)
     ("2" split-window-below)
     ("3" split-window-right)
+    (" " tear-off-window)
+    (" " balance-windows)
+    (" " delete-other-windows)
+    (" " delete-other-windows-vertically)
+    (" " follow-delete-other-windows-and-split)
+    (" " shrink-window-if-larger-than-buffer)
     )
 
    "buf"
@@ -390,8 +408,14 @@
     ("b" buf-move-left)
     ("b" buf-move-right)
     )
+
+   "resize"
+   (("_" resize-whatever))
+
+
    ))
-(global-set-key (kbd "s-p") 'hydra-window/body)
+;; (hydra-set-property 'hydra-window :verbosity 1)
+(global-set-key (kbd "s-p") #'hydra-window/body)
 
 (pretty-hydra-define hydra-drill ()
   ("asdfasdf"
@@ -419,6 +443,8 @@
 (pretty-hydra-define hydra-search ()
   ("search and replace"
    (("f" anzu)   ; TODO: https://github.com/emacsorphanage/anzu
+    (" " smartscan)
+    (" " goto-line)
     )
 
    "Ripgrep"
