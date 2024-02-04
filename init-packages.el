@@ -267,19 +267,30 @@
     (timer-activate timer)))
 
 (defun csb-hide ()
-  (hydra-set-property 'hydra-window :verbosity 0))
+  ;; (hydra-disable)
+  (hydra-set-property 'hydra-window :verbosity 0)
+  ;; (hydra-window/body)
+  )
 
 (defun csb-show ()
-  (hydra-set-property 'hydra-window :verbosity 1)
-  (let ((hydra-active (eq hydra-curr-map hydra-window/keymap)))
-      (when hydra-active
-      (hydra-window/body))))
+  (hydra-set-property 'hydra-window :verbosity t)      ; 1 is for terminal emacs, otherwise t; see the hydra-show-hint function definition
+  (let ((hydra-active (eq hydra-curr-map hydra-window/keymap))
+        (f (timer--function hydra-message-timer))
+        (a (timer--args hydra-message-timer))
+        )
+    (when hydra-active
+      (hydra-window/body)
+      (progn   ; show hydra immediately, without the idle delay, because we already waited for the moment to show
+       (cancel-timer hydra-message-timer)
+       (apply f a))
+      )))
 
 (defmacro csb-wrap (&rest body)
   `(progn
      ,@body
      (csb-hide)
-     (timer-reset 'csb-timer 0.7 'csb-show)))
+     (timer-reset 'csb-timer 0.7 'csb-show)
+     ))
 
 (defmacro csb-wrap-ignore-error (condition &rest body)
   `(progn
@@ -503,13 +514,29 @@
 ;; to configure it for evaluating python, try this: https://emacs.stackexchange.com/questions/74478/evaluate-single-python-code-blocks-in-a-quarto-file-like-in-r-studio-or-jupyter
 
 ;; difference between the built-in python mode and the python-mode package: https://www.reddit.com/r/emacs/comments/sshhdi/difference_between_inbuild_python_and_pythonmode/
-;; tldr: the built-in python mode is fine
-(use-package python-mode)
+;; tldr: the built-in python-mode is fine
+;; (use-package python-mode)
+
+(use-package pyvenv
+  ;; :config
+  ;; (pyvenv-mode 1)       ; shows current venv in modeline
+
+  ;; try pyvenv-tracking-mode
+  ;; https://blog.allardhendriksen.nl/posts/tracking-project-virtual-environments-with-pyvenv-tracking-mode/
+  ;; https://stackoverflow.com/questions/37472595/how-to-activate-the-anancondas-env-python-in-emacs/37489343#37489343
+  ;; https://github.com/jorgenschaefer/pyvenv/issues/6
+  )
 
 
 ;; System Crafters -- Python Development Configuration
 ;; https://www.youtube.com/watch?v=jPXIP46BnNA
 ;; https://systemcrafters.net/emacs-ide/python-development-config/
+
+;; Python Executable Tracker
+;; https://github.com/wyuenho/emacs-pet
+
+
+
 
 ;; -------------------------------------------------------------------
 
@@ -744,9 +771,26 @@ become defined after invocation."
   )
 
 ;; from reddit: "Mine is just the default nil. I don't use any of the packages. But I prefer magit to be fullscreen and to restore back to where I was on quit:"
-(setq magit-display-buffer-function 'magit-display-buffer-fullframe-status-topleft-v1)
-(setq magit-bury-buffer-function 'magit-restore-window-configuration)
+;; ???
+;; (setq magit-display-buffer-function 'magit-display-buffer-fullframe-status-topleft-v1)
+;; (setq magit-bury-buffer-function 'magit-restore-window-configuration)
 
+
+;;;; links to revisions
+;;;; from https://www.reddit.com/r/emacs/comments/asbjai/comment/egv5ymf/
+;;;; or [[elisp:(magit-status "/my/repo")][magit status for my repository]]
+;; (use-package orgit
+;;   ;; Automatically copy orgit link to last commit after commit
+;;   :hook (git-commit-post-finish . orgit-store-after-commit)
+;;   :config
+;;   (defun orgit-store-after-commit ()
+;;     "Store orgit-link for latest commit after commit message editor is finished."
+;;     (let* ((repo (abbreviate-file-name default-directory))
+;;            (rev (magit-git-string "rev-parse" "HEAD"))
+;;            (link (format "orgit-rev:%s::%s" repo rev))
+;;            (summary (substring-no-properties (magit-format-rev-summary rev)))
+;;            (desc (format "%s (%s)" summary repo)))
+;;       (push (list link desc) org-stored-links))))
 
 ;; -------------------------------------------------------------------
 
@@ -828,23 +872,23 @@ become defined after invocation."
 
 ;; -------------------------------------------------------------------
 
-(use-package key-chord
-  :config
-  ;; (key-chord-mode 1)
-  (setq key-chord-one-key-delay 0.15)
-  (setq key-chord-two-keys-delay 0.01)
-  ;; (key-chord-define-global "qq"     "cool")
-  ;; (key-chord-define-global "kl"     "cool")
-  ;; (key-chord-define-global " a"     "cool")
-  ;; (key-chord-define-global "((" 'sp-wrap-round)
-  ;; (key-chord-define c++-mode-map ";;"  "\C-e;")
-  )
+;; (use-package key-chord
+;;   :config
+;;   ;; (key-chord-mode 1)
+;;   (setq key-chord-one-key-delay 0.15)
+;;   (setq key-chord-two-keys-delay 0.01)
+;;   ;; (key-chord-define-global "qq"     "cool")
+;;   ;; (key-chord-define-global "kl"     "cool")
+;;   ;; (key-chord-define-global " a"     "cool")
+;;   ;; (key-chord-define-global "((" 'sp-wrap-round)
+;;   ;; (key-chord-define c++-mode-map ";;"  "\C-e;")
+;;   )
 
-(use-package key-seq
-  ;; (key-seq-define-global ";a" "cool")
-  ;; (key-seq-define text-mode-map "qf" 'flyspell-buffer)
-  ;; (key-chord-mode 1)
-  )
+;; (use-package key-seq
+;;   ;; (key-seq-define-global ";a" "cool")
+;;   ;; (key-seq-define text-mode-map "qf" 'flyspell-buffer)
+;;   ;; (key-chord-mode 1)
+;;   )
 ;; https://www.johndcook.com/blog/2015/02/01/rare-bigrams/
 ;; https://www.reddit.com/r/emacs/comments/22hzx7/what_are_your_keychord_abbreviations/ 
 
@@ -907,18 +951,14 @@ become defined after invocation."
 
 ;; -------------------------------------------------------------------
 
-;; (setq tab-always-indent t)
-(setq tab-always-indent 'complete)
+(setq tab-always-indent t)
+;; (setq tab-always-indent 'complete)
 ;; c-tab-always-indent has to be set separately
 
-;; (global-set-key (kbd "M-i") #'completion-at-point)
 
 
 
 (use-package dabbrev
-  ;; Swap M-/ and C-M-/
-  ;; :bind (("M-/" . dabbrev-completion)
-  ;;        ("C-M-/" . dabbrev-expand))
   :config
   (add-to-list 'dabbrev-ignored-buffer-regexps "\\` ")
   (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)

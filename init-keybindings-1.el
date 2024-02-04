@@ -12,6 +12,11 @@
 
 ;; -------------------------------------------------------------------
 
+(ym-define-key (kbd "M-<tab>") #'completion-at-point)      ; dabbrev, corfu
+
+
+;; -------------------------------------------------------------------
+
 ;; I no longer use cua-mode
 ;; (cua-mode t)   ; CUA mode: C-x, C-c, C-v for copying, pasting, C-z for undo
 ;; (setq cua-keep-region-after-copy t)   ; Standard Windows behaviour
@@ -46,7 +51,7 @@
 
   )
 
-(pretty-hydra-define hydra-smartparens ()  ; :title "smartparens" :idle 0.5
+(pretty-hydra-define hydra-smartparens (:idle 0.5)  ; :title "smartparens" :idle 0.5
 
   ;; TODO: toggle show-parens-mode/show-smartparens-mode
   ;; TODO: toggle smartparens-mode/smartparens-strict-mode
@@ -366,7 +371,7 @@
 
 
 (pretty-hydra-define hydra-window (:idle 0.7
-                                         :after-exit (hydra-set-property 'hydra-window :verbosity 1)
+                                         :after-exit (hydra-set-property 'hydra-window :verbosity t)
                                          )
   ("move"
    (

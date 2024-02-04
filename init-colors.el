@@ -40,7 +40,7 @@
   (deftheme ym-base16-theme)
 
   (setq ym-base16-colors (list
-			              :base00 "white"     ; Default Background
+			              :base00 "grey99"     ; Default Background
 			              :base01 "grey88"     ; Lighter Background (Used for status bars)
 			              :base02 "#d8d8d8"    ; Selection Background
 			              :base03 "grey70"     ; Comments, Invisibles, Line Highlighting
@@ -325,25 +325,25 @@ Containing LEFT, and RIGHT aligned respectively."
 
 ;; https://emacs.stackexchange.com/questions/24630/is-there-a-way-to-change-color-of-active-windows-fringe
 ;; https://stackoverflow.com/questions/47456134/emacs-lisp-hooks-for-detecting-change-of-active-buffer
+;; (defun highlight-selected-window ()
 (defun highlight-selected-window ()
   "Highlight selected window with a different background color."
   (let ((hydra-window lv-wnd))        ; this is the hydra echo area, see https://github.com/abo-abo/hydra/blob/master/lv.el
    (walk-windows (lambda (w)
-                  (cond 
-                   ((or    ; a bit of redundancy here
-                     (eq w (selected-window))
-                     (eq (window-buffer w) (window-buffer (selected-window))))
+                   (cond 
+                   ((eq w (selected-window))       ; could be also (eq (window-buffer w) (window-buffer (selected-window)))
                     (buffer-face-set 'default))
                    ((eq w hydra-window)
                     (with-current-buffer (window-buffer w)
-                      (buffer-face-set '(:background "gray"))))
+                      (buffer-face-set '(:background "grey"))))
                    (t
                     (with-current-buffer (window-buffer w)
-                      (buffer-face-set '(:background "#f1f1f1"))))
+                      (buffer-face-set '(:background "grey92"))))
                    )))
    ))
-(add-hook 'buffer-list-update-hook 'highlight-selected-window)
-(add-hook 'window-configuration-change-hook 'highlight-selected-window)
+(add-hook 'buffer-list-update-hook #'highlight-selected-window)
+(add-hook 'window-configuration-change-hook #'highlight-selected-window)
+
 
 ;; see an alternative:
 ;; a package that apparently does the same

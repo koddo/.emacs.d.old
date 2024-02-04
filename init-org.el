@@ -137,15 +137,20 @@
 
 
 
+(setq org-src-fontify-natively nil)
+(setq org-confirm-babel-evaluate nil)
+;; (setq org-link-elisp-skip-confirm-regexp ?)    ; 
+
 
 
 ;; ob-ipython is abandoned, apparently and unfortunately
-(use-package jupyter
-  :config
-  ;; don't forget to run the following:
-  ;; $ pip install ipykernel && python -m ipykernel install --user
-  (setq org-babel-python-command "~/.python_venv/python3.8/bin/python")
-  )
+;; (use-package jupyter
+;;   :config
+;;   ;; don't forget to run the following:
+;;   ;; $ pip install ipykernel && python -m ipykernel install --user
+;;   (setq org-babel-python-command "~/.python_venv/python3.8/bin/python")
+;;   )
+
 
 
 
