@@ -13,13 +13,6 @@
 
 
 
-(setq global-hl-line-sticky-flag nil)   ; only appear in one window
-(global-hl-line-mode)
-(blink-cursor-mode 0)
-(setq-default cursor-type 'box)
-(setq-default cursor-in-non-selected-windows t)   ;;  displays a cursor related to the usual cursor type
-;; cursor color is set by base16, it used to be (set-cursor-color "#000")
-
 
 
 
@@ -221,8 +214,6 @@ Containing LEFT, and RIGHT aligned respectively."
 					; (set-face-attribute 'org-level-8 nil :height 1.0 :foreground "#9096c5")
   )
 
-(setq ym-hl-line-color-normal-mode-color "#e6eef7")   ; was LightSteelBlue1, e3ecf7
-(set-face-background 'hl-line ym-hl-line-color-normal-mode-color)
 
 
 
@@ -385,20 +376,31 @@ Containing LEFT, and RIGHT aligned respectively."
   (setq prism-comments nil)
   (setq prism-parens t)
   (prism-set-colors :num 16
-    ;; :desaturations (cl-loop for i from 0 below 16 collect (* i 2.5))
-    ;; :lightens (cl-loop for i from 0 below 16 collect (* i 2.5))
-    :desaturations '(0) :lightens '(0)  ; don't lower, keep the contrast high
+    :desaturations (cl-loop for i from 0 below 16 collect 20)
+    :lightens (cl-loop for i from 0 below 16 collect 0)
+    ;; :desaturations '(0) :lightens '(0)  ; don't lower, keep the contrast high
     :colors (list
-             "black"
+             ;; "black"
              "medium blue"
              "dark violet"
              "firebrick"
              "forest green"
+             ;; "red"
+             ;; "forest green"
+             ;; "blue"
              )
 
     ;; try color-saturate-name, color-saturate-hsl
+    ;; :parens-fn (lambda (color)
+    ;;              (prism-blend color "white" 1))
+    
     :parens-fn (lambda (color)
-                 (prism-blend color "white" 0.5))
+                 (apply #'color-rgb-to-hex (apply #'color-hsl-to-rgb (apply #'color-saturate-hsl (append (apply #'color-rgb-to-hsl (color-name-to-rgb color)) '(3000))))))
+
+    
+    ;; (apply #'color-saturate-hsl (append (apply #'color-rgb-to-hsl (color-name-to-rgb "white")) '(30)))
+    ;; (apply #'color-saturate-hsl (append (apply #'color-rgb-to-hsl (color-name-to-rgb "#102030")) '(30)))
+    
     
     ;; :strings-fn (lambda (color)
     ;;               (prism-blend color "white" 0.5))
@@ -416,6 +418,75 @@ Containing LEFT, and RIGHT aligned respectively."
 
 
 
+;; -------------------------------------------------------------------
+
+(setq global-hl-line-sticky-flag nil)   ; only appear in one window
+(global-hl-line-mode)
+(blink-cursor-mode 0)
+(setq-default cursor-type 'box)
+(setq-default cursor-in-non-selected-windows t)   ;;  displays a cursor related to the usual cursor type
+;; cursor color is set by base16, it used to be (set-cursor-color "#000")
+
+(setq ym-hl-line-color-normal-mode-color "#e6eef7")   ; was LightSteelBlue1, e3ecf7
+(set-face-background 'hl-line ym-hl-line-color-normal-mode-color)
+
+;; -------------------------------------------------------------------
+
+;; electric-pair-mode is enough most of the time
+;; I don't use strict mode and soft deletion from puni and smartparens
+(electric-pair-mode t)
+
+(use-package puni
+  ;; No configuration here. I just directly use functions from puni, smartparens, lispy, etc
+  )
+
+(use-package smartparens
+  ;; :demand t
+  ;; :diminish smartparens-mode smartparens-global-mode show-smartparens-mode show-smartparens-global-mode
+  :config
+  (require 'smartparens-config)   ; default configuration
+  (setq sp-navigate-reindent-after-up-in-string nil)
+  (setq sp-navigate-reindent-after-up nil)
+
+  ;; I now use electric-pair-mode
+  ;; (smartparens-global-mode 1)     ; used to be (smartparens-global-strict-mode 1), but I don't need it to be that strict
+  ;; (show-smartparens-global-mode 1)
+  
+  ;; customize sp-show-pair-match-content-face if you want to highlight not only parens but also the content of the s-exp
+  ;; '(sp-show-pair-enclosing ((t (:inherit show-paren-match))))  
+  )
+
+
+;; highlight matching parenthesis
+(require 'paren)   ; I prefer stock show-paren-mode over show-smartparen-mode because it's ultra-fast
+;; (setq show-paren-delay 0)
+;; (setq show-paren-delay 0.1)
+(setq show-paren-delay 0.01)
+(show-paren-mode 1)
+;; (show-paren-mode -1)
+(setq show-paren-style 'parenthesis)
+(copy-face 'default 'show-paren-match)
+(set-face-attribute 'show-paren-match nil
+                    :weight 'bold
+                    :foreground "black"
+                    :background "grey"         ; was ym-hl-line-color-normal-mode-color
+                    )    ; inherited by show-paren-match-expression
+
+
+;; (progn (require 'autopair)   ; insert paired parenthesis
+;;      (autopair-global-mode)
+;;      (setq autopair-blink nil)
+;;      (setq autopair-skip-whitespace 'chomp))   ; ) ) => )) when closing
+
+;; here's a modified snippet from https://stackoverflow.com/questions/34846531/show-parentheses-when-inside-them-emacs/34861578#34861578
+;; rename the advice and make it toggleable through hydra
+;; (define-advice show-paren-function (:around (fn) fix)
+;;   "Highlight enclosing parens."
+;;   (cond ((looking-at-p "\\s(") (funcall fn))      ; \s( and \s) are open and close delimiter character
+;; 	  ((save-match-data (looking-back "\\s)" 1)) (funcall fn))   ; if performance is an issue, replace looking-back with char-before and 
+;; 	  (t (save-excursion
+;; 	       (ignore-errors (backward-up-list))
+;; 	       (funcall fn)))))
 
 ;; -------------------------------------------------------------------
 

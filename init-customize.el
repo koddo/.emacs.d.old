@@ -4,8 +4,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(dired-omit-extensions 'nil nil nil "Customized by me")
- '(dired-omit-files (rx (or (seq bol "." eol) (seq bol "." (not (any "."))))) nil nil "Customized by me")
-)
+ '(dired-omit-files (rx (or (seq bol "." eol) (seq bol "." (not (any "."))))) nil nil "Customized by me"))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
