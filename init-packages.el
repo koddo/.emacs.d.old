@@ -1006,7 +1006,7 @@ become defined after invocation."
   ;; Configure a custom style dispatcher (see the Consult wiki)
   ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
   ;;       orderless-component-separator #'orderless-escapable-split-on-space)
-  (setq completion-styles '(orderless basic)   ; try '(orderless flex), it ignores spaces, but it can't be used to look for middle first, beginning second
+  (setq completion-styles '(orderless flex)   ; basic lets you input multiple parts of words out of order, separated by space; flex lets you avoid space, this is faster to type
         completion-category-defaults nil
         completion-category-overrides '((file (styles . (partial-completion))))))
 
@@ -1159,22 +1159,155 @@ become defined after invocation."
 ;; for rg clone?
 
 
+(defvar bubbles-empty-buffer-fn
+  (lambda (i) (get-buffer-create "*scratch*"))
+  "When there are more windows than buffers, fill them in with the results of this function. It must accept an index arg. Added just in case someone wants to implement something fancy, like adding dired buffers to the end.")
 
+(defun bubbles (&rest numbers)
+  (let* ((bufs (mapcar
+                (lambda (w) (window-buffer w))
+                (window-list)))
+         (i 0)
+         ;; (inc-by-ncols (or (gethash (length numbers) bubbles/main-area-enlarments-at-different-divisions)
+         ;;                   0))
+         (main-area-width (if (< bubbles/main-area-colsize (/ (frame-width) (length numbers)))
+                              (/ (frame-width) (length numbers))
+                            bubbles/main-area-colsize
+                              ))
+         )
+    (cl-flet ((switch-to-next-buffer ()    ; We could avoid switching to the same buffer at the very first entry in the list, but this would hurt simplicity of the body.
+                (if bufs
+                    (progn
+                      (let ((next-buf (car bufs)))
+                        (unless (eq next-buf (current-buffer))      ; Handling a special case here, when there are multiple windows for the same buffer, with different positions. Otherwise, point may jump.
+                         (switch-to-buffer next-buf)))
+                      (pop bufs))
+                  (progn
+                    (switch-to-buffer (funcall bubbles-empty-buffer-fn i))
+                    (cl-incf i)))))
+      (delete-other-windows)
+      (dotimes (idx (length numbers))    ; instead of dolist, because we want to handle edge cases
+        (unless (= idx (- (length numbers) 1))
+         (if (= idx 0)
+            (split-window-right main-area-width)
+          (split-window-right
+           (round (/ (window-total-width)
+                     (- (length numbers) idx)))
+           )))
+        (switch-to-next-buffer)
+        (dotimes (idx-v (- (nth idx numbers) 1))
+          (split-window-below
+           (round (/ (window-total-height)
+                     (- (nth idx numbers) idx-v)))
+           )
+          (other-window 1)
+          (switch-to-next-buffer))
+        (other-window 1))
+      (while (ignore-error user-error (windmove-left))
+        (comment do nothing))
+      (while (ignore-error user-error (windmove-up))
+        (comment do nothing))
+      ;; (bubbles/enlarge-main-area inc-by-ncols :save-to-preferences nil)
+      )))
+
+(defvar bubbles/main-area-colsize 130)
+
+(defun bubbles/enlarge-main-area (ncols &rest args)
+  (interactive)
+  (let* ((save-to-preferences (plist-get args :save-to-preferences))
+         (cur-wnd (selected-window))
+         (n-divisions 1))
+    (while (ignore-error user-error (windmove-right))
+      (comment do nothing while we move to the right edge of the frame))
+    (while (ignore-error user-error (windmove-left))
+      (cl-incf n-divisions))
+    ;; (windmove-right)
+    (while (ignore-error user-error
+             (windmove-right))
+      (shrink-window-horizontally ncols))
+    (select-window cur-wnd)
+    (when save-to-preferences
+      (let* ((cur-main-area-size (or (gethash n-divisions bubbles/main-area-enlarments-at-different-divisions)
+                                     0))
+             (increased-size (+ cur-main-area-size ncols)))
+        (puthash n-divisions
+                 increased-size
+                 bubbles/main-area-enlarments-at-different-divisions)))))
+
+(defun bubbles-from-str (s)
+  (interactive "s")
+  (let ((l (mapcar #'string-to-number (mapcar #'char-to-string s))))
+    (apply #'bubbles l)))
+
+(defun bubbles-balance-windows ()
+  (interactive)
+  
+  )
+
+
+(defun my-enlarge-right (delta)
+  (interactive "p")
+  (if (window-in-direction 'right)
+      (with-selected-window (window-in-direction 'right)
+        (shrink-window-horizontally delta))))
 
 
 (comment
+ (bubbles 1 2)
+ (bubbles 2 3)
+ (bubbles 3 3)
+ (bubbles 1 2 3)
+ (bubbles 1 2 4)
+ (bubbles 1 2 5)
+ (bubbles 1 3 4)
+ (bubbles 2 3 4)
+ (bubbles 2 3 4 5)
+
+ (xah-print-hash bubbles/main-area-enlarments-at-different-divisions)
+
+ (defun xah-print-hash (hashtable)
+   "Prints the hashtable, each line is key, val"
+   (maphash
+    (lambda (k v)
+      (princ (format "%s , %s" k v))
+      (princ "\n"))
+    hashtable
+    ))
+ 
+ (enlarge-window-horizontally 3)
+ (enlarge-window (round (* (window-width) .5)) t)
+
+ 
+ ;; (defvar bubbles-main-area-increase-factor 0.4)       ; I don't bother to calculate the right percentage, this factor is not seen by the user, so it can be 
+ (shrink-window (round (* (window-width) bubbles-main-area-percentage)) t)
+
+
+ ;; (defvar bubbles-main-area-enlarge-by-number-of-columns 30)
+
+ 
+
+ 
  (progn
+   (delete-other-windows)
    (split-window-horizontally)
-   (other-window 1)
-   (split-window-horizontally)
+   (split-window-vertically)
    (other-window 1)
    (split-window-vertically)
+   (other-window 1)
+   ;; (split-window-horizontally)
    (other-window 1)
    (split-window-vertically)
    (other-window 1)
    (balance-windows)
    )
 
+ 
+ ;; (window-parent (selected-window))
+ (split-window (window-parent (selected-window)) nil 'right)   ; instead of (split-window-horizontally)
+ (split-window (frame-root-window) nil 'right)   ; instead of (split-window-horizontally)
+
+ 
+ 
 
  (window-in-direction 'down)   ; https://www.gnu.org/software/emacs/manual/html_node/elisp/Windows-and-Frames.html
  (window-full-height-p)

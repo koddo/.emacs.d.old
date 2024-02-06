@@ -389,12 +389,11 @@
     (" " tab-bar-history-forward)
     (" " visual-line-mode :toggle t)
     (" " (lambda () (interactive)
-	       (follow-mode t))
+	       (follow-mode t) "hint")
      "follow-mode 2" :exit t)
     (" "
      (lambda () (interactive) (message "test of empty keybinding"))
-     "test")
-    )
+     "test"))
    "window"
    (("1" delete-other-windows)
     ("2" split-window-below)
@@ -405,6 +404,8 @@
     (" " delete-other-windows-vertically)
     (" " follow-delete-other-windows-and-split)
     (" " shrink-window-if-larger-than-buffer)
+    ("[" (bubbles/enlarge-main-area -5 :save-to-preferences t) "main shrink")
+    ("]" (bubbles/enlarge-main-area  5 :save-to-preferences t) "main enrarge")
     )
 
    "buf"

@@ -209,9 +209,9 @@ Containing LEFT, and RIGHT aligned respectively."
   (set-face-attribute 'org-level-3 nil :height 1.5 :foreground f)
   (set-face-attribute 'org-level-4 nil :height 1.0 :foreground "#5c69cc")
   (set-face-attribute 'org-level-5 nil :height 1.0 :foreground "#9096c5")
-					; (set-face-attribute 'org-level-6 nil :height 1.0 :foreground "#9096c5")
-					; (set-face-attribute 'org-level-7 nil :height 1.0 :foreground "#9096c5")
-					; (set-face-attribute 'org-level-8 nil :height 1.0 :foreground "#9096c5")
+                                        ; (set-face-attribute 'org-level-6 nil :height 1.0 :foreground "#9096c5")
+                                        ; (set-face-attribute 'org-level-7 nil :height 1.0 :foreground "#9096c5")
+                                        ; (set-face-attribute 'org-level-8 nil :height 1.0 :foreground "#9096c5")
   )
 
 
@@ -249,18 +249,18 @@ Containing LEFT, and RIGHT aligned respectively."
 
 
 ;; agenda coloring, configure this later
-  ;; (setq ym-org-todo-keywords-working-regexp
-  ;; 	(concat "\\("
-  ;; 		(mapconcat (lambda (str) (car (split-string str "("))) ym-org-todo-keywords-working "\\|")
-  ;; 		"\\)"))
-  ;; (setq ym-org-todo-keywords-undone-regexp
-  ;; 	(concat ym-org-todo-state-string-in-log "\\("
-  ;; 		(mapconcat (lambda (str) (car (split-string str "("))) ym-org-todo-keywords-undone "\\|")
-  ;; 		"\\))"))
-  ;; (setq ym-org-todo-keywords-done-regexp
-  ;; 	(concat ym-org-todo-state-string-in-log "\\("
-  ;; 		(mapconcat (lambda (str) (car (split-string str "("))) ym-org-todo-keywords-done "\\|")
-  ;; 		"\\))"))
+;; (setq ym-org-todo-keywords-working-regexp
+;; 	(concat "\\("
+;; 		(mapconcat (lambda (str) (car (split-string str "("))) ym-org-todo-keywords-working "\\|")
+;; 		"\\)"))
+;; (setq ym-org-todo-keywords-undone-regexp
+;; 	(concat ym-org-todo-state-string-in-log "\\("
+;; 		(mapconcat (lambda (str) (car (split-string str "("))) ym-org-todo-keywords-undone "\\|")
+;; 		"\\))"))
+;; (setq ym-org-todo-keywords-done-regexp
+;; 	(concat ym-org-todo-state-string-in-log "\\("
+;; 		(mapconcat (lambda (str) (car (split-string str "("))) ym-org-todo-keywords-done "\\|")
+;; 		"\\))"))
 
 
 
@@ -320,18 +320,18 @@ Containing LEFT, and RIGHT aligned respectively."
 (defun highlight-selected-window ()
   "Highlight selected window with a different background color."
   (let ((hydra-window lv-wnd))        ; this is the hydra echo area, see https://github.com/abo-abo/hydra/blob/master/lv.el
-   (walk-windows (lambda (w)
-                   (cond 
-                   ((eq w (selected-window))       ; could be also (eq (window-buffer w) (window-buffer (selected-window)))
-                    (buffer-face-set 'default))
-                   ((eq w hydra-window)
-                    (with-current-buffer (window-buffer w)
-                      (buffer-face-set '(:background "grey"))))
-                   (t
-                    (with-current-buffer (window-buffer w)
-                      (buffer-face-set '(:background "grey92"))))
-                   )))
-   ))
+    (walk-windows (lambda (w)
+                    (cond 
+                     ((eq (window-buffer w) (window-buffer (selected-window)))         ; if you want to dim same buffers, use (eq w (selected-window))
+                      (buffer-face-set 'default))
+                     ((eq (window-buffer w) (window-buffer hydra-window))         ; saved for history: (eq w hydra-window)
+                      (with-current-buffer (window-buffer w)
+                        (buffer-face-set '(:background "grey"))))
+                     (t
+                      (with-current-buffer (window-buffer w)
+                        (buffer-face-set '(:background "grey92"))))
+                     )))
+    ))
 (add-hook 'buffer-list-update-hook #'highlight-selected-window)
 (add-hook 'window-configuration-change-hook #'highlight-selected-window)
 
@@ -385,28 +385,11 @@ Containing LEFT, and RIGHT aligned respectively."
              "dark violet"
              "firebrick"
              "forest green"
-             ;; "red"
-             ;; "forest green"
-             ;; "blue"
-             )
-
-    ;; try color-saturate-name, color-saturate-hsl
-    ;; :parens-fn (lambda (color)
-    ;;              (prism-blend color "white" 1))
-    
-    :parens-fn (lambda (color)
-                 (apply #'color-rgb-to-hex (apply #'color-hsl-to-rgb (apply #'color-saturate-hsl (append (apply #'color-rgb-to-hsl (color-name-to-rgb color)) '(3000))))))
-
-    
-    ;; (apply #'color-saturate-hsl (append (apply #'color-rgb-to-hsl (color-name-to-rgb "white")) '(30)))
-    ;; (apply #'color-saturate-hsl (append (apply #'color-rgb-to-hsl (color-name-to-rgb "#102030")) '(30)))
-    
-    
-    ;; :strings-fn (lambda (color)
-    ;;               (prism-blend color "white" 0.5))
-    )
-
-   ;; there's a function/macro used to return the face for a point at a given depth. Change that function and the face will change. Then you'd probably need to refontify the whole visible portion of the buffer whenever the point moves to a position at a different logical depth.
+             ;; ;; found a comment in on a forum: nothing prevents you from doing: :hook ((markdown-mode . visual-line-mode) (markdown-mode flyspell-mode)) although I'd do the reverse, as in (use-package flyspell-mode :hook markdown-mode)
+             ))
+  (add-hook 'emacs-lisp-mode-hook 'prism-mode)
+  (add-hook 'python-mode-hook 'prism-mode)
+  (add-hook 'clojure-mode-hook 'prism-mode)
   )
 
 ;; (use-package highlight-function-calls

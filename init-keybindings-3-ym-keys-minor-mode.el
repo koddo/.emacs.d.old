@@ -83,6 +83,8 @@
   "\""
   ))
 
+(ym-define-key (kbd "C-z")    #'ym-undefined-key-message)    ; I constantly hit this unintentionally
+
 (ym-define-key (kbd "<s-return>")    #'ym-undefined-key-message)
 (ym-define-key (kbd "<M-s-return>")  #'ym-undefined-key-message)
 (ym-define-key (kbd "<S-s-return>")  #'ym-undefined-key-message)
