@@ -1207,6 +1207,84 @@ become defined after invocation."
         (comment do nothing))
       )))
 
+(defun bubbles-window-configuration-is-ok-p ()
+  (cl-flet ((next-and-below-are-same-p (_)    ; I'm not entirely sure this catches all possible problems, but it's good enough.
+              (if (window-in-direction 'below)
+                  (eq (window-in-direction 'below)
+                      (next-window))
+                (let ((cur-wnd (selected-window))
+                      (top-wnd-next-column (progn (ignore-error user-error (windmove-right))
+                                                  (while (ignore-error user-error (windmove-up)))
+                                                  (selected-window))))
+                  (select-window cur-wnd)
+                  (eq (next-window)
+                      top-wnd-next-column)))))
+    (let ((list-of-broken-assumptions
+           (seq-filter #'not
+                       (mapcar
+                        #'next-and-below-are-same-p
+                        (window-list)))))
+     (if (seq-empty-p list-of-broken-assumptions)
+        t
+       nil))))
+
+
+(defun my-wnd-info (w)
+  (with-selected-window w
+      (with-current-buffer (window-buffer w)
+        (list
+         :buffer-filename-or-name (if (buffer-file-name)
+                                      (file-relative-name buffer-file-name (projectile-project-root))
+                                    (window-buffer w))
+         :projectile-project-root (projectile-project-root)
+         :is-file (when (buffer-file-name) t)
+         :line-number (save-restriction (widen) (line-number-at-pos))
+         :window-width  (window-width)
+         :window-height (window-height)
+         ))))
+
+(defun bubbles-detect-window-configuration-str (gather-relevant-window-data-fn)
+  (interactive)
+  (if (not (bubbles-window-configuration-is-ok-p))
+      (error "Bubbles detected a broken window configuration.")
+    (let ((list-of-wnd-data (mapcar
+                             gather-relevant-window-data-fn
+                             (window-list))))
+      (while (ignore-error user-error (windmove-left)))
+      (while (ignore-error user-error (windmove-up)))
+      (let ((wnd-rows-count-list '()))
+        (cl-flet ((asdf () (let ((r 1))
+                             (while (ignore-error user-error (windmove-up)))
+                             (while (ignore-error user-error (windmove-down))
+                               (cl-incf r)
+                               )
+                             ;; r
+                             (push r wnd-rows-count-list)
+                             )))
+          (asdf)
+          (while (ignore-error user-error (windmove-right)
+                               (asdf))))
+        (push (nreverse wnd-rows-count-list) list-of-wnd-data)
+        )
+      )
+    )
+  )
+
+(bubbles-detect-window-configuration-str #'my-wnd-info)
+
+((:buffer-filename-or-name "init-packages.el" :projectile-project-root "/home/alexander/.emacs.d.old/" :is-file t :line-number 1256 :window-width 124 :window-height 78)
+ (:buffer-filename-or-name #<buffer *scratch*> :projectile-project-root nil :is-file nil :line-number 9 :window-width 89 :window-height 39)
+ (:buffer-filename-or-name #<buffer *scratch*> :projectile-project-root nil :is-file nil :line-number 9 :window-width 89 :window-height 39)
+ (:buffer-filename-or-name #<buffer *scratch*> :projectile-project-root nil :is-file nil :line-number 9 :window-width 89 :window-height 26)
+ (:buffer-filename-or-name #<buffer *scratch*> :projectile-project-root nil :is-file nil :line-number 9 :window-width 89 :window-height 26)
+ (:buffer-filename-or-name #<buffer *scratch*> :projectile-project-root nil :is-file nil :line-number 9 :window-width 89 :window-height 26)
+ )
+
+
+
+
+
+
 (defvar bubbles/main-area-colsize 130)
 
 (defun bubbles/enlarge-main-area (ncols &rest args)
