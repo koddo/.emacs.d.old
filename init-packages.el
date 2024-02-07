@@ -1243,17 +1243,17 @@ become defined after invocation."
          :window-height (window-height)
          ))))
 
-(defun bubbles-detect-window-configuration-str (gather-relevant-window-data-fn)
+(defun bubbles-detect-window-configuration-str-2 (get-relevant-window-data-fn)
   (interactive)
   (if (not (bubbles-window-configuration-is-ok-p))
       (error "Bubbles detected a broken window configuration.")
     (let ((list-of-wnd-data (mapcar
-                             gather-relevant-window-data-fn
+                             get-relevant-window-data-fn
                              (window-list))))
       (while (ignore-error user-error (windmove-left)))
       (while (ignore-error user-error (windmove-up)))
       (let ((wnd-rows-count-list '()))
-        (cl-flet ((asdf () (let ((r 1))
+        (cl-flet ((count-rows-in-a-column () (let ((r 1))
                              (while (ignore-error user-error (windmove-up)))
                              (while (ignore-error user-error (windmove-down))
                                (cl-incf r)
@@ -1261,26 +1261,53 @@ become defined after invocation."
                              ;; r
                              (push r wnd-rows-count-list)
                              )))
-          (asdf)
+          (count-rows-in-a-column)
           (while (ignore-error user-error (windmove-right)
-                               (asdf))))
+                               (count-rows-in-a-column))))
         (push (nreverse wnd-rows-count-list) list-of-wnd-data)
         )
       )
     )
   )
 
+
+;;;; an example usage of do-while construct in elisp using the widely disliked loop macro, for reference
+;; (let ((x 10))
+;;   (loop
+;;    do (progn
+;;         (decf x)
+;;         (print x))
+;;    while (plusp x)))
+
+(defun bubbles-detect-window-configuration-str-2 (get-relevant-window-data-fn)
+  (interactive)
+  (cl-flet ((windmove-left-or-nil ()   (ignore-error user-error (windmove-left)))   ; otherwise it throws an error when it's the leftmost window
+            (windmove-right-or-nil ()  (ignore-error user-error (windmove-right)))
+            (windmove-up-or-nil ()     (ignore-error user-error (windmove-up)))
+            (windmove-down-or-nil ()   (ignore-error user-error (windmove-down))))
+    (if (not (bubbles-window-configuration-is-ok-p))
+        (error "Bubbles detected a broken window configuration.")
+      (let ((the-window-before-we-started-walking (selected-window)))
+       (while (windmove-left-or-nil))
+       (while (windmove-up-or-nil))
+       (let ((cols '()))     ; our configuration is a list of columns, which are lists of rows, which are descriptions of windows
+         (loop
+          do (progn   ; wrapped the body of do-while, just for readability
+               (while (windmove-up-or-nil))   ; it's a different while, not related to the loop macro
+               (let ((rows '()))
+                 (loop
+                  do (push (funcall get-relevant-window-data-fn (selected-window)) rows)
+                  while (windmove-down-or-nil))
+                 (push rows cols))
+               )
+          while (windmove-right-or-nil))
+         (select-window the-window-before-we-started-walking)
+         (nreverse cols)
+         )))))
+
+
 (bubbles-detect-window-configuration-str #'my-wnd-info)
-
-((:buffer-filename-or-name "init-packages.el" :projectile-project-root "/home/alexander/.emacs.d.old/" :is-file t :line-number 1256 :window-width 124 :window-height 78)
- (:buffer-filename-or-name #<buffer *scratch*> :projectile-project-root nil :is-file nil :line-number 9 :window-width 89 :window-height 39)
- (:buffer-filename-or-name #<buffer *scratch*> :projectile-project-root nil :is-file nil :line-number 9 :window-width 89 :window-height 39)
- (:buffer-filename-or-name #<buffer *scratch*> :projectile-project-root nil :is-file nil :line-number 9 :window-width 89 :window-height 26)
- (:buffer-filename-or-name #<buffer *scratch*> :projectile-project-root nil :is-file nil :line-number 9 :window-width 89 :window-height 26)
- (:buffer-filename-or-name #<buffer *scratch*> :projectile-project-root nil :is-file nil :line-number 9 :window-width 89 :window-height 26)
- )
-
-
+(bubbles-detect-window-configuration-str-2 #'my-wnd-info)
 
 
 
