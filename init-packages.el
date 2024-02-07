@@ -1168,8 +1168,6 @@ become defined after invocation."
                 (lambda (w) (window-buffer w))
                 (window-list)))
          (i 0)
-         ;; (inc-by-ncols (or (gethash (length numbers) bubbles/main-area-enlarments-at-different-divisions)
-         ;;                   0))
          (main-area-width (if (< bubbles/main-area-colsize (/ (frame-width) (length numbers)))
                               (/ (frame-width) (length numbers))
                             bubbles/main-area-colsize
@@ -1207,7 +1205,6 @@ become defined after invocation."
         (comment do nothing))
       (while (ignore-error user-error (windmove-up))
         (comment do nothing))
-      ;; (bubbles/enlarge-main-area inc-by-ncols :save-to-preferences nil)
       )))
 
 (defvar bubbles/main-area-colsize 130)
@@ -1221,7 +1218,6 @@ become defined after invocation."
       (comment do nothing while we move to the right edge of the frame))
     (while (ignore-error user-error (windmove-left))
       (cl-incf n-divisions))
-    ;; (windmove-right)
     (while (ignore-error user-error
              (windmove-right))
       (shrink-window-horizontally ncols))
@@ -1369,10 +1365,30 @@ become defined after invocation."
 
 (use-package org-transclusion)
 
+(defun org-dblock-write:transclusion (params)
+  (progn
+    (with-temp-buffer
+      
+      (insert-file-contents (plist-get params :filename))
+      (let ((range-start (or (plist-get params :min) (line-number-at-pos (point-min))))
+            (range-end (or (plist-get params :max) (line-number-at-pos (point-max)))))
+        (copy-region-as-kill (line-beginning-position range-start)
+                             (line-end-position range-end)))
+      )
+    (insert "\n#+begin_src elisp\n")
+    (yank)
+    (insert "\n#+end_src\n")
+    ))
+
 ;; -------------------------------------------------------------------
 
+;; for searching symbols with a single keybinding
 (use-package smartscan
   )
+
+;; -------------------------------------------------------------------
+
+
 
 ;; -------------------------------------------------------------------
 
