@@ -583,7 +583,7 @@
 	     )
   	    )
 
-  (setq avy-background nil)
+  (setq avy-background nil)      ; (set-face-attribute 'avy-background-face nil :foreground "grey90" :background "grey98") -- doesn't work with my highlighting of active window
   (setq avy-highlight-first nil)
   (setq avy-all-windows t) ; 'all-frames
   (setq avy-style 'at-full)
@@ -914,14 +914,11 @@ become defined after invocation."
 
 ;; -------------------------------------------------------------------
 
+;; this is the new winner-mode
 (tab-bar-mode)
 
-;; instead of winner-mode
-(tab-bar-history-mode)
-
-;; tab-bar-history-back
-;; tab-bar-history-forward
-
+(tab-bar-history-mode 1)
+(setq tab-bar-history-limit 100)
 
 ;; -------------------------------------------------------------------
 
@@ -970,9 +967,11 @@ become defined after invocation."
                               ))     ; this is the way to add these packages, see https://www.reddit.com/r/emacs/comments/z6sk1f/how_to_update_corfudoc_to_the_new_corfuinfo/
   
   ;; Optional customizations
-  ;; :custom
+  :custom
+  (corfu-auto t)
+  (corfu-auto-delay 0.3)
+  (corfu-auto-prefix 4)
   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  ;; (corfu-auto t)                 ;; Enable auto completion
   ;; (corfu-separator ?\s)          ;; Orderless field separator
   ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
   ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
@@ -993,12 +992,13 @@ become defined after invocation."
   (global-corfu-mode)
   (corfu-popupinfo-mode)
   
-  :bind
-  (:map corfu-map
-        ("SPC" . corfu-insert-separator))
+  ;; :bind
+  ;; (:map corfu-map
+  ;;       ("SPC" . corfu-insert-separator))      ; no need for this, when using flex
   )
 
-;; setq-local
+
+
 
 
 (use-package orderless
@@ -1006,7 +1006,7 @@ become defined after invocation."
   ;; Configure a custom style dispatcher (see the Consult wiki)
   ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
   ;;       orderless-component-separator #'orderless-escapable-split-on-space)
-  (setq completion-styles '(orderless flex)   ; basic lets you input multiple parts of words out of order, separated by space; flex lets you avoid space, this is faster to type
+  (setq completion-styles '(orderless flex)   ; '(orderless flex) lets you input multiple parts of words out of order, separated by space; flex lets you avoid space, this is faster to type
         completion-category-defaults nil
         completion-category-overrides '((file (styles . (partial-completion))))))
 
@@ -1128,18 +1128,65 @@ become defined after invocation."
 
 ;; -------------------------------------------------------------------
 
-;; (use-package edwina
-;;   :ensure t
-;;   :config
-;;   (setq display-buffer-base-action '(display-buffer-below-selected))
-;;   ;; I don't enable edwina-mode, I just use M-x edwina-arrange when needed
-;;   )
-
 ;; Always open popups in the active window.
 ;; The back button through winner-undo is available.
 ;; There's a package named current-window-only for this, but this is much simpler.
-(setq display-buffer-alist '((".*"
-                              (display-buffer-same-window))))
+
+;; (setq display-buffer-alist '((".*" (display-buffer-same-window))
+;;                              ))
+
+; The switch-to-buffer-other-window function chooses an arbitrary window, I don't like this.
+;; This function defines the behaviour.
+;; At the moment it chooses next window in cyclic order.
+;; (defun my/switch-to-buffer-other-window-advised (buffer &optional norecord)
+;;   (when (one-window-p)
+;;     (split-window nil nil t))  
+;;   (other-window 1)
+;;   (switch-to-buffer buffer norecord))
+;; (advice-add 'switch-to-buffer-other-window :override #'my/switch-to-buffer-other-window-advised)
+;; ;; (advice-remove 'switch-to-buffer-other-window #'my/switch-to-buffer-other-window-advised)
+
+
+
+(defun display-buffer-same-or-next-window (buffer alist)     ; slightly modified definition of display-buffer-same-window
+  (if (not (or
+            (cdr (assq 'inhibit-same-window alist))      ; some functions like occur-mode-display-occurrence signal the request to show occurences in some other window using inhibit-same-window, and we abide below by choosing next window
+            ;; (window-dedicated-p)   ; TODO: make it skip all dedicated windows until it finds a free one
+	        (window-minibuffer-p)))
+      (window--display-buffer buffer (selected-window) 'reuse alist)
+    (window--display-buffer buffer (next-window) 'reuse alist)
+    ))
+(setq display-buffer-alist
+      '((".*" (display-buffer-same-or-next-window))))
+
+
+
+;; saving for history of how I struggled, this is not needed anymore
+;; (defun display-buffer-next-window (buffer alist)
+;;   (unless (or
+;;            ;; (cdr (assq 'inhibit-same-window alist))
+;;            ;; (window-dedicated-p)
+;; 	       ;; (window-minibuffer-p)
+;;            )
+;;     (window--display-buffer buffer (next-window) 'reuse alist)))
+;; (defun ym/occur-mode-display-occurrence-advice (orig-fun &rest args)
+;;   (let ((old-display-buffer-fn (symbol-function #'display-buffer)))
+;;     (cl-letf (((symbol-function #'display-buffer) (lambda (&rest old-display-buffer-args)
+;;                                                     (let ((display-buffer-overriding-action '((display-buffer-next-window))))
+;;                                                       (apply old-display-buffer-fn old-display-buffer-args)))))
+;;       (apply orig-fun args)
+;;       )))
+;; (advice-add 'occur-mode-display-occurrence :around #'ym/occur-mode-display-occurrence-advice)
+;; ;; ;; (advice-remove 'occur-mode-display-occurrence #'ym/occur-mode-display-occurrence-advice)
+
+
+
+
+
+;;; I don't remember why I had this:
+(setq switch-to-buffer-obey-display-actions t)
+(setq switch-to-buffer-in-dedicated-window 'prompt)    ; I'm not sure what this does, so I configured it to ask me.
+
 
 ;; -------------------------------------------------------------------
 
@@ -1222,7 +1269,7 @@ become defined after invocation."
     (let ((list-of-broken-assumptions
            (seq-filter #'not
                        (mapcar
-                        #'next-and-below-are-same-p
+                        #'next-and-below-are-same-p          ; the crux of it
                         (window-list)))))
      (if (seq-empty-p list-of-broken-assumptions)
         t
@@ -1232,43 +1279,46 @@ become defined after invocation."
 (defun my-wnd-info (w)
   (with-selected-window w
       (with-current-buffer (window-buffer w)
-        (list
-         :buffer-filename-or-name (if (buffer-file-name)
-                                      (file-relative-name buffer-file-name (projectile-project-root))
-                                    (window-buffer w))
-         :projectile-project-root (projectile-project-root)
-         :is-file (when (buffer-file-name) t)
-         :line-number (save-restriction (widen) (line-number-at-pos))
-         :window-width  (window-width)
-         :window-height (window-height)
+        (append
+         (list
+          :buffer-filename-or-name (if (buffer-file-name)
+                                       (file-relative-name buffer-file-name (projectile-project-root))
+                                     (window-buffer w))
+          :projectile-project-root (projectile-project-root)
+          :is-file (when (buffer-file-name) t)
+          :line-number (save-restriction (widen) (line-number-at-pos))
+          :window-width  (window-width)
+          :window-height (window-height))
+         (when (eq w (selected-window))
+             (list :is-selected-window t))
          ))))
 
-(defun bubbles-detect-window-configuration-str-2 (get-relevant-window-data-fn)
-  (interactive)
-  (if (not (bubbles-window-configuration-is-ok-p))
-      (error "Bubbles detected a broken window configuration.")
-    (let ((list-of-wnd-data (mapcar
-                             get-relevant-window-data-fn
-                             (window-list))))
-      (while (ignore-error user-error (windmove-left)))
-      (while (ignore-error user-error (windmove-up)))
-      (let ((wnd-rows-count-list '()))
-        (cl-flet ((count-rows-in-a-column () (let ((r 1))
-                             (while (ignore-error user-error (windmove-up)))
-                             (while (ignore-error user-error (windmove-down))
-                               (cl-incf r)
-                               )
-                             ;; r
-                             (push r wnd-rows-count-list)
-                             )))
-          (count-rows-in-a-column)
-          (while (ignore-error user-error (windmove-right)
-                               (count-rows-in-a-column))))
-        (push (nreverse wnd-rows-count-list) list-of-wnd-data)
-        )
-      )
-    )
-  )
+;; (defun bubbles-detect-window-configuration-str-2 (get-relevant-window-data-fn)
+;;   (interactive)
+;;   (if (not (bubbles-window-configuration-is-ok-p))
+;;       (error "Bubbles detected a broken window configuration.")
+;;     (let ((list-of-wnd-data (mapcar
+;;                              get-relevant-window-data-fn
+;;                              (window-list))))
+;;       (while (ignore-error user-error (windmove-left)))
+;;       (while (ignore-error user-error (windmove-up)))
+;;       (let ((wnd-rows-count-list '()))
+;;         (cl-flet ((count-rows-in-a-column () (let ((r 1))
+;;                              (while (ignore-error user-error (windmove-up)))
+;;                              (while (ignore-error user-error (windmove-down))
+;;                                (cl-incf r)
+;;                                )
+;;                              ;; r
+;;                              (push r wnd-rows-count-list)
+;;                              )))
+;;           (count-rows-in-a-column)
+;;           (while (ignore-error user-error (windmove-right)
+;;                                (count-rows-in-a-column))))
+;;         (push (nreverse wnd-rows-count-list) list-of-wnd-data)
+;;         )
+;;       )
+;;     )
+;;   )
 
 
 ;;;; an example usage of do-while construct in elisp using the widely disliked loop macro, for reference
@@ -1289,26 +1339,52 @@ become defined after invocation."
         (error "Bubbles detected a broken window configuration.")
       (let ((the-window-before-we-started-walking (selected-window)))
        (while (windmove-left-or-nil))
-       (while (windmove-up-or-nil))
+       (while (windmove-up-or-nil)q)
        (let ((cols '()))     ; our configuration is a list of columns, which are lists of rows, which are descriptions of windows
-         (loop
+         (cl-loop
           do (progn   ; wrapped the body of do-while, just for readability
                (while (windmove-up-or-nil))   ; it's a different while, not related to the loop macro
                (let ((rows '()))
-                 (loop
+                 (cl-loop
                   do (push (funcall get-relevant-window-data-fn (selected-window)) rows)
                   while (windmove-down-or-nil))
-                 (push rows cols))
+                 (push (nreverse rows) cols))
                )
           while (windmove-right-or-nil))
          (select-window the-window-before-we-started-walking)
          (nreverse cols)
          )))))
 
+(defun rebuild-bubbles (conf)
+  (interactive)
+  (let ((columns conf))   ; just renaming it
+    (delete-other-windows)
+    (cl-loop for idx from 0
+             for col in columns do
+             (unless (= idx
+                        (- (length columns) 1))   ; the last one
+               (split-window-right))
+             (cl-loop for idx-v from 0
+                      for row in col
+                      do
+                      (switch-to-buffer (plist-get row :buffer-filename-or-name))
+                      (unless (= idx-v
+                                 (- (length col) 1))   ; the last one
+                        (split-window-below)
+                        (other-window 1)
+                        ))
+             (other-window 1))
+    ))
 
-(bubbles-detect-window-configuration-str #'my-wnd-info)
-(bubbles-detect-window-configuration-str-2 #'my-wnd-info)
+;; (bubbles-detect-window-configuration-str #'my-wnd-info)
+(setq my-test-wm-conf (bubbles-detect-window-configuration-str-2 #'my-wnd-info))
+(pp my-test-wm-conf)
+(rebuild-bubbles my-test-wm-conf)
+;; (rebuild-bubbles my-test-wm-conf)
 
+      ;; (other-window 1)  ; After all splitting we're left in the last window, this transfers us to the first one.
+      ;; (while (ignore-error user-error (windmove-left)))
+      ;; (while (ignore-error user-error (windmove-up)))
 
 
 
@@ -1358,6 +1434,7 @@ become defined after invocation."
  (bubbles 2 3)
  (bubbles 3 3)
  (bubbles 1 2 3)
+ (bubbles 1 2 4)
  (bubbles 1 2 4)
  (bubbles 1 2 5)
  (bubbles 1 3 4)
@@ -1496,8 +1573,6 @@ become defined after invocation."
 
 
 ;; -------------------------------------------------------------------
-
-
 
 
 

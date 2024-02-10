@@ -51,7 +51,10 @@
 
   )
 
-(pretty-hydra-define hydra-smartparens (:idle 0.5)  ; :title "smartparens" :idle 0.5
+(pretty-hydra-define hydra-smartparens (
+                                        :title "smartparens"
+                                               ;; :idle 0.5
+                                        )
 
   ;; TODO: toggle show-parens-mode/show-smartparens-mode
   ;; TODO: toggle smartparens-mode/smartparens-strict-mode
@@ -272,8 +275,20 @@
 
 
   ;; TODO: reindent after
-  
-  ("Move" (
+
+
+
+  (  "Misc"
+     ((" " anzu "toggle anzu")   ; TODO: https://github.com/emacsorphanage/anzu
+      (" " smartscan)
+      (" " goto-line)
+      (" " rg)
+      (" " rg-project)
+      (" " rg-menu)
+      )
+
+
+   "Move" (
 	   ("l" puni-forward-sexp)
 	   ("j" puni-backward-sexp)
 
@@ -375,29 +390,20 @@
                                          )
   ("move"
    (
-    ("j" (csb-wrap-ignore-error 'user-error (windmove-left)) "windmove-left")     ; user-error -- "no window to the left"
-    ("k" (csb-wrap-ignore-error 'user-error (windmove-down)) "windmove-down")
-    ("i" (csb-wrap-ignore-error 'user-error (windmove-up)) "windmove-up")
-    ("l" (csb-wrap-ignore-error 'user-error (windmove-right)) "windmove-right")
-    ;; ("j" windmove-left)
-    ;; ("k" windmove-down)
-    ;; ("i" windmove-up)
-    ;; ("l" windmove-right)
-    (" " winner-undo)
-    (" " winner-redo)
-    (" " tab-bar-history-backward)
-    (" " tab-bar-history-forward)
+    ;; (" " winner-undo)
+    ;; (" " winner-redo)
     (" " visual-line-mode :toggle t)
     (" " (lambda () (interactive)
 	       (follow-mode t) "hint")
      "follow-mode 2" :exit t)
-    (" "
-     (lambda () (interactive) (message "test of empty keybinding"))
-     "test"))
+    )
    "window"
    (("1" delete-other-windows)
     ("2" split-window-below)
     ("3" split-window-right)
+    ("4" tab-bar-history-back)
+    ("5" tab-bar-history-forward)
+    ("0" delete-window)
     (" " tear-off-window)
     (" " balance-windows)
     (" " delete-other-windows)
@@ -408,76 +414,11 @@
     ("]" (bubbles/enlarge-main-area  5 :save-to-preferences t) "main enrarge")
     )
 
-   "buf"
-   (("b" buf-move-up)
-    ("b" buf-move-down)
-    ("b" buf-move-left)
-    ("b" buf-move-right)
-    )
-
-   "resize"
-   (("_" resize-whatever))
-
-
    ))
 ;; (hydra-set-property 'hydra-window :verbosity 1)
-(global-set-key (kbd "s-p") #'hydra-window/body)
-
-(pretty-hydra-define hydra-drill ()
-  ("asdfasdf"
-   (
-    ;; ("d" org-drill)
-    ;; ("t" org-drill-tree)
-    ;; ("r" org-drill-resume)
-
-    ;; ("z" (lambda () (interactive) (org-agenda nil "dn"))
-    ;;  "show new")
-    ;; ("x" (lambda () (interactive) (org-agenda nil "dt"))
-    ;;  "show today")
-    ;; ("c" (lambda () (interactive) (org-agenda nil "df"))
-    ;;  "show future")
-    ;; ("q" (lambda () (interactive) (org-toggle-tag "drill")) "toggle :drill:")
-    ;; ("w" (lambda () (interactive) (org-toggle-tag "drilltodo")) "toggle :drilltodo:")
-    ;; TODO: org-set-tags
-
-
-
-   
-   )))
-
-
-(pretty-hydra-define hydra-search ()
-  ("search and replace"
-   (("f" anzu)   ; TODO: https://github.com/emacsorphanage/anzu
-    (" " smartscan)
-    (" " goto-line)
-    )
-
-   "Ripgrep"
-   (("r" rg)
-    ("r" rg-project)
-    ("r" rg-menu)
-    )
-   ))
-
-(pretty-hydra-define hydra-text ()
-  ("text"
-   (("m" mc/edit-lines)
-    ("m" mc/mark-all-like-this)
-    ("m" mc/mark-next-like-this)
-    ("m" mc/mark-previous-like-this)
-
-
-    ("d" duplicate)
-    ("c" comment)
-    ("c" copy-line)
-    ("c" cut-line)
-    ("c" remove-line)
-
-    ("d" drag-stuff)    ; see also at the end of this: https://www.emacswiki.org/emacs/MoveLine
-    )
-   ))
-;; (yas-expand-snippet (yas-lookup-snippet "let"))
+;; (global-set-key (kbd "s-p") #'hydra-window/body)
+(global-set-key (kbd "s-^") #'hydra-window/body)
+(ym-define-key (kbd "s-^") #'hydra-window/body)
 
 
 

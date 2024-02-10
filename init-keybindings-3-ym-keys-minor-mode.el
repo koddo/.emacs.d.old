@@ -170,12 +170,48 @@
 (ym-define-key (kbd "s-j") 'backward-char)
 (ym-define-key (kbd "s-l") 'forward-char)
 
+(ym-define-key (kbd "s-s") (lambda () (interactive) (ignore-error 'user-error (windmove-left))))
+(ym-define-key (kbd "s-d") (lambda () (interactive) (ignore-error 'user-error (windmove-down))))
+(ym-define-key (kbd "s-f") (lambda () (interactive) (ignore-error 'user-error (windmove-right))))
+(ym-define-key (kbd "s-e") (lambda () (interactive) (ignore-error 'user-error (windmove-up))))
+
+(ym-define-key (kbd "s-S") (lambda () (interactive) (ignore-error 'error (buf-move-left))))
+(ym-define-key (kbd "s-D") (lambda () (interactive) (ignore-error 'error (buf-move-down))))
+(ym-define-key (kbd "s-F") (lambda () (interactive) (ignore-error 'error (buf-move-right))))
+(ym-define-key (kbd "s-E") (lambda () (interactive) (ignore-error 'error (buf-move-up))))
+
+(ym-define-key (kbd "s-w") (lambda () (interactive) (ignore-error 'user-error (tab-bar-switch-to-prev-tab))))
+(ym-define-key (kbd "s-r") (lambda () (interactive) (ignore-error 'user-error (tab-bar-switch-to-next-tab))))
+
+(ym-define-key (kbd "M-s-s") (lambda () (interactive) (ignore-error 'user-error (enlarge-window -5 t))))
+(ym-define-key (kbd "M-s-d") (lambda () (interactive) (ignore-error 'user-error (enlarge-window -5))))
+(ym-define-key (kbd "M-s-f") (lambda () (interactive) (ignore-error 'user-error (enlarge-window 5 t))))
+(ym-define-key (kbd "M-s-e") (lambda () (interactive) (ignore-error 'user-error (enlarge-window 5))))
+
+
+(defvar ym/toggle-single-window-last-wc nil)
+(defun ym/toggle-single-window ()
+  (interactive)
+  (if (not (one-window-p))            ; used to be (> (count-windows) 1)
+      (progn
+        (setq ym/toggle-single-window-last-wc (current-window-configuration))
+        (delete-other-windows))
+    (when (window-configuration-p ym/toggle-single-window-last-wc)
+      (set-window-configuration ym/toggle-single-window-last-wc)
+      (setq ym/toggle-single-window-last-wc nil))))
+
+(ym-define-key (kbd "s-!") (lambda () (interactive) (ignore-error 'error (delete-window))))
+(ym-define-key (kbd "s-1") 'ym/toggle-single-window)
+(ym-define-key (kbd "s-2") (lambda () (interactive) (ignore-error 'error (split-window-below))))
+(ym-define-key (kbd "s-3") (lambda () (interactive) (ignore-error 'error (split-window-right))))
+(ym-define-key (kbd "s-4") 'tab-bar-history-back)
+(ym-define-key (kbd "s-5") 'tab-bar-history-forward)
+
+
 ;; (ym-define-key (kbd "H-i") 'windmove-up)
 ;; (ym-define-key (kbd "H-k") 'windmove-down)
 ;; (ym-define-key (kbd "H-j") 'windmove-left)
 ;; (ym-define-key (kbd "H-l") 'windmove-right)
-
-
 
 (ym-define-key (kbd "s-&") (lambda () (interactive "^") (scroll-up-command   3)))
 (ym-define-key (kbd "s-(") (lambda () (interactive "^") (scroll-down-command 3)))
@@ -325,7 +361,7 @@ there's a region, all lines that region covers will be duplicated."
         (insert region)
         (setq end (point)))
       (goto-char (+ origin (* (length region) arg) arg)))))
-(ym-define-key (kbd "s-d") #'ym-duplicate-current-line-or-region)
+;; (ym-define-key (kbd "s-d") #'ym-duplicate-current-line-or-region)
 
 (defun ym-duplicate-and-comment-current-line-or-region (arg)   ; got it from here: http://tuxicity.se/emacs/elisp/2010/03/11/duplicate-current-line-or-region-in-emacs.html
   "Duplicates the current line or region ARG times.
@@ -354,7 +390,7 @@ there's a region, all lines that region covers will be duplicated."
       ;; maybe fix this: we don't actually know the length of the resulting commented region, so it jumps to an arbitrary position
       ;; but on the other hand, it's not really important
       )))
-(ym-define-key (kbd "s-D") #'ym-duplicate-and-comment-current-line-or-region)
+;; (ym-define-key (kbd "s-D") #'ym-duplicate-and-comment-current-line-or-region)
 
 
 ;; -------------------------------------------------------------------
@@ -401,22 +437,9 @@ there's a region, all lines that region covers will be duplicated."
 ;; -------------------------------------------------------------------
 
 (setq text-scale-mode-step 1.1)
-(ym-define-key (kbd "s--") #'text-scale-decrease)
-(ym-define-key (kbd "s-=") #'text-scale-increase)
-(ym-define-key (kbd "s-0") (lambda () (interactive) (text-scale-adjust 0)))
-
-;; -------------------------------------------------------------------
-
-
-
-;; -------------------------------------------------------------------
-
-;; TODO:
-;; isearch
-;; remove mark when move
-;; switch marks
-
-(ym-define-key (kbd "s-f") #'isearch-forward)
+;; (ym-define-key (kbd "s--") #'text-scale-decrease)
+;; (ym-define-key (kbd "s-=") #'text-scale-increase)
+;; (ym-define-key (kbd "s-0") (lambda () (interactive) (text-scale-adjust 0)))
 
 ;; -------------------------------------------------------------------
 
@@ -457,7 +480,7 @@ there's a region, all lines that region covers will be duplicated."
 (ym-define-key (kbd "s-;") #'avy-goto-word-1)
 ;; (ym-define-key (kbd "s-;") #'avy-goto-word-2)
 ;; (ym-define-key (kbd "s-;") #'avy-goto-char-timer)
-(ym-define-key (kbd "s-^") #'avy-goto-parens)   ; "S-s-;" -- this is not a usual ^, it's a unicode character
+;; (ym-define-key (kbd "s-^") #'avy-goto-parens)   ; "S-s-;" -- this is not a usual ^, it's a unicode character
 
 ;; -------------------------------------------------------------------
 
@@ -489,10 +512,10 @@ there's a region, all lines that region covers will be duplicated."
       )))
 (defun ym-search-selection-or-isearch-forward ()   (interactive) (ym-search-selection-or-isearch t))
 (defun ym-search-selection-or-isearch-backward ()  (interactive) (ym-search-selection-or-isearch nil))
-(ym-define-key (kbd "s-s") 'ym-search-selection-or-isearch-forward)
-(ym-define-key (kbd "s-r") 'ym-search-selection-or-isearch-backward)
-(define-key isearch-mode-map (kbd "s-s") 'isearch-repeat-forward)
-(define-key isearch-mode-map (kbd "s-r") 'isearch-repeat-backward)
+;; (ym-define-key (kbd "s-s") 'ym-search-selection-or-isearch-forward)
+;; (ym-define-key (kbd "s-r") 'ym-search-selection-or-isearch-backward)
+;; (define-key isearch-mode-map (kbd "s-s") 'isearch-repeat-forward)
+;; (define-key isearch-mode-map (kbd "s-r") 'isearch-repeat-backward)
 
 
 ;; -------------------------------------------------------------------

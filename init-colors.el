@@ -110,7 +110,7 @@
                     :foreground "grey60"
                     :box (list
                           :color "grey22"
-                          :line-width '(0 . 9)
+                          :line-width '(0 . 2)       ; used to be '(0 . 9)
                           )
                     :background "grey22"
                     )
@@ -118,7 +118,7 @@
                     :foreground "grey60"
                     :box (list
                           :color "grey22"
-                          :line-width '(1 . 2)
+                          :line-width '(1 . 2)      ; used to be '(1 . 2)
                           )
                     :background "grey90"
                     )
@@ -151,7 +151,9 @@ Containing LEFT, and RIGHT aligned respectively."
 
 (setq-default
  mode-line-format
- '((:eval
+ (list
+  (propertize "\u200b" 'display '((raise -0.4) (height 1.6)))          ; a zero-width character in mode-line in order to make it wider vertically
+  '(:eval
     (ym/align-mode-line
      ;; Left.
      '("%e" mode-line-front-space mode-line-mule-info mode-line-client mode-line-modified mode-line-remote mode-line-frame-identification mode-line-buffer-identification)
@@ -297,7 +299,6 @@ Containing LEFT, and RIGHT aligned respectively."
   ;; (set-face-attribute x nil :foreground "white" :background "#e5b180")
   ;; (set-face-attribute x nil :foreground "white" :background "#eecbaa")
   )
-;; (set-face-attribute 'avy-background-face nil :foreground "grey90" :background "grey98")
 ;; (dolist (buf (buffer-list))
 ;;    (when (get-buffer-window buf 'visible) (....<STUFF>...))
 
