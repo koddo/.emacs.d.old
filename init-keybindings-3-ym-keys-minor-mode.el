@@ -212,52 +212,81 @@
 ;;         (setq error nil))
 ;;     (when error (cleanup))))
 
-(defvar bouncy-scroll-up-and-down-last-pos nil)
-(defun bouncy-scroll-down ()        ; page up
-  (interactive)
-  (let ((error t))
-    (unwind-protect
-        (prog1 (progn
-                 (if (and
-                      (= (line-number-at-pos) (line-number-at-pos (point-max)))
-                      (eq last-command #'bouncy-scroll-up)
-                      )
-                     (goto-char bouncy-scroll-up-and-down-last-pos))
-                 (scroll-down))
-          (setq error nil))
-      (when error
-        (if (= (line-number-at-pos) (line-number-at-pos (point-min)))
-            (if (eq last-command this-command)         
-                (goto-char bouncy-scroll-up-and-down-last-pos)
-              (setq bouncy-scroll-up-and-down-last-pos (point)))
-          (setq bouncy-scroll-up-and-down-last-pos (point))
-          (beginning-of-line (beginning-of-buffer)))))))
-(defun bouncy-scroll-up ()        ; page down
-  (interactive)
-  (let ((error t))
-    (unwind-protect
-        (prog1
-            (progn (when (and
-                          (= (line-number-at-pos) (line-number-at-pos (point-min))))
-                     (eq last-command #'bouncy-scroll-down)
-                     (goto-char bouncy-scroll-up-and-down-last-pos))
-                   (scroll-up))
-          (setq error nil))
-      (when error
-        (if (= (line-number-at-pos) (line-number-at-pos (point-max)))
-            (if (eq last-command this-command)         
-                (goto-char bouncy-scroll-up-and-down-last-pos)
-              (setq bouncy-scroll-up-and-down-last-pos (point)))
-          (setq bouncy-scroll-up-and-down-last-pos (point))
-          (beginning-of-line (end-of-buffer)))))))
+;; (defun bouncy-scroll-down ()        ; page up
+;;   (interactive)
+;;   (let ((error t))
+;;     (unwind-protect
+;;         (prog1 (progn
+;;                  (if (and
+;;                       (= (line-number-at-pos) (line-number-at-pos (point-max)))
+;;                       (eq last-command #'bouncy-scroll-up)
+;;                       )
+;;                      (goto-char bouncy-scroll-last-pos))
+;;                  (scroll-down))
+;;           (setq error nil))
+;;       (when error
+;;         (if (= (line-number-at-pos) (line-number-at-pos (point-min)))
+;;             (if (eq last-command this-command)         
+;;                 (goto-char bouncy-scroll-last-pos)
+;;               (setq bouncy-scroll-last-pos (point)))
+;;           (setq bouncy-scroll-last-pos (point))
+;;           (beginning-of-line (beginning-of-buffer)))))))
+;; (defun bouncy-scroll-up ()        ; page down
+;;   (interactive)
+;;   (let ((error t))
+;;     (unwind-protect
+;;         (prog1
+;;             (progn (when (and
+;;                           (= (line-number-at-pos) (line-number-at-pos (point-min))))
+;;                      (eq last-command #'bouncy-scroll-down)
+;;                      (goto-char bouncy-scroll-last-pos))
+;;                    (scroll-up))
+;;           (setq error nil))
+;;       (when error
+;;         (if (= (line-number-at-pos) (line-number-at-pos (point-max)))
+;;             (if (eq last-command this-command)         
+;;                 (goto-char bouncy-scroll-last-pos)
+;;               (setq bouncy-scroll-last-pos (point)))
+;;           (setq bouncy-scroll-last-pos (point))
+;;           (beginning-of-line (end-of-buffer)))))))
+
+(defvar bouncy-scroll-last-pos nil)
+
+(defun bouncy-scroll (direction)        ; page down
+  (cl-multiple-value-bind (point-min---if-up
+                           bouncy-scroll-down---if-up                ; binding all at once, instead of having a lot of (if (eq direction 'up)) scattered below
+                           scroll-up---if-up            ; just pretend you're reading the blocks below about scrolling up
+                           point-max---if-up            ; scrolling down is symmetrical, the logic is inversed
+                           end-of-buffer---if-up)
+      (if (eq direction 'up)
+          (list (point-min) #'bouncy-scroll-down #'scroll-up (point-max) #'end-of-buffer)
+        (list (point-max) #'bouncy-scroll-up #'scroll-down (point-min) #'beginning-of-buffer))
+    (let ((error t))
+      (unwind-protect
+          (prog1               ; this block is for scrolling before encountering the end of buffer
+              (progn (when (and
+                            (= (line-number-at-pos) (line-number-at-pos point-min---if-up)))    ; in case of the beginning of buffer jump to next page at the last position
+                       (eq last-command bouncy-scroll-down---if-up)
+                       (goto-char bouncy-scroll-last-pos))
+                     (funcall scroll-up---if-up))
+            (setq error nil))
+        (when error             ; this block is about encountering the end of buffer, jumping back and forth from end of buffer to the last position
+          (if (= (line-number-at-pos) (line-number-at-pos point-max---if-up))
+              (if (eq last-command this-command)         
+                  (goto-char bouncy-scroll-last-pos)
+                (setq bouncy-scroll-last-pos (point)))
+            (setq bouncy-scroll-last-pos (point))
+            (beginning-of-line (funcall end-of-buffer---if-up))))))))
+
+(defun bouncy-scroll-up ()    (interactive) (bouncy-scroll 'up))
+(defun bouncy-scroll-down ()  (interactive) (bouncy-scroll 'down))
 
 
 
-
-(ym-define-key (kbd "s-,") (lambda () (interactive "^") (scroll-up-command   3)))    ; ^ is for leaving selection intact
+(ym-define-key (kbd "s-,") (lambda () (interactive "^") (scroll-up-command   3)))
 (ym-define-key (kbd "s-.") (lambda () (interactive "^") (scroll-down-command 3)))
-(ym-define-key (kbd "s-m") 'bouncy-scroll-down)
-(ym-define-key (kbd "s-n") 'bouncy-scroll-up)
+(ym-define-key (kbd "s-m") #'bouncy-scroll-down)        ; page up
+(ym-define-key (kbd "s-n") #'bouncy-scroll-up)          ; page down
 ;; (ym-define-key (kbd "s-n") (lambda () (interactive "^") (scroll-up)))    ; ^ is for leaving selection intact
 ;; (ym-define-key (kbd "s-h") (lambda () (interactive "^") (scroll-down)))
 ;; (ym-define-key (kbd "s-,") (lambda () (interactive "^") (recenter

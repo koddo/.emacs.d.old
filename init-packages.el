@@ -968,7 +968,7 @@ become defined after invocation."
   
   ;; Optional customizations
   :custom
-  (corfu-auto t)
+  (corfu-auto nil)
   (corfu-auto-delay 0.3)
   (corfu-auto-prefix 4)
   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
