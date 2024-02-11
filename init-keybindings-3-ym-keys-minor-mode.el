@@ -256,6 +256,53 @@
 (defvar bouncy-scroll--jump-to-prev-pos-from-ends-when-going-in-the-opposite-direction t)
 (setq next-screen-context-lines 0)
 
+
+(comment
+
+ (let ((existing-overlays (overlays-in (point-max) (point-max))))
+     (dolist (next-overlay existing-overlays)
+       (if (overlay-get next-overlay 'eob-overlay)
+	   (delete-overlay next-overlay))))
+
+ 
+ (defun my-mark-eob ()
+   (let ((existing-overlays (overlays-in (point-max) (point-max)))
+	     (eob-mark (make-overlay (point-max) (point-max) nil t t))
+	     (eob-text "--- eof---"))
+     ;; Delete any previous EOB markers.  Necessary so that they don't
+     ;; accumulate on calls to revert-buffer.
+     (dolist (next-overlay existing-overlays)
+       (if (overlay-get next-overlay 'eob-overlay)
+	       (delete-overlay next-overlay)))
+     ;; Add a new EOB marker.
+     (put-text-property 0 (length eob-text)
+			            'face '(:foreground "grey50" :background "grey80" :extend t) eob-text)
+     (overlay-put eob-mark 'eob-overlay t)
+     (overlay-put eob-mark 'after-string eob-text))
+   )
+ ;; (add-hook 'find-file-hooks 'my-mark-eob)
+
+
+
+ (let ((existing-overlays (overlays-in (point-min) (point-min))))
+     (dolist (next-overlay existing-overlays)
+       (if (overlay-get next-overlay 'bob-overlay)
+	       (delete-overlay next-overlay))))
+
+
+ (let ((existing-overlays (overlays-in (point-min) (point-min)))
+	     (bob-mark (make-overlay (point-min) (point-min) nil t t))
+	     (bob-text "--- bof---"))
+     (dolist (next-overlay existing-overlays)
+       (if (overlay-get next-overlay 'bob-overlay)
+	       (delete-overlay next-overlay)))
+     (put-text-property 0 (length bob-text)
+			            'face '(:foreground "grey50" :background "grey95" :extend t) bob-text)
+     (overlay-put bob-mark 'bob-overlay t)
+     (overlay-put bob-mark 'before-string bob-text))
+ 
+ )
+
 (defun bouncy-scroll (direction)        ; page down
   (cl-multiple-value-bind (point-min---if-up
                            bouncy-scroll-down---if-up                ; binding all at once, instead of having a lot of (if (eq direction 'up)) scattered below
@@ -268,6 +315,7 @@
     (let ((col (current-column))
           (last-command-was-bouncy-scroll-up-or-down (or (eq last-command #'bouncy-scroll-up)
                                                          (eq last-command #'bouncy-scroll-down)))
+          (point-before-scrolled (point))
           (error t))
       (unwind-protect
           (prog1               ; this block is for scrolling before encountering the end of buffer
@@ -276,7 +324,8 @@
                   (setq bouncy-scroll---column-before-scrolling (current-column)))
                 (if (and
                      (= (line-number-at-pos) (line-number-at-pos point-min---if-up))    ; in case of the beginning of buffer jump to next page at the last position
-                     (eq last-command bouncy-scroll-down---if-up))
+                     (eq last-command bouncy-scroll-down---if-up)
+                     bouncy-scroll---last-pos)
                     (goto-char bouncy-scroll---last-pos)
                   (when bouncy-scroll--jump-to-prev-pos-from-ends-when-going-in-the-opposite-direction
                     (funcall scroll-up---if-up)))
@@ -289,14 +338,14 @@
                 (when (= (line-number-at-pos) (line-number-at-pos point-max---if-up))
                   (let ((recenter-positions '(bottom)))                             ;; (set-window-start nil bouncy-scroll---last-pos)
                     (recenter-top-bottom)
-                    (goto-char bouncy-scroll---last-pos)
-                    ))
-                )
+                    (when bouncy-scroll---last-pos (goto-char bouncy-scroll---last-pos))))
+                (when (= point-before-scrolled (point))
+                      (funcall scroll-up---if-up)))
             (setq error nil))
         (when error             ; this block is about encountering the end of buffer, jumping back and forth from end of buffer to the last position
           (if (= (line-number-at-pos) (line-number-at-pos point-max---if-up))
               (if (eq last-command this-command)         
-                  (goto-char bouncy-scroll---last-pos)
+                  (when bouncy-scroll---last-pos (goto-char bouncy-scroll---last-pos))
                 (setq bouncy-scroll---last-pos (point)))
             (setq bouncy-scroll---last-pos (point))
             (beginning-of-line (funcall end-of-buffer---if-up))))))))
