@@ -221,15 +221,15 @@
 ;;                       (= (line-number-at-pos) (line-number-at-pos (point-max)))
 ;;                       (eq last-command #'bouncy-scroll-up)
 ;;                       )
-;;                      (goto-char bouncy-scroll-last-pos))
+;;                      (goto-char bouncy-scroll---last-pos))
 ;;                  (scroll-down))
 ;;           (setq error nil))
 ;;       (when error
 ;;         (if (= (line-number-at-pos) (line-number-at-pos (point-min)))
 ;;             (if (eq last-command this-command)         
-;;                 (goto-char bouncy-scroll-last-pos)
-;;               (setq bouncy-scroll-last-pos (point)))
-;;           (setq bouncy-scroll-last-pos (point))
+;;                 (goto-char bouncy-scroll---last-pos)
+;;               (setq bouncy-scroll---last-pos (point)))
+;;           (setq bouncy-scroll---last-pos (point))
 ;;           (beginning-of-line (beginning-of-buffer)))))))
 ;; (defun bouncy-scroll-up ()        ; page down
 ;;   (interactive)
@@ -239,18 +239,21 @@
 ;;             (progn (when (and
 ;;                           (= (line-number-at-pos) (line-number-at-pos (point-min))))
 ;;                      (eq last-command #'bouncy-scroll-down)
-;;                      (goto-char bouncy-scroll-last-pos))
+;;                      (goto-char bouncy-scroll---last-pos))
 ;;                    (scroll-up))
 ;;           (setq error nil))
 ;;       (when error
 ;;         (if (= (line-number-at-pos) (line-number-at-pos (point-max)))
 ;;             (if (eq last-command this-command)         
-;;                 (goto-char bouncy-scroll-last-pos)
-;;               (setq bouncy-scroll-last-pos (point)))
-;;           (setq bouncy-scroll-last-pos (point))
+;;                 (goto-char bouncy-scroll---last-pos)
+;;               (setq bouncy-scroll---last-pos (point)))
+;;           (setq bouncy-scroll---last-pos (point))
 ;;           (beginning-of-line (end-of-buffer)))))))
 
-(defvar bouncy-scroll-last-pos nil)
+(defvar bouncy-scroll---last-pos nil)
+(defvar bouncy-scroll---column-before-scrolling nil)
+
+(defvar bouncy-scroll--jump-to-prev-pos-from-ends-when-going-in-the-opposite-direction t)
 
 (defun bouncy-scroll (direction)        ; page down
   (cl-multiple-value-bind (point-min---if-up
@@ -261,21 +264,32 @@
       (if (eq direction 'up)
           (list (point-min) #'bouncy-scroll-down #'scroll-up (point-max) #'end-of-buffer)
         (list (point-max) #'bouncy-scroll-up #'scroll-down (point-min) #'beginning-of-buffer))
-    (let ((error t))
+    (let ((col (current-column))
+          (last-command-was-bouncy-scroll-up-or-down (or (eq last-command #'bouncy-scroll-up)
+                                          (eq last-command #'bouncy-scroll-down)))
+          (error t))
       (unwind-protect
           (prog1               ; this block is for scrolling before encountering the end of buffer
-              (progn (when (and
-                            (= (line-number-at-pos) (line-number-at-pos point-min---if-up)))    ; in case of the beginning of buffer jump to next page at the last position
-                       (eq last-command bouncy-scroll-down---if-up)
-                       (goto-char bouncy-scroll-last-pos))
-                     (funcall scroll-up---if-up))
+              (progn
+                (unless last-command-was-bouncy-scroll-up-or-down                   ; preserve column
+                  (setq bouncy-scroll---column-before-scrolling (current-column)))
+                (if (and
+                     (= (line-number-at-pos) (line-number-at-pos point-min---if-up))    ; in case of the beginning of buffer jump to next page at the last position
+                     (eq last-command bouncy-scroll-down---if-up))
+                    (goto-char bouncy-scroll---last-pos)
+                  (when bouncy-scroll--jump-to-prev-pos-from-ends-when-going-in-the-opposite-direction
+                    (funcall scroll-up---if-up)))
+                (unless bouncy-scroll--jump-to-prev-pos-from-ends-when-going-in-the-opposite-direction
+                    (funcall scroll-up---if-up))
+                (when last-command-was-bouncy-scroll-up-or-down
+                      (move-to-column bouncy-scroll---column-before-scrolling)))
             (setq error nil))
         (when error             ; this block is about encountering the end of buffer, jumping back and forth from end of buffer to the last position
           (if (= (line-number-at-pos) (line-number-at-pos point-max---if-up))
               (if (eq last-command this-command)         
-                  (goto-char bouncy-scroll-last-pos)
-                (setq bouncy-scroll-last-pos (point)))
-            (setq bouncy-scroll-last-pos (point))
+                  (goto-char bouncy-scroll---last-pos)
+                (setq bouncy-scroll---last-pos (point)))
+            (setq bouncy-scroll---last-pos (point))
             (beginning-of-line (funcall end-of-buffer---if-up))))))))
 
 (defun bouncy-scroll-up ()    (interactive) (bouncy-scroll 'up))
@@ -601,10 +615,5 @@ there's a region, all lines that region covers will be duplicated."
 
 
 ;; -------------------------------------------------------------------
-
-
-
-
-
 
 
