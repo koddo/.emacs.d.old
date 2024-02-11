@@ -250,8 +250,12 @@
 ;;           (setq bouncy-scroll---last-pos (point))
 ;;           (beginning-of-line (end-of-buffer)))))))
 
+
+
 (defvar bouncy-scroll---last-pos nil)
 (defvar bouncy-scroll---column-before-scrolling nil)
+(make-variable-buffer-local 'bouncy-scroll---last-pos)
+(make-variable-buffer-local 'bouncy-scroll---column-before-scrolling)
 
 (defvar bouncy-scroll--jump-to-prev-pos-from-ends-when-going-in-the-opposite-direction t)
 (setq next-screen-context-lines 0)
