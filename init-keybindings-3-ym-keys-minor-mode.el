@@ -254,7 +254,6 @@
 (defvar bouncy-scroll---column-before-scrolling nil)
 
 (defvar bouncy-scroll--jump-to-prev-pos-from-ends-when-going-in-the-opposite-direction t)
-
 (setq next-screen-context-lines 0)
 
 (defun bouncy-scroll (direction)        ; page down
@@ -287,6 +286,11 @@
                   (setq bouncy-scroll---last-pos (point)))
                 (when last-command-was-bouncy-scroll-up-or-down
                   (move-to-column bouncy-scroll---column-before-scrolling))
+                (when (= (line-number-at-pos) (line-number-at-pos point-max---if-up))
+                  (let ((recenter-positions '(bottom)))                             ;; (set-window-start nil bouncy-scroll---last-pos)
+                    (recenter-top-bottom)
+                    (goto-char bouncy-scroll---last-pos)
+                    ))
                 )
             (setq error nil))
         (when error             ; this block is about encountering the end of buffer, jumping back and forth from end of buffer to the last position
