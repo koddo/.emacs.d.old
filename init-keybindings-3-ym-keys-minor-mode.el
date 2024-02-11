@@ -183,11 +183,8 @@
 (ym-define-key (kbd "s-w") (lambda () (interactive) (ignore-error 'user-error (tab-bar-switch-to-prev-tab))))
 (ym-define-key (kbd "s-r") (lambda () (interactive) (ignore-error 'user-error (tab-bar-switch-to-next-tab))))
 
-(ym-define-key (kbd "M-s-s") (lambda () (interactive) (ignore-error 'user-error (enlarge-window -5 t))))
-(ym-define-key (kbd "M-s-d") (lambda () (interactive) (ignore-error 'user-error (enlarge-window -5))))
-(ym-define-key (kbd "M-s-f") (lambda () (interactive) (ignore-error 'user-error (enlarge-window 5 t))))
-(ym-define-key (kbd "M-s-e") (lambda () (interactive) (ignore-error 'user-error (enlarge-window 5))))
-
+(ym-define-key (kbd "s-W") (lambda () (interactive) (tab-bar-move-tab -1)))
+(ym-define-key (kbd "s-R") (lambda () (interactive) (tab-bar-move-tab 1)))
 
 (defvar ym/toggle-single-window-last-wc nil)
 (defun ym/toggle-single-window ()
@@ -202,19 +199,68 @@
 
 (ym-define-key (kbd "s-!") (lambda () (interactive) (ignore-error 'error (delete-window))))
 (ym-define-key (kbd "s-1") 'ym/toggle-single-window)
-(ym-define-key (kbd "s-2") (lambda () (interactive) (ignore-error 'error (split-window-below))))
-(ym-define-key (kbd "s-3") (lambda () (interactive) (ignore-error 'error (split-window-right))))
-(ym-define-key (kbd "s-4") 'tab-bar-history-back)
-(ym-define-key (kbd "s-5") 'tab-bar-history-forward)
+(ym-define-key (kbd "s-@") (lambda () (interactive) (ignore-error 'error (split-window-below))))
+(ym-define-key (kbd "s-#") (lambda () (interactive) (ignore-error 'error (split-window-right))))
+(ym-define-key (kbd "s-2") 'tab-bar-history-back)
+(ym-define-key (kbd "s-3") 'tab-bar-history-forward)
+
+;;; here we avoid catching rethrowing errors: https://emacs.stackexchange.com/questions/13705/rethrowing-an-error-in-emacs-lisp
+;;; for reference:
+;; (let ((error t))
+;;   (unwind-protect
+;;       (prog1 (call-function)
+;;         (setq error nil))
+;;     (when error (cleanup))))
+
+(defvar bouncy-page-up-down-last-pos nil)
+(defun bouncy-page-up ()
+  (interactive)
+  (let ((error t))
+    (unwind-protect
+        (prog1 (if (and
+                    (eq last-command #'bouncy-page-down)
+                    (= (line-number-at-pos) (line-number-at-pos (point-max)))
+                    )
+                   (goto-char bouncy-page-up-down-last-pos)
+                 (scroll-down))
+          (setq error nil))
+      (when error
+        (if (= (line-number-at-pos) (line-number-at-pos (point-min)))
+            (if (eq last-command this-command)         
+                (goto-char bouncy-page-up-down-last-pos)
+              (setq bouncy-page-up-down-last-pos (point)))
+          (setq bouncy-page-up-down-last-pos (point))
+          (beginning-of-line (beginning-of-buffer)))))))
+(defun bouncy-page-down ()
+  (interactive)
+  (let ((error t))
+    (unwind-protect
+        (prog1 (if (and
+                    (eq last-command #'bouncy-page-up)
+                    (= (line-number-at-pos) (line-number-at-pos (point-min))))
+                   (goto-char bouncy-page-up-down-last-pos)
+                (scroll-up))
+          (setq error nil))
+      (when error
+        (if (= (line-number-at-pos) (line-number-at-pos (point-max)))
+            (if (eq last-command this-command)         
+                (goto-char bouncy-page-up-down-last-pos)
+              (setq bouncy-page-up-down-last-pos (point)))
+          (setq bouncy-page-up-down-last-pos (point))
+          (beginning-of-line (end-of-buffer)))))))
 
 
-;; (ym-define-key (kbd "H-i") 'windmove-up)
-;; (ym-define-key (kbd "H-k") 'windmove-down)
-;; (ym-define-key (kbd "H-j") 'windmove-left)
-;; (ym-define-key (kbd "H-l") 'windmove-right)
 
-(ym-define-key (kbd "s-&") (lambda () (interactive "^") (scroll-up-command   3)))
-(ym-define-key (kbd "s-(") (lambda () (interactive "^") (scroll-down-command 3)))
+
+(ym-define-key (kbd "s-,") (lambda () (interactive "^") (scroll-up-command   3)))    ; ^ is for leaving selection intact
+(ym-define-key (kbd "s-.") (lambda () (interactive "^") (scroll-down-command 3)))
+(ym-define-key (kbd "s-m") 'bouncy-page-up)
+(ym-define-key (kbd "s-n") 'bouncy-page-down)
+;; (ym-define-key (kbd "s-n") (lambda () (interactive "^") (scroll-up)))    ; ^ is for leaving selection intact
+;; (ym-define-key (kbd "s-h") (lambda () (interactive "^") (scroll-down)))
+;; (ym-define-key (kbd "s-,") (lambda () (interactive "^") (recenter
+;;                                                          ;; (floor (* (window-height) 0.2z))
+;;                                                          )))
 (ym-define-key (kbd "H-s-*") (kbd "s-*"))
 (ym-define-key (kbd "H-s-&") (kbd "s-&"))
 (ym-define-key (kbd "H-s-(") (kbd "s-("))
@@ -460,7 +506,7 @@ there's a region, all lines that region covers will be duplicated."
 
 ;; we turn off our keybindings-only minor mode in minibuffer
 ;; but the very same keybindings still work in global keymap
-;; so ido takes precedence in minibuffer
+;; so ido takes precedxence in minibuffer
 (add-hook 'minibuffer-setup-hook (lambda () (ym-keys-minor-mode 0)))
 
 (mapcar (lambda (map)
@@ -524,7 +570,6 @@ there's a region, all lines that region covers will be duplicated."
 
 
 ;; -------------------------------------------------------------------
-
 
 
 

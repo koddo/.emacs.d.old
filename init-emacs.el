@@ -50,7 +50,7 @@
 (line-number-mode t)
 (column-number-mode t)
 
-(setq scroll-error-top-bottom nil)  ;; point moves to the beginning or the end of the buffer (depending on scrolling direction) when no more scrolling possible
+(setq scroll-error-top-bottom t)  ;; point moves to the beginning or the end of the buffer (depending on scrolling direction) when no more scrolling possible
 ;; maybe someday try to fix hl-line-mode at the end of buffer: https://emacs.stackexchange.com/questions/24311/eval-buffer-works-init-does-not-hl-line-fix
 
 ;; for warning-suppress-types later in init
@@ -75,13 +75,8 @@
 
 
 
-(setq scroll-preserve-screen-position t)
-
 ;; also https://www.emacswiki.org/emacs/SmoothScrolling
 
-;; (use-package golden-ratio-scroll-screen)
-;; golden-ratio-scroll-highlight-line-face
-;; (setq golden-ratio-scroll-highlight-delay (cons 0 0))   ; just a tiny flash is enough
 
 ;; -------------------------------------------------------------------
 

@@ -376,21 +376,26 @@ Containing LEFT, and RIGHT aligned respectively."
   :config
   (setq prism-comments nil)
   (setq prism-parens t)
-  (prism-set-colors :num 16
-    :desaturations (cl-loop for i from 0 below 16 collect 20)
-    :lightens (cl-loop for i from 0 below 16 collect 0)
-    ;; :desaturations '(0) :lightens '(0)  ; don't lower, keep the contrast high
+  (setq prism-strings t)
+  
+  (prism-set-colors            ; used to be :num 1
+    :desaturations '(30 0 60)                  ; used to be (cl-loop for i from 0 below 16 collect 60)
+    :lightens '(0)
     :colors (list
-             ;; "black"
-             "medium blue"
-             "dark violet"
-             "firebrick"
-             "forest green"
-             ;; ;; found a comment in on a forum: nothing prevents you from doing: :hook ((markdown-mode . visual-line-mode) (markdown-mode flyspell-mode)) although I'd do the reverse, as in (use-package flyspell-mode :hook markdown-mode)
-             ))
+             (color-darken-name "red" 20)
+             (color-darken-name "green" 30)
+             (color-lighten-name "purple" 10)
+             (color-darken-name "blue" 10)
+             
+             )
+    :parens-fn
+    (lambda (color) (color-lighten-name (color-saturate-name color 1000) 10))
+    :strings-fn #'identity
+    )
   (add-hook 'emacs-lisp-mode-hook 'prism-mode)
   (add-hook 'python-mode-hook 'prism-mode)
   (add-hook 'clojure-mode-hook 'prism-mode)
+  ;; found a comment in on a forum: nothing prevents you from doing: :hook ((markdown-mode . visual-line-mode) (markdown-mode flyspell-mode)) although I'd do the reverse, as in (use-package flyspell-mode :hook markdown-mode)
   )
 
 ;; (use-package highlight-function-calls
