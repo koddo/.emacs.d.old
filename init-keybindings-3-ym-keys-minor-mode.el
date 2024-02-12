@@ -324,11 +324,15 @@
       (unwind-protect
           (prog1               ; this block is for scrolling before encountering the end of buffer
               (progn
+
                 ;; (let ((visible-lines (count-lines (window-start) (buffer-size))))
                 ;;   (unless (< visible-lines (window-text-height))       ; (window-body-height)
                 ;;     (funcall scroll-up---if-up)))
+
                 (unless last-command-was-bouncy-scroll-up-or-down                   ; preserve column
                   (setq bouncy-scroll---column-before-scrolling (current-column)))
+
+
                 (if (and
                      (= (line-number-at-pos) (line-number-at-pos point-min---if-up))    ; in case of the beginning of buffer jump to next page at the last position
                      (eq last-command bouncy-scroll-down---if-up)
@@ -362,13 +366,71 @@
 (defun bouncy-scroll-down ()  (interactive) (bouncy-scroll 'down))
 
 
+(defvar ym/scroll-updown---last-position nil)
+(defvar ym/scroll-updown---column-before-scrolling nil)
+(make-variable-buffer-local 'ym/scroll-down-last-position)
+(make-variable-buffer-local 'ym/scroll-down-last-column)
+
+(defun ym/scroll-down-command ()
+  (interactive)
+  (let ((visible-lines (count-lines (point-min) (window-end))))
+    (when (<= (window-text-height) visible-lines)
+      (setq ym/scroll-updown---last-position (point))
+      (message "scroll down, saved: %s" ym/scroll-updown---last-position)
+      
+
+      (unless (or (eq last-command #'ym/scroll-down-command)
+                  (eq last-command #'ym/scroll-up-command))
+        (setq ym/scroll-updown---column-before-scrolling (current-column)))
+
+
+      (scroll-down-command)
+
+
+
+      (when (or (eq last-command #'ym/scroll-down-command)
+                (eq last-command #'ym/scroll-up-command))
+        (move-to-column ym/scroll-updown---column-before-scrolling))
+
+      
+      
+      )))
+
+
+(defun ym/scroll-up-command ()
+  (interactive)
+
+  (unless (or (eq last-command #'ym/scroll-down-command)
+              (eq last-command #'ym/scroll-up-command))
+    (setq ym/scroll-updown---column-before-scrolling (current-column)))
+  
+  (ignore-errors (scroll-up-command))
+
+  (message "(window-start): %s" (line-number-at-pos (window-start)))
+  (message "ym/scroll-updown---last-position %s: " (line-number-at-pos ym/scroll-updown---last-position))
+  (message "(window-end): %s" (+ (line-number-at-pos (window-start)) (window-body-height)))
+  
+  (let ((b (line-number-at-pos (window-start)))
+        (l (line-number-at-pos ym/scroll-updown---last-position))
+        (e (+ (line-number-at-pos (window-start)) (window-body-height))))   ; (window-end) doesn't work for some reason, it shows position before scrolling
+   (when (and (<= b l ) (< l e))
+    (message "scroll up, going to the saved: %s" ym/scroll-updown---last-position)
+    (goto-char ym/scroll-updown---last-position)
+    ))
+
+  (when (or (eq last-command #'ym/scroll-down-command)
+            (eq last-command #'ym/scroll-up-command))
+    (move-to-column ym/scroll-updown---column-before-scrolling))
+  )
+
+
 
 (ym-define-key (kbd "s-,") (lambda () (interactive "^") (scroll-up-command   3)))
 (ym-define-key (kbd "s-.") (lambda () (interactive "^") (scroll-down-command 3)))
-(ym-define-key (kbd "s-m") #'bouncy-scroll-down)        ; page up
-(ym-define-key (kbd "s-n") #'bouncy-scroll-up)          ; page down
-;; (ym-define-key (kbd "s-m") #'scroll-down-command)        ; page up
-;; (ym-define-key (kbd "s-n") #'scroll-up-command)          ; page down
+;; (ym-define-key (kbd "s-m") #'bouncy-scroll-down)        ; page up
+;; (ym-define-key (kbd "s-n") #'bouncy-scroll-up)          ; page down
+(ym-define-key (kbd "s-m") #'ym/scroll-down-command)        ; page up
+(ym-define-key (kbd "s-n") #'ym/scroll-up-command)          ; page down
 ;; (ym-define-key (kbd "s-m") (lambda () (interactive) (ignore-errors (scroll-down-command))))        ; page up
 ;; (ym-define-key (kbd "s-n") (lambda () (interactive)
                              
