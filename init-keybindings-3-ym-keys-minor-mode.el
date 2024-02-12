@@ -373,10 +373,12 @@
 
 (defun ym/scroll-down-command ()
   (interactive)
-  (let ((visible-lines (count-lines (point-min) (window-end))))
+  (let ((visible-lines (count-lines (point-min) (window-end)))
+        (point--before (point))
+        (last-position--before ym/scroll-updown---last-position)
+        )
     (when (<= (window-text-height) visible-lines)
       (setq ym/scroll-updown---last-position (point))
-      (message "scroll down, saved: %s" ym/scroll-updown---last-position)
       
 
       (unless (or (eq last-command #'ym/scroll-down-command)
@@ -384,10 +386,26 @@
         (setq ym/scroll-updown---column-before-scrolling (current-column)))
 
 
-      (scroll-down-command)
 
+      (message "11111 -- DOWN -- ym/scroll-updown---last-position %s: " ym/scroll-updown---last-position)
+      
+      ;; //////////////////////////////////
+      (ignore-errors (scroll-down-command))
+      ;; //////////////////////////////////
 
+      (message "22222 -- DOWN -- ym/scroll-updown---last-position %s: " ym/scroll-updown---last-position)
 
+      (message "33333 -- DOWN -- last-position--before %s: " last-position--before)
+      ;; (message "33333 -- DOWN -- last-command %s: " last-command)
+      ;; (pp last-command)
+      (when (and (eq last-command #'ym/scroll-up-command)
+                 (= point--before (point-max)))
+        (message "44444 -- DOWN -- last-position--before %s: " last-position--before)
+        (goto-char last-position--before)
+        (message "55555 -- DOWN -- point: %s" (point))
+        )
+
+      
       (when (or (eq last-command #'ym/scroll-down-command)
                 (eq last-command #'ym/scroll-up-command))
         (move-to-column ym/scroll-updown---column-before-scrolling))
@@ -400,27 +418,42 @@
 (defun ym/scroll-up-command ()
   (interactive)
 
-  (unless (or (eq last-command #'ym/scroll-down-command)
+  (let ((window-start--before (window-start))
+        (point--before (point))
+        )
+
+    (unless (or (eq last-command #'ym/scroll-down-command)
+                (eq last-command #'ym/scroll-up-command))
+      (setq ym/scroll-updown---column-before-scrolling (current-column)))
+    
+
+    (message "00000 --  UP  -- point--before: %s" point--before)
+    (message "11111 --  UP  -- ym/scroll-updown---last-position %s: " ym/scroll-updown---last-position)
+
+
+    
+    ;; ////////////////////////////////
+    (ignore-errors (scroll-up-command))
+    ;; ////////////////////////////////
+    
+    (when (and (eq last-command #'ym/scroll-down-command)
+               (= window-start--before (point-min)))
+      (goto-char ym/scroll-updown---last-position)
+      (message "====================== asdf")
+      )
+
+
+    (when (and (= (point) (point-max))
+               (/= (point) point--before))
+      (message "setting last position")
+      (setq ym/scroll-updown---last-position point--before))
+
+    (message "22222 --  UP  -- ym/scroll-updown---last-position %s: " ym/scroll-updown---last-position)
+
+    
+    (when (or (eq last-command #'ym/scroll-down-command)
               (eq last-command #'ym/scroll-up-command))
-    (setq ym/scroll-updown---column-before-scrolling (current-column)))
-  
-  (ignore-errors (scroll-up-command))
-
-  (message "(window-start): %s" (line-number-at-pos (window-start)))
-  (message "ym/scroll-updown---last-position %s: " (line-number-at-pos ym/scroll-updown---last-position))
-  (message "(window-end): %s" (+ (line-number-at-pos (window-start)) (window-body-height)))
-  
-  (let ((b (line-number-at-pos (window-start)))
-        (l (line-number-at-pos ym/scroll-updown---last-position))
-        (e (+ (line-number-at-pos (window-start)) (window-body-height))))   ; (window-end) doesn't work for some reason, it shows position before scrolling
-   (when (and (<= b l ) (< l e))
-    (message "scroll up, going to the saved: %s" ym/scroll-updown---last-position)
-    (goto-char ym/scroll-updown---last-position)
-    ))
-
-  (when (or (eq last-command #'ym/scroll-down-command)
-            (eq last-command #'ym/scroll-up-command))
-    (move-to-column ym/scroll-updown---column-before-scrolling))
+      (move-to-column ym/scroll-updown---column-before-scrolling)))
   )
 
 
@@ -769,7 +802,6 @@ there's a region, all lines that region covers will be duplicated."
 
 
 ;; -------------------------------------------------------------------
-
 
 
 
