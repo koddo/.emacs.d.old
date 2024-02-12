@@ -378,8 +378,10 @@
         (last-position--before ym/scroll-updown---last-position)
         )
     (when (<= (window-text-height) visible-lines)
-      (setq ym/scroll-updown---last-position (point))
-      
+
+      (when (/= (point) point--before)
+        (setq ym/scroll-updown---last-position (point)))
+
 
       (unless (or (eq last-command #'ym/scroll-down-command)
                   (eq last-command #'ym/scroll-up-command))
@@ -419,9 +421,11 @@
   (interactive)
 
   (let ((window-start--before (window-start))
-        (point--before (point))
-        )
+        (point--before (point)))
 
+    (when (/= (point) point--before)
+        (setq ym/scroll-updown---last-position (point)))
+    
     (unless (or (eq last-command #'ym/scroll-down-command)
                 (eq last-command #'ym/scroll-up-command))
       (setq ym/scroll-updown---column-before-scrolling (current-column)))
