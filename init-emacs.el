@@ -72,7 +72,7 @@
 
 (setq mouse-wheel-scroll-amount '(1))
 
-
+(setq scroll-error-top-bottom nil)
 
 
 ;; also https://www.emacswiki.org/emacs/SmoothScrolling

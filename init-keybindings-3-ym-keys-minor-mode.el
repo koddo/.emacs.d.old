@@ -324,6 +324,9 @@
       (unwind-protect
           (prog1               ; this block is for scrolling before encountering the end of buffer
               (progn
+                ;; (let ((visible-lines (count-lines (window-start) (buffer-size))))
+                ;;   (unless (< visible-lines (window-text-height))       ; (window-body-height)
+                ;;     (funcall scroll-up---if-up)))
                 (unless last-command-was-bouncy-scroll-up-or-down                   ; preserve column
                   (setq bouncy-scroll---column-before-scrolling (current-column)))
                 (if (and
@@ -339,12 +342,13 @@
                   (setq bouncy-scroll---last-pos (point)))
                 (when last-command-was-bouncy-scroll-up-or-down
                   (move-to-column bouncy-scroll---column-before-scrolling))
-                (when (= (line-number-at-pos) (line-number-at-pos point-max---if-up))
-                  (let ((recenter-positions '(bottom)))                             ;; (set-window-start nil bouncy-scroll---last-pos)
-                    (recenter-top-bottom)
-                    (when bouncy-scroll---last-pos (goto-char bouncy-scroll---last-pos))))
-                (when (= point-before-scrolled (point))
-                      (funcall scroll-up---if-up)))
+                ;; (when (= (line-number-at-pos) (line-number-at-pos point-max---if-up))
+                ;;   (let ((recenter-positions '(bottom)))                             ;; (set-window-start nil bouncy-scroll---last-pos)
+                ;;     (recenter-top-bottom)
+                ;;     (when bouncy-scroll---last-pos (goto-char bouncy-scroll---last-pos))))
+                ;; (when (= point-before-scrolled (point))
+                ;;   (funcall scroll-up---if-up))
+                )
             (setq error nil))
         (when error             ; this block is about encountering the end of buffer, jumping back and forth from end of buffer to the last position
           (if (= (line-number-at-pos) (line-number-at-pos point-max---if-up))
@@ -363,8 +367,14 @@
 (ym-define-key (kbd "s-.") (lambda () (interactive "^") (scroll-down-command 3)))
 (ym-define-key (kbd "s-m") #'bouncy-scroll-down)        ; page up
 (ym-define-key (kbd "s-n") #'bouncy-scroll-up)          ; page down
-;; (ym-define-key (kbd "s-m") #'scroll-down)        ; page up
-;; (ym-define-key (kbd "s-n") #'scroll-up)          ; page down
+;; (ym-define-key (kbd "s-m") #'scroll-down-command)        ; page up
+;; (ym-define-key (kbd "s-n") #'scroll-up-command)          ; page down
+;; (ym-define-key (kbd "s-m") (lambda () (interactive) (ignore-errors (scroll-down-command))))        ; page up
+;; (ym-define-key (kbd "s-n") (lambda () (interactive)
+                             
+;;                                  (scroll-up-command)))
+
+
 ;; (ym-define-key (kbd "s-n") (lambda () (interactive "^") (scroll-up)))    ; ^ is for leaving selection intact
 ;; (ym-define-key (kbd "s-h") (lambda () (interactive "^") (scroll-down)))
 ;; (ym-define-key (kbd "s-,") (lambda () (interactive "^") (recenter
@@ -381,6 +391,7 @@
 (use-package topspace
   :config
   (setq-default indicate-empty-lines t)
+  (setq topspace-autocenter-buffers nil)
   (global-topspace-mode 1)
   )
 
