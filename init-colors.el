@@ -15,6 +15,11 @@
 
 
 
+;; -------------------------------------------------------------------
+
+;; TODO: move everything from custom.el
+
+;; https://tech.toryanderson.com/2020/11/13/migrating-to-a-custom-file-less-setup/
 
 
 ;; -------------------------------------------------------------------

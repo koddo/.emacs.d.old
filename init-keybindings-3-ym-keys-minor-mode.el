@@ -363,11 +363,28 @@
 (ym-define-key (kbd "s-.") (lambda () (interactive "^") (scroll-down-command 3)))
 (ym-define-key (kbd "s-m") #'bouncy-scroll-down)        ; page up
 (ym-define-key (kbd "s-n") #'bouncy-scroll-up)          ; page down
+;; (ym-define-key (kbd "s-m") #'scroll-down)        ; page up
+;; (ym-define-key (kbd "s-n") #'scroll-up)          ; page down
 ;; (ym-define-key (kbd "s-n") (lambda () (interactive "^") (scroll-up)))    ; ^ is for leaving selection intact
 ;; (ym-define-key (kbd "s-h") (lambda () (interactive "^") (scroll-down)))
 ;; (ym-define-key (kbd "s-,") (lambda () (interactive "^") (recenter
 ;;                                                          ;; (floor (* (window-height) 0.2z))
 ;;                                                          )))
+
+
+
+;; (use-package vi-tilde-fringe
+;;   :config
+;;   (global-vi-tilde-fringe-mode -1)
+;;   )
+
+(use-package topspace
+  :config
+  (setq-default indicate-empty-lines t)
+  (global-topspace-mode 1)
+  )
+
+
 (ym-define-key (kbd "H-s-*") (kbd "s-*"))
 (ym-define-key (kbd "H-s-&") (kbd "s-&"))
 (ym-define-key (kbd "H-s-(") (kbd "s-("))
@@ -671,11 +688,17 @@ there's a region, all lines that region covers will be duplicated."
 ;; (define-key isearch-mode-map (kbd "s-r") 'isearch-repeat-backward)
 
 
+
+
+;; -------------------------------------------------------------------
+
+
+
+
 ;; -------------------------------------------------------------------
 
 
 
 
-;; -------------------------------------------------------------------
 
 
