@@ -366,6 +366,11 @@
 (defun bouncy-scroll-down ()  (interactive) (bouncy-scroll 'down))
 
 
+
+
+
+;; TODO: make these variable window-local: https://emacs.stackexchange.com/questions/30513/making-a-variable-window-local
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Window-Parameters.html
 (defvar ym/scroll-updown---last-position nil)
 (defvar ym/scroll-updown---column-before-scrolling nil)
 (make-variable-buffer-local 'ym/scroll-down-last-position)
@@ -379,8 +384,9 @@
         )
     (when (<= (window-text-height) visible-lines)
 
-      (when (/= (point) point--before)
-        (setq ym/scroll-updown---last-position (point)))
+      ;; (when (/= (point) point--before)
+        (setq ym/scroll-updown---last-position (point))
+        ;; )
 
 
       (unless (or (eq last-command #'ym/scroll-down-command)
@@ -389,22 +395,22 @@
 
 
 
-      (message "11111 -- DOWN -- ym/scroll-updown---last-position %s: " ym/scroll-updown---last-position)
+      ;; (message "11111 -- DOWN -- ym/scroll-updown---last-position %s: " ym/scroll-updown---last-position)
       
       ;; //////////////////////////////////
       (ignore-errors (scroll-down-command))
       ;; //////////////////////////////////
 
-      (message "22222 -- DOWN -- ym/scroll-updown---last-position %s: " ym/scroll-updown---last-position)
+      ;; (message "22222 -- DOWN -- ym/scroll-updown---last-position %s: " ym/scroll-updown---last-position)
 
-      (message "33333 -- DOWN -- last-position--before %s: " last-position--before)
+      ;; (message "33333 -- DOWN -- last-position--before %s: " last-position--before)
       ;; (message "33333 -- DOWN -- last-command %s: " last-command)
       ;; (pp last-command)
       (when (and (eq last-command #'ym/scroll-up-command)
                  (= point--before (point-max)))
-        (message "44444 -- DOWN -- last-position--before %s: " last-position--before)
+        ;; (message "44444 -- DOWN -- last-position--before %s: " last-position--before)
         (goto-char last-position--before)
-        (message "55555 -- DOWN -- point: %s" (point))
+        ;; (message "55555 -- DOWN -- point: %s" (point))
         )
 
       
@@ -431,8 +437,8 @@
       (setq ym/scroll-updown---column-before-scrolling (current-column)))
     
 
-    (message "00000 --  UP  -- point--before: %s" point--before)
-    (message "11111 --  UP  -- ym/scroll-updown---last-position %s: " ym/scroll-updown---last-position)
+    ;; (message "00000 --  UP  -- point--before: %s" point--before)
+    ;; (message "11111 --  UP  -- ym/scroll-updown---last-position %s: " ym/scroll-updown---last-position)
 
 
     
@@ -443,16 +449,16 @@
     (when (and (eq last-command #'ym/scroll-down-command)
                (= window-start--before (point-min)))
       (goto-char ym/scroll-updown---last-position)
-      (message "====================== asdf")
+      ;; (message "====================== asdf")
       )
 
 
     (when (and (= (point) (point-max))
                (/= (point) point--before))
-      (message "setting last position")
+      ;; (message "setting last position")
       (setq ym/scroll-updown---last-position point--before))
 
-    (message "22222 --  UP  -- ym/scroll-updown---last-position %s: " ym/scroll-updown---last-position)
+    ;; (message "22222 --  UP  -- ym/scroll-updown---last-position %s: " ym/scroll-updown---last-position)
 
     
     (when (or (eq last-command #'ym/scroll-down-command)
@@ -468,6 +474,8 @@
 ;; (ym-define-key (kbd "s-n") #'bouncy-scroll-up)          ; page down
 (ym-define-key (kbd "s-m") #'ym/scroll-down-command)        ; page up
 (ym-define-key (kbd "s-n") #'ym/scroll-up-command)          ; page down
+;; (ym-define-key (kbd "s-m") #'scroll-down-command)        ; page up
+;; (ym-define-key (kbd "s-n") #'scroll-up-command)          ; page down
 ;; (ym-define-key (kbd "s-m") (lambda () (interactive) (ignore-errors (scroll-down-command))))        ; page up
 ;; (ym-define-key (kbd "s-n") (lambda () (interactive)
                              
