@@ -382,11 +382,12 @@
         (point--before (point))
         (last-position--before ym/scroll-updown---last-position)
         )
-    (when (<= (window-text-height) visible-lines)
+    (if (<  visible-lines (window-text-height))
+        (signal 'end-of-buffer nil)
 
       ;; (when (/= (point) point--before)
-        (setq ym/scroll-updown---last-position (point))
-        ;; )
+      (setq ym/scroll-updown---last-position (point))
+      ;; )
 
 
       (unless (or (eq last-command #'ym/scroll-down-command)
@@ -443,7 +444,7 @@
 
     
     ;; ////////////////////////////////
-    (ignore-errors (scroll-up-command))
+    (scroll-up-command)      ; we don't do (signal 'end-of-buffer nil), since it this command does it already
     ;; ////////////////////////////////
     
     (when (and (eq last-command #'ym/scroll-down-command)
@@ -467,9 +468,13 @@
   )
 
 
+(defun ym/scroll-up-command-n () (interactive "^") (scroll-up-command 3))
+(defun ym/scroll-down-command-n () (interactive "^") (scroll-down-command 3))
 
-(ym-define-key (kbd "s-,") (lambda () (interactive "^") (scroll-up-command   3)))
-(ym-define-key (kbd "s-.") (lambda () (interactive "^") (scroll-down-command 3)))
+;; (ym-define-key (kbd "s-,") (lambda () (interactive "^") (scroll-up-command   3)))
+;; (ym-define-key (kbd "s-.") (lambda () (interactive "^") (scroll-down-command 3)))
+(ym-define-key (kbd "s-,") #'ym/scroll-up-command-n)
+(ym-define-key (kbd "s-.") #'ym/scroll-down-command-n)
 ;; (ym-define-key (kbd "s-m") #'bouncy-scroll-down)        ; page up
 ;; (ym-define-key (kbd "s-n") #'bouncy-scroll-up)          ; page down
 (ym-define-key (kbd "s-m") #'ym/scroll-down-command)        ; page up
@@ -814,8 +819,6 @@ there's a region, all lines that region covers will be duplicated."
 
 
 ;; -------------------------------------------------------------------
-
-
 
 
 
