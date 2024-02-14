@@ -369,14 +369,14 @@
 ;; -------------------------------------------------------------------
 
 
-(use-package treemacs
-  :config
-  (setq treemacs-no-png-images t)
-  )
-(use-package treemacs-projectile
-  :after treemacs projectile)
-(use-package treemacs-magit
-  :after treemacs magit)
+;; (use-package treemacs
+;;   :config
+;;   (setq treemacs-no-png-images t)
+;;   )
+;; (use-package treemacs-projectile
+;;   :after treemacs projectile)
+;; (use-package treemacs-magit
+;;   :after treemacs magit)
 
 ;; (use-package all-the-icons
 ;;   :if (display-graphic-p))
@@ -1377,9 +1377,11 @@ become defined after invocation."
     ))
 
 ;; (bubbles-detect-window-configuration-str #'my-wnd-info)
-(setq my-test-wm-conf (bubbles-detect-window-configuration-str-2 #'my-wnd-info))
-(pp my-test-wm-conf)
-(rebuild-bubbles my-test-wm-conf)
+
+;; (setq my-test-wm-conf (bubbles-detect-window-configuration-str-2 #'my-wnd-info))
+;; (pp my-test-wm-conf)
+;; (rebuild-bubbles my-test-wm-conf)
+
 ;; (rebuild-bubbles my-test-wm-conf)
 
       ;; (other-window 1)  ; After all splitting we're left in the last window, this transfers us to the first one.
