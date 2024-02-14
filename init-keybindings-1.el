@@ -51,10 +51,10 @@
 
   )
 
-(pretty-hydra-define hydra-smartparens (
-                                        :title "smartparens"
-                                               ;; :idle 0.5
-                                        )
+;; (pretty-hydra-define hydra-smartparens (
+;;                                         :title "smartparens"
+;;                                                ;; :idle 0.5
+;;                                         )
 
   ;; TODO: toggle show-parens-mode/show-smartparens-mode
   ;; TODO: toggle smartparens-mode/smartparens-strict-mode
@@ -69,7 +69,7 @@
   ;; TODO: let us use hydra funcs by name
   ;; (ido-completing-read "test: " '("hello" "world"))
   
-  ("Move" (
+  ;; ("Move" (
 
            ;; (" " sp-forward-parallel-sexp)
 	       ;; (" " sp-backward-parallel-sexp)
@@ -108,9 +108,9 @@
 	   ;; ("" sp-backward-down-sexp)
 
 	   ;; these are internal functions: sp-forward-symbol, sp-backward-symbol
-	   )
+	   ;; )
 
-   "Wrapping" (
+   ;; "Wrapping" (
 	       ;; not used, because these three only work forward, and we can use selection anyway
 	       ;; ("(" sp-wrap-round)
 	       ;; ("{" sp-wrap-curly)
@@ -124,8 +124,8 @@
                ;; ("y" sp-unwrap-sexp)   ; unwrap next sexp, I don't need this; I use splice
 	           ;; ("Y" sp-backward-unwrap-sexp)
 
-	       )
-   "Selecting" (
+	       ;; )
+   ;; "Selecting" (
 		;; ("m" sp-select-next-thing)        ; expand-region is more intuitive, when you place cursorn on parens
 	    ;; ("M" sp-select-previous-thing)
         
@@ -133,9 +133,9 @@
 		;; ("" sp-select-next-thing-exchange)
 		;; ("" sp-select-previous-thing-exchange)
 		
-		)
+		;; )
 
-   "Slurp, barf, extract, absorb, emit" (
+   ;; "Slurp, barf, extract, absorb, emit" (
 					 
 
 					 ;; these two are like slurp, when you add a thing to an s-exp, but it does more, which is too much to me, and it's easier to just use slurp
@@ -146,13 +146,13 @@
 					 ;; and forgets to remove a whitespace
 					 ;; and its understanding of at point is quirky, cursor must be exactly at a thing, not after
 					 ;; TODO: indent after extracting using sp-extract-before-sexp
-					 )
-   "Sexp juggling" (
+					 ;; )
+   ;; "Sexp juggling" (
 		    
 		    ;; sp-splice-sexp-killing-forward, sp-splice-sexp-killing-backward, sp-splice-sexp-killing-around   ; easier to cut and paste
 
 
-   "Destructive editing" (
+   ;; "Destructive editing" (
 			  ;; not used, easier to do this manually
 			  ;; sp-comment -- in strict mode it moves the closing parenthesis on a new line
 			  ;; ( ;
@@ -168,7 +168,7 @@
 			  ;; ("" sp-backward-copy-sexp)
 			  ;; sp--kill-or-copy-region -- internal
 
-			  )
+			  ;; )
 
 
 
@@ -231,11 +231,11 @@
    ;; 		   )
    ;; 		 ))
 
-   )))
+   ;; )))
 ;; (global-set-key (kbd "s-q") 'hydra-smartparens/body)
 
 
-(pretty-hydra-define hydra-puni ()  ; :title "puni" :idle 0.5
+;; (pretty-hydra-define hydra-puni ()  ; :title "puni" :idle 0.5
            ;; (" " puni-forward-sexp)
 	       ;; (" " puni-backward-sexp)
 
@@ -277,7 +277,7 @@
    ;; puni-mark-list-around-point
    ;; puni-mark-sexp-around-point
    ;; puni-squeeze = expand region and cut
-)
+;; )
 
 
 
