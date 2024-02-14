@@ -70,21 +70,18 @@
   ;; (ido-completing-read "test: " '("hello" "world"))
   
   ("Move" (
+
+           ;; (" " sp-forward-parallel-sexp)
+	       ;; (" " sp-backward-parallel-sexp)
+
+	       ;; (" " sp-backward-up-sexp)
+	       ;; (" " sp-up-sexp)
+
 	   ;; these are cool
 	   ;; the only thing I'd fix in them is they cycle through the list, e.g., (a| b c) -> (a b| c) -> (a b c|) and then back to the first one
 	   ;; TODO: stop the sp-forward-parallel-sexp and sp-backward-parallel-sexp navigation from cycling in lists
-	   ("l" sp-forward-parallel-sexp)
-	   ("j" sp-backward-parallel-sexp)
 
-	   ("i" sp-backward-up-sexp)
-	   ("k" sp-up-sexp)
-
-	   ("q" sp-show-enclosing-pair)       ; TODO: move faces configuration from customize.el
-
-	   ("1" rainbow-mode "show hex colors" :toggle t )
-	   ("2" rainbow-delimiters-mode :toggle t)
-	   ("3" beacon-mode :toggle t)
-	   ;; sp-highlight-current-sexp -- useless for me
+	       ;; sp-highlight-current-sexp -- useless for me
 	   ;; TODO: configure faces, see sp-show-pair-enclosing and sp-show-pair-match-content-face, and https://github.com/Fuco1/smartparens/wiki/User-interface
 	   ;; TODO: show three levels of enclosing pairs
 
@@ -114,36 +111,32 @@
 	   )
 
    "Wrapping" (
-	       ("r" sp-rewrap-sexp)
-	       ("y" sp-unwrap-sexp)
-	       ("u" sp-backward-unwrap-sexp)
-
 	       ;; not used, because these three only work forward, and we can use selection anyway
-	       ("(" sp-wrap-round)
-	       ("{" sp-wrap-curly)
-	       ("[" sp-wrap-square)
+	       ;; ("(" sp-wrap-round)
+	       ;; ("{" sp-wrap-curly)
+	       ;; ("[" sp-wrap-square)
 	       ;; TODO: maybe add my own bindings like sp-wrap-round-backwards later
 
 	       ;; not used, because it's easier to rewrap than remembering this command
-	       ;; ("" sp-swap-enclosing-sexp)   ; should ask for a number
+	           ;; ("" sp-swap-enclosing-sexp)   ; should ask for a number
+
+
+               ;; ("y" sp-unwrap-sexp)   ; unwrap next sexp, I don't need this; I use splice
+	           ;; ("Y" sp-backward-unwrap-sexp)
 
 	       )
    "Selecting" (
-		("w" sp-select-next-thing)
-		("W" sp-select-previous-thing)
+		;; ("m" sp-select-next-thing)        ; expand-region is more intuitive, when you place cursorn on parens
+	    ;; ("M" sp-select-previous-thing)
+        
 		;; these are the same as above, but exchange the point and the mark
 		;; ("" sp-select-next-thing-exchange)
 		;; ("" sp-select-previous-thing-exchange)
 		
-		("e" er/expand-region)
-		("E" er/contract-region)
 		)
 
    "Slurp, barf, extract, absorb, emit" (
-					 ("s" sp-forward-slurp-sexp)
-					 ("S" sp-backward-slurp-sexp)
-					 ("b" sp-forward-barf-sexp)
-					 ("B" sp-backward-barf-sexp)
+					 
 
 					 ;; these two are like slurp, when you add a thing to an s-exp, but it does more, which is too much to me, and it's easier to just use slurp
 					 ;; ("" sp-add-to-next-sexp)
@@ -153,27 +146,11 @@
 					 ;; and forgets to remove a whitespace
 					 ;; and its understanding of at point is quirky, cursor must be exactly at a thing, not after
 					 ;; TODO: indent after extracting using sp-extract-before-sexp
-					 ("a" sp-extract-before-sexp)
-					 ("A" sp-extract-after-sexp)
-
-					 ("z" sp-absorb-sexp)   ; a (f b) -> (f a b)
-					 ("Z" sp-emit-sexp)    ; (f a b) -> a (f b)
 					 )
    "Sexp juggling" (
-		    ("v" sp-split-sexp)
-		    ("c" sp-join-sexp)
-		    ("" sp-raise-sexp)   ; raise next expr, (a |b c) -> b
-
-		    ("x" sp-convolute-sexp)   ; (outer (inner target)) -> (inner (outer target))     ; https://hungyi.net/posts/convolute-lisp-sexp-with-smartparens/
-
-		    ;; ("m" sp-splice-sexp)  ; easier to use unwrap
+		    
 		    ;; sp-splice-sexp-killing-forward, sp-splice-sexp-killing-backward, sp-splice-sexp-killing-around   ; easier to cut and paste
 
-		    ("." sp-transpose-sexp)            ; = drag forward/backward
-		    (","
-		     (lambda () (interactive) (sp-transpose-sexp -1))
-		     "sp-transpose-sexp backwards")
-		    )
 
    "Destructive editing" (
 			  ;; not used, easier to do this manually
@@ -191,8 +168,6 @@
 			  ;; ("" sp-backward-copy-sexp)
 			  ;; sp--kill-or-copy-region -- internal
 
-			  ("d" sp-clone-sexp)
-			  ("D" sp-kill-whole-line)
 			  )
 
 
@@ -241,7 +216,6 @@
    ;; 	      		   (if (> end-of-thing (point))
    ;; 	      		       (goto-char end-of-thing))
    ;; 			   )))
-   ;; 	      ("H-a" . sp-splice-sexp)
    ;; 	      ("H-s" . sp-splice-sexp-killing-forward)
    ;; 	      ("H-d" . sp-splice-sexp-killing-backward)
    ;; 	      ("H-f" . sp-splice-sexp-killing-around)
@@ -257,45 +231,18 @@
    ;; 		   )
    ;; 		 ))
 
-   ))
-(global-set-key (kbd "s-q") 'hydra-smartparens/body)
+   )))
+;; (global-set-key (kbd "s-q") 'hydra-smartparens/body)
 
 
 (pretty-hydra-define hydra-puni ()  ; :title "puni" :idle 0.5
+           ;; (" " puni-forward-sexp)
+	       ;; (" " puni-backward-sexp)
 
-  ;; TODO: toggle on/off
-
-  ;; sp-narrow-to-sexp
-  
-  ;; TODO: let us use hydra funcs by name
-  ;; (ido-completing-read "test: " '("hello" "world"))
-
-  ;; TODO: toggle rainbow-mode
-  ;; TODO: toggle beacon-mode
-
-
-  ;; TODO: reindent after
-
-
-
-  (  "Misc"
-     ((" " anzu "toggle anzu")   ; TODO: https://github.com/emacsorphanage/anzu
-      (" " smartscan)
-      (" " goto-line)
-      (" " rg)
-      (" " rg-project)
-      (" " rg-menu)
-      )
-
-
-   "Move" (
-	   ("l" puni-forward-sexp)
-	   ("j" puni-backward-sexp)
-
-	   ("i" puni-beginning-of-sexp)
-	   ("k" puni-end-of-sexp)
-
-       ;; TODO: bind puni-backward-delete-char to backspace
+           ;; (" " puni-beginning-of-sexp)
+	       ;; (" " puni-end-of-sexp)
+           
+       ;; bind puni-backward-delete-char to backspace?
        
        ;; puni-forward-delete-char
        ;; puni-backward-delete-char
@@ -306,70 +253,31 @@
 
        ;; (setq puni-confirm-when-delete-unbalanced-active-region nil)
        ;; puni-kill-active-region
-       ;; puni-force-delete
-	   )
+   ;; puni-force-delete
 
-   "Wrapping" (
-	           ("" ym/rewrap--imp)
-	           ("(" puni-wrap-round)
-	           ("{" puni-wrap-curly)
-	           ("[" puni-wrap-square)
-	           ("<" puni-wrap-angle)
-	           ("" ym/wrap-with-arg--imp)
 
-               )
-	       
-   "Selecting" (
-                ;; puni-expand-region is fine, but these are better:
-		        ("e" er/expand-region)
-		        ("E" er/contract-region)
-		        ("m" exchange-point-and-mark)
+           ;; ("s" puni-slurp-forward)
+	       ;; ("S" puni-slurp-backward)
+	       ;; ("b" puni-barf-forward)
+	       ;; ("B" puni-barf-backward)
+           ;; ("s" sp-forward-slurp-sexp)
+	       ;; ("S" sp-backward-slurp-sexp)
+	       ;; ("b" sp-forward-barf-sexp)
+	       ;; ("B" sp-backward-barf-sexp)
 
-                ;; no need for these:
-                ;; puni-mark-sexp-at-point
-                ;; puni-mark-list-around-point
-                ;; puni-mark-sexp-around-point
-                ;; puni-squeeze = expand region and cut
-                )
 
-   "Slurp, barf, extract, absorb, emit" (
-                                         ;; TODO: (setq puni-blink-for-slurp-barf ?)
-                                         
-					                     ("s" puni-slurp-forward)
-					                     ("S" puni-slurp-backward)
-					                     ("b" puni-barf-forward)
-					                     ("B" puni-barf-backward)
-					                     )
-   "Sexp juggling" (
-                    ("r" puni-splice)     ; = unwrap
-	                ("y" puni-split)
-                    ("" my-join-sexp--imp)
-		            ("" puni-raise)   ; raise next expr, (a |b c) -> b
-
-		            ("x" puni-convolute)   ; (outer (inner target)) -> (inner (outer target))     ; https://hungyi.net/posts/convolute-lisp-sexp-with-smartparens/
-                    ;; TODO: indent after convolute
-                    
-		            ("" puni-transpose)
-		            ("" puni-drag-forward--imp)
-		            ("" puni-drag-backward--imp)
-
-                    ("" ym/absorb--imp)
-                    ("" ym/emit--imp)
-                    ("" ym/extract--imp)
-
-                    ("" ym/clone-sexp--imp)
-		            )
-
-   "More" (
-           ("" eval-sexp--imp)
-           ("" eval-defun--imp)
-           ("" eval-after--imp)
-           ("" eval-etc--imp)
-           ("" see-symex-control--imp)
-           )
-
-   ))
-(global-set-key (kbd "s-w") 'hydra-puni/body)
+   ;; ("(" puni-wrap-round)
+   ;; ("{" puni-wrap-curly)
+   ;; ("[" puni-wrap-square)
+   ;; ("<" puni-wrap-angle)
+   ;; ("R" sp-show-enclosing-pair)
+   
+   ;; no need for these:
+   ;; puni-mark-sexp-at-point
+   ;; puni-mark-list-around-point
+   ;; puni-mark-sexp-around-point
+   ;; puni-squeeze = expand region and cut
+)
 
 
 
@@ -587,3 +495,129 @@
 
 ;; https://www.masteringemacs.org/article/highlighting-by-word-line-regexp
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Highlight-Interactively.html
+
+
+;; -------------------------------------------------------------------
+
+(defun match-paren ()
+  "Move point to the matching parenthesis."
+  (interactive)
+  (cond
+   (mark-active
+    (exchange-point-and-mark))
+   ((looking-at "\\s\(") ; If on an opening parenthesis
+    (forward-sexp 1)) 
+   ((save-excursion (backward-char  1) (looking-at "\\s\)")) ; If on a closing parenthesis
+    (backward-sexp 1)
+    ;; (forward-char 1)
+    )))
+
+
+;; -------------------------------------------------------------------
+
+(use-package expand-region)
+(use-package lispy)
+(use-package symex)
+
+(pretty-hydra-define hydra-aaa (:exit nil)
+  (
+   "Move"
+   (
+    ("s-e" er/expand-region :exit nil)
+	("s-w" er/contract-region :exit nil)
+    ("s-q" match-paren :exit t)
+    ;; puni-expand-region -- can't contract
+    
+
+    
+    ("s-i" lispy-slurp)      ; from the current side
+    ("s-o" lispy-barf)
+    ("^" sp-raise-sexp) ; (" " puni-raise)  ; raise next expr, (a |b c) -> b
+
+
+
+    
+    ;; TODO: indent after convolute
+    ("rc" sp-convolute-sexp) ; ("_" puni-convolute)   ; (outer (inner target)) -> (inner (outer target))     ; https://hungyi.net/posts/convolute-lisp-sexp-with-smartparens/
+    
+    ("a" sp-extract-before-sexp)
+	("A" sp-extract-after-sexp)
+
+	("z" sp-absorb-sexp)   ; a (save-excurtion b) -> (save-excurtion a b)
+	("Z" sp-emit-sexp)    ; (save-excurtion a b) -> a (save-excurtion b)
+
+    ("v" sp-split-sexp) ; (" " puni-split)
+	("V" sp-join-sexp)
+	
+    
+
+    
+
+    ("." sp-transpose-sexp)            ; = drag forward/backward
+	(","
+	 (lambda () (interactive) (sp-transpose-sexp -1))
+	 "sp-transpose-sexp backwards")
+    (">" symex-shift-forward)
+    ("<" symex-shift-backward)
+    ;; ("" puni-transpose) -- sp-transpose works better, it allows to drag sexps
+
+    
+    
+    (" " sp-clone-sexp)
+	(" " sp-kill-whole-line)
+    )
+
+
+   "Wrap"
+   (
+    ("rr" sp-rewrap-sexp "rewrap")
+    ("ru" sp-splice-sexp "unwrap")        ; (" " puni-splice)     ; = unwrap at point
+    ("rc" symex-comment)
+    ;; TODO: add angle brackets to electcic-pair-mode
+    ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
+    )
+
+   "Misc"
+   (
+    (" " smartscan)
+    (" " goto-line)
+    (" " rg)
+    (" " rg-project)
+    (" " rg-menu)
+
+    (" " anzu "toggle anzu")   ; TODO: https://github.com/emacsorphanage/anzu
+    (" " beacon-mode :toggle t)
+    (" " rainbow-mode "show hex colors" :toggle t )
+	(" " rainbow-delimiters-mode :toggle t)
+    (" " prism-mode :toggle t)
+    (" " org-toggle-link-display :toggle t)
+
+    ("" eval-sexp--imp)
+    ("" eval-defun--imp)
+    ("" eval-after--imp)
+    ("" eval-etc--imp)
+    ("" see-symex-control--imp)
+
+
+    (" " eval-and-insert--from-lispy)
+
+    ;; from lispy:
+    ;; i prettifies code (remove extra space, hanging parens ...)
+    ;; xl turns current defun into a lambda
+    ;; xd turns current lambda into a defun
+    ;; etc
+    ;; ide features from lispy:
+    ;; Z breaks out of edebug, while storing current function's arguments
+
+    ;; narrow/widen, etc
+    )
+
+
+   
+   
+   ))
+(global-set-key (kbd "s-p") 'hydra-aaa/body)
+
+;; -------------------------------------------------------------------
+
+

@@ -479,6 +479,8 @@
 ;; (ym-define-key (kbd "s-n") #'bouncy-scroll-up)          ; page down
 (ym-define-key (kbd "s-m") #'ym/scroll-down-command)        ; page up
 (ym-define-key (kbd "s-n") #'ym/scroll-up-command)          ; page down
+(ym-define-key (kbd "s-M-m") #'beginning-of-buffer)        ; page up
+(ym-define-key (kbd "s-M-n") #'end-of-buffer)          ; page down
 ;; (ym-define-key (kbd "s-m") #'scroll-down-command)        ; page up
 ;; (ym-define-key (kbd "s-n") #'scroll-up-command)          ; page down
 ;; (ym-define-key (kbd "s-m") (lambda () (interactive) (ignore-errors (scroll-down-command))))        ; page up
