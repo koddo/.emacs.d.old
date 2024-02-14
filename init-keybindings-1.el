@@ -146,7 +146,7 @@
 					 ;; and forgets to remove a whitespace
 					 ;; and its understanding of at point is quirky, cursor must be exactly at a thing, not after
 					 ;; TODO: indent after extracting using sp-extract-before-sexp
-   ;;  				 )
+					 ;; )
    ;; "Sexp juggling" (
 		    
 		    ;; sp-splice-sexp-killing-forward, sp-splice-sexp-killing-backward, sp-splice-sexp-killing-around   ; easier to cut and paste

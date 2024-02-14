@@ -788,6 +788,12 @@ become defined after invocation."
 ;;            (desc (format "%s (%s)" summary repo)))
 ;;       (push (list link desc) org-stored-links))))
 
+
+(comment
+(use-package forge
+  :after magit)
+)
+
 ;; -------------------------------------------------------------------
 
 (use-package cider
