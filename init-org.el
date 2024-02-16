@@ -259,3 +259,52 @@
 
 
 
+
+;; -------------------------------------------------------------------
+
+(defun ym/find-last-heading-with-tag (tag)
+  "Find the last org-mode heading with a specific TAG and go to the last line of it."
+  (interactive "sEnter the tag: ")
+  (let ((positions '()))
+    (org-map-entries
+     (lambda ()
+       (when (member tag (org-get-tags))
+         (setq positions (cons (point) positions))))
+     (format "+%s" tag))
+    (when positions
+      (goto-char (car positions))
+      (org-end-of-subtree t)
+      ;; (beginning-of-line)
+      ;; (newline)
+      (forward-line)
+      (recenter)
+      )))
+
+(defun ym/find-and-run-last-file (regexp directory function)
+  "Find the last file in DIRECTORY matching REGEXP, open it, and run FUNCTION in its buffer."
+  (let* ((files (directory-files directory t regexp))
+         (last-file (car (last (sort files #'string<)))))
+    (when last-file
+      (find-file last-file)
+      (funcall function))))
+
+
+(defun ym/generate-regexp (words)
+  "Generate a regexp string that matches any of the words in WORDS."
+  (mapconcat
+   (lambda (word)
+     (concat "(?=.*" word ")"))
+   (split-string words)
+   ""))
+
+(comment
+ (ym/find-and-run-last-file "^Notes-.*\\.org$" "~/werk" (lambda () (interactive) (ym/find-last-heading-with-tag "nnnnn")))
+
+ (ym/generate-regexp "word1 word2 word3")
+ )
+
+
+;; -------------------------------------------------------------------
+
+
+

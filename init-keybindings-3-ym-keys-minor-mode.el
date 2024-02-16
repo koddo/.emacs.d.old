@@ -389,7 +389,7 @@
       (setq ym/scroll-updown---last-position (point))
       ;; )
 
-
+      
       (unless (or (eq last-command #'ym/scroll-down-command)
                   (eq last-command #'ym/scroll-up-command))
         (setq ym/scroll-updown---column-before-scrolling (current-column)))
@@ -399,6 +399,7 @@
       ;; (message "11111 -- DOWN -- ym/scroll-updown---last-position %s: " ym/scroll-updown---last-position)
       
       ;; //////////////////////////////////
+      ;; (ignore-errors (scroll-down-command))
       (ignore-errors (scroll-down-command))
       ;; //////////////////////////////////
 
@@ -433,9 +434,9 @@
     (when (/= (point) point--before)
         (setq ym/scroll-updown---last-position (point)))
     
-    (unless (or (eq last-command #'ym/scroll-down-command)
-                (eq last-command #'ym/scroll-up-command))
-      (setq ym/scroll-updown---column-before-scrolling (current-column)))
+    ;; (unless (or (eq last-command #'ym/scroll-down-command)
+    ;;             (eq last-command #'ym/scroll-up-command))
+    ;;   (setq ym/scroll-updown---column-before-scrolling (current-column)))
     
 
     ;; (message "00000 --  UP  -- point--before: %s" point--before)
@@ -462,10 +463,49 @@
     ;; (message "22222 --  UP  -- ym/scroll-updown---last-position %s: " ym/scroll-updown---last-position)
 
     
-    (when (or (eq last-command #'ym/scroll-down-command)
-              (eq last-command #'ym/scroll-up-command))
-      (move-to-column ym/scroll-updown---column-before-scrolling)))
+    ;; (when (or (eq last-command #'ym/scroll-down-command)
+    ;;           (eq last-command #'ym/scroll-up-command))
+    ;;   (move-to-column ym/scroll-updown---column-before-scrolling))
+    )
   )
+
+(defvar my/scroll-command---virtual-cur-line nil)
+(defvar my/scroll-command---n-lines-from-top nil)
+(defvar my/scroll-command---column-before-scrolling nil)
+(make-variable-buffer-local 'my/scroll-command---virtual-cur-line)
+(make-variable-buffer-local 'my/scroll-command---n-lines-from-top)
+(make-variable-buffer-local 'my/scroll-command---column-before-scrolling)
+
+(defun my/scroll-down-command () (interactive) (my/scroll-command (- (window-body-height))))
+(defun my/scroll-up-command () (interactive) (my/scroll-command (+ (window-body-height))))
+
+(defun my/scroll-command (n-lines)
+  (interactive)
+  (unless
+      (or (eq last-command #'my/scroll-down-command)
+          (eq last-command #'my/scroll-up-command))
+    (setq my/scroll-command---virtual-cur-line
+          (line-number-at-pos (point)))
+    (setq my/scroll-command---n-lines-from-top
+          (- my/scroll-command---virtual-cur-line (line-number-at-pos (window-start))))
+    (setq my/scroll-command---column-before-scrolling (current-column)))
+  (let* ((cur-line my/scroll-command---virtual-cur-line)
+         (next-screen-line (+ cur-line n-lines))
+         ;; (n-lines-from-top (- cur-line (line-number-at-pos (window-start))))
+         )
+    (unless (or (< next-screen-line (line-number-at-pos (beginning-of-buffer)))
+                (> next-screen-line (line-number-at-pos (end-of-buffer))))
+      (goto-line next-screen-line)
+      (recenter my/scroll-command---n-lines-from-top)
+      (setq my/scroll-command---virtual-cur-line next-screen-line)
+      (move-to-column my/scroll-command---column-before-scrolling))))
+
+
+(global-set-key (kbd "s-m") #'my/scroll-down-command)        ; page up
+(global-set-key (kbd "s-n") #'my/scroll-up-command)          ; page down
+
+(ym-define-key (kbd "s-m") #'my/scroll-down-command)        ; page up
+(ym-define-key (kbd "s-n") #'my/scroll-up-command)          ; page down
 
 
 (defun ym/scroll-up-command-n () (interactive "^") (scroll-up-command 3))
@@ -479,10 +519,10 @@
 ;; (ym-define-key (kbd "s-n") #'bouncy-scroll-up)          ; page down
 (ym-define-key (kbd "s-m") #'ym/scroll-down-command)        ; page up
 (ym-define-key (kbd "s-n") #'ym/scroll-up-command)          ; page down
-(ym-define-key (kbd "s-M-m") #'beginning-of-buffer)        ; page up
-(ym-define-key (kbd "s-M-n") #'end-of-buffer)          ; page down
 ;; (ym-define-key (kbd "s-m") #'scroll-down-command)        ; page up
 ;; (ym-define-key (kbd "s-n") #'scroll-up-command)          ; page down
+(ym-define-key (kbd "s-M-m") #'beginning-of-buffer)        ; page up
+(ym-define-key (kbd "s-M-n") #'end-of-buffer)          ; page down
 ;; (ym-define-key (kbd "s-m") (lambda () (interactive) (ignore-errors (scroll-down-command))))        ; page up
 ;; (ym-define-key (kbd "s-n") (lambda () (interactive)
                              

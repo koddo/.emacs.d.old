@@ -789,10 +789,17 @@ become defined after invocation."
 ;;       (push (list link desc) org-stored-links))))
 
 
-(comment
 (use-package forge
-  :after magit)
-)
+  :after magit
+  :config
+  (setq auth-sources '("~/.authinfo"))
+  )
+
+(comment 
+ (use-package github-review)
+ ;; This is a cool package for leaving comments in PRs,
+ ;; Maybe later.
+ )
 
 ;; -------------------------------------------------------------------
 
@@ -806,6 +813,9 @@ become defined after invocation."
 
 
 ;; -------------------------------------------------------------------
+
+
+;; TODO: also try https://github.com/dgutov/diff-hl/
 
 (use-package git-gutter
   :config
