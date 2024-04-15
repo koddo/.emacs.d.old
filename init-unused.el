@@ -11,7 +11,7 @@
 
 
 
-;; this package shows org-links like clickable links everywhere
+;; this package shows org-links like clickable links in other modes
 ;; [[http://ya.ru][yandex]]
 (use-package orglink)
 

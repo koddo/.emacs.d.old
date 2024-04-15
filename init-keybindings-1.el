@@ -325,7 +325,7 @@
    ))
 ;; (hydra-set-property 'hydra-window :verbosity 1)
 ;; (global-set-key (kbd "s-p") #'hydra-window/body)
-(global-set-key (kbd "s-^") #'hydra-window/body)
+;; (global-set-key (kbd "s-^") #'hydra-window/body)
 (ym-define-key (kbd "s-^") #'hydra-window/body)
 
 
@@ -423,6 +423,11 @@
    ))
 (global-set-key (kbd "<f1>") 'hydra-agenda/body)
 
+(global-set-key (kbd "<f2>")
+                (lambda ()
+                  (interactive)
+                  (ym/find-and-run-last-file "^Notes-.*\\.org$" "~/werk" (lambda () (interactive) (ym/find-last-heading-with-tag "nnnnn")))
+                  ))
 
 ;; add narrow-to-subtree
 ;; org-agenda-drag-line-forward, org-agenda-drag-line-backward
@@ -595,12 +600,40 @@
     ("" eval-sexp--imp)
     ("" eval-defun--imp)
     ("" eval-after--imp)
-    ("" eval-etc--imp)
+    (" " eval-and-insert-after-the-sexp)
+    ("" eval-more-functions--imp)
+
+    (" " bind-variable-in-let)
+    (" " unbind-variable)
+    
     ("" see-symex-control--imp)
+    (" " eval-whole-buffer)
+    (" " switch-to-repl)
+    (" " switch-to-messages-buffer)
+    (" " documentation)
 
 
     (" " eval-and-insert--from-lispy)
 
+    (" " unfurl)    ;    -- https://countvajhula.com/2021/09/25/the-animated-guide-to-symex/
+    (" " collapse)
+
+    (" " reindent-functions-needed)
+    (" " comment-uncomment-sexp)
+
+    
+    (" " toggle-code-highlighting)
+
+
+    (" " polilith-specific)
+    (" " integrant-specific)
+
+
+    (" " outline-mode-collapse-sexp)
+
+    (" " highlight-symbol-sexp-or-regexp)
+
+    (" " elisp-debug-other-window)
     ;; from lispy:
     ;; i prettifies code (remove extra space, hanging parens ...)
     ;; xl turns current defun into a lambda

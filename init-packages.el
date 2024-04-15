@@ -5,7 +5,16 @@
 ;;   ;; (add-hook 'window-setup-hook 'maximize-frame t)
 ;;   )
 
+;; -------------------------------------------------------------------
 
+;; with this all keybindings work even with non-English layout
+
+(use-package reverse-im
+  :ensure t
+  :custom
+  (reverse-im-input-methods '("russian-computer"))
+  :config
+  (reverse-im-mode t))
 
 ;; -------------------------------------------------------------------
 
@@ -423,9 +432,8 @@
   (yas-global-mode 1)
 
   ;; there's also grep-edit.el, which could be used to modify snippets in its buffer, instead of doing C-x C-f at their paths here, but the difference is not worth it at the moment
-  (cl-defun ym-list-all-yasnippets (&optional (dirs yas-snippet-dirs))
-    (interactive)
-    (switch-to-buffer (get-buffer-create "*yasnippets*"))
+  (defun ym-list-yasnippets (bufname dirs)
+    (switch-to-buffer (if bufname (get-buffer-create bufname) (get-buffer-create "*yasnippets*")))
     (erase-buffer)
     (dolist (dir dirs)
       (dolist (filename (directory-files-recursively dir "" nil))
@@ -445,31 +453,32 @@
     )
   (defun ym-list-all-yasnippets-official ()
     (interactive)
-    (ym-list-all-yasnippets '("~/.emacs.d.new/straight/repos/yasnippet-snippets/snippets/"))
+    (ym-list-all-yasnippets "*yasnippets-official*" '( "~/.emacs.d.old/straight/repos/yasnippet-snippets/snippets/"))
+    )
+  (defun ym-list-all-yasnippets-my ()
+    (interactive)
+    (ym-list-all-yasnippets "*yasnippets-my*" '( "~/.emacs.d.old/yasnippets"))
     )
   )
 
+(use-package yasnippet-snippets)
 
 ;; -------------------------------------------------------------------
 
-(use-package company
-  :config
-  (add-to-list
-   'company-backends 'company-yasnippet)
-  (defun ym-adfadf () (interactive) (company-abort) (company-begin-backend 'company-yasnippet))
-  (setq company-minimum-prefix-length 3)
+;; (use-package company
+;;   :config
+;;   (add-to-list
+;;    'company-backends 'company-yasnippet)
+;;   (defun ym-adfadf () (interactive) (company-abort) (company-begin-backend 'company-yasnippet))
+;;   (setq company-minimum-prefix-length 3)
 
-  ;; FIXME: (low) company-yasnippet doesn't work for me, figure out why
-  )
+;;   ;; FIXME: (low) company-yasnippet doesn't work for me, figure out why
+;;   )
 
-(use-package company-quickhelp
-  :config
-  (company-quickhelp-mode))
+;; (use-package company-quickhelp
+;;   :config
+;;   (company-quickhelp-mode))
 
-
-
-;; I use my own set of snippets instead of the official one
-;; (use-package yasnippet-snippets)
 
 ;; -------------------------------------------------------------------
 
@@ -1174,6 +1183,17 @@ become defined after invocation."
     ))
 (setq display-buffer-alist
       '((".*" (display-buffer-same-or-next-window))))
+(setq transient-display-buffer-action   
+      '(display-buffer-same-or-next-window
+        (inhibit-same-window . t)))
+
+;; remove this
+;; ;; from https://idiomdrottning.org/magit-transients
+;; (defun magit-display-buffer-same-window (buffer)
+;;   "Display BUFFER in the selected window like God intended."
+;;   (display-buffer
+;;    buffer '(display-buffer-same-window)))
+;; (setq magit-display-buffer-function 'magit-display-buffer-same-window)
 
 
 
@@ -1591,6 +1611,18 @@ become defined after invocation."
 
 ;; -------------------------------------------------------------------
 
+;; for showing off emacs during online meetings
+;; displays the log of pressed keybindings
+
+(use-package command-log-mode)
+
+(comment
+ (global-command-log-mode -1)
+ )
+
+
+
+;; -------------------------------------------------------------------
 
 
 

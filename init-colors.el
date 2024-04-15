@@ -398,7 +398,7 @@ Containing LEFT, and RIGHT aligned respectively."
     :strings-fn #'identity
     )
   (add-hook 'emacs-lisp-mode-hook 'prism-mode)
-  (add-hook 'python-mode-hook 'prism-mode)
+  (add-hook 'python-mode-hook 'prism-whitespace-mode)
   (add-hook 'clojure-mode-hook 'prism-mode)
   ;; found a comment in on a forum: nothing prevents you from doing: :hook ((markdown-mode . visual-line-mode) (markdown-mode flyspell-mode)) although I'd do the reverse, as in (use-package flyspell-mode :hook markdown-mode)
   )

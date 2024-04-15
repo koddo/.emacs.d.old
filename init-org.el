@@ -56,6 +56,8 @@
    org-src-preserve-indentation t
    ;; org-src-tab-acts-natively t
    )
+
+  (setq org-link-descriptive nil)   ; shows links as is, e.g., [[http://example.com][example]], doesn't collapse to just example
   )
   
 
@@ -165,9 +167,9 @@
      (http . t)
      (shell . t)
      (sqlite . t)
-     ;; (clojure . t)
+     (clojure . t)
      ;; (haskell . t)
-     ;; (java . t)
+     (java . t)
      ;; (javascript . t)
      ;; (lisp . t)
      ;; (R . t)
