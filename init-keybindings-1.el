@@ -23,11 +23,11 @@
 
 ;; -------------------------------------------------------------------
 
-(defhydra hydra-zoom ()
-  "zoom"
-  ("g" text-scale-increase "in")
-  ("l" text-scale-decrease "out"))
-(global-set-key (kbd "H-z") 'hydra-zoom/body)
+;; (defhydra hydra-zoom ()
+;;   "zoom"
+;;   ("g" text-scale-increase "in")
+;;   ("l" text-scale-decrease "out"))
+;; (global-set-key (kbd "H-z") 'hydra-zoom/body)
 
 
 
