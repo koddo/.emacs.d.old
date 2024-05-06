@@ -41,3 +41,8 @@ smex-items
 .org-generic-id-locations
 
 
+/.cider-repl-history
+
+/eln-cache
+
+/yasnippets/**/.yas-compiled-snippets.el

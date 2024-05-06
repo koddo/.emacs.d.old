@@ -133,10 +133,11 @@
     (dired-hide-details-mode 1)))
   (define-key dired-mode-map "(" 'ym/dired-toggle-hide-and-omit)
 
-  ;; (require 'ls-lisp) ;; ignore case when listing directory
-  ;; (setq ls-lisp-ignore-case t)
-  ;; (setq ls-lisp-use-insert-directory-program nil)
-  ;; (setq ls-lisp-use-string-collate nil)
+  ;; used to be (setq dired-listing-switches "-la"), but, apparently, ls can't show dot files at the top
+  (require 'ls-lisp)    ;; ignore case when listing directory
+  (setq ls-lisp-ignore-case t)
+  (setq ls-lisp-use-insert-directory-program nil)
+  (setq ls-lisp-use-string-collate nil)
 
  )
 
