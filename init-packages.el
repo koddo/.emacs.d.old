@@ -703,76 +703,72 @@
 
 ;; disable version control enabled by default, it slows down emacs, and i don't use it
 ;; this probably breaks some functions like vc-annotate and vc-diff
-;; TODO: read the faq, disabling the built-in version control is no longer recommended
+;; also read the faq, disabling the built-in version control is no longer recommended
 ;; https://magit.vc/manual/magit/Should-I-disable-VC_003f.html
-
-
 (setq vc-handled-backends nil)
 
 (use-package compat)    ; temporarily here, see https://github.com/magit/magit/issues/4836
 
+(use-package f)   ; https://github.com/rejeep/f.el -- Modern API for working with files and directories in Emacs 
+
 (use-package magit
   :config
-
-
-  (add-hook 'magit-section-movement-hook 'magit-status-maybe-update-blob-buffer)
-
-  ;; https://magit.vc/manual/magit/Action-Confirmation.html
-  ;; stage-all-changes
-  
-  (defun kisaragi/magit-log-visit-changed-file ()
-    "Visit a changed file of revision under point in `magit-log-mode'.
-
-Uses `general-simulate-key', so `general-simulate-RET' will
-become defined after invocation."
-    (interactive)
-    (general-simulate-key "RET")
-    ;; visit the commit
-    (general-simulate-RET)
-    ;; move to first changed file in diff buffer
-    (setf (point) (point-min))
-    (search-forward "|" nil t)
-    ;; open the revision
-    (general-simulate-RET))
-
-
-  (defun ym/magit-repolist-column--date-last-touched (_)
-    "20230329"
-    )
-  ;; M-x tabulated-list-sort
-
-
   ;; (setq magit-git-debug nil)   ; useful for checking out the actual commands behind the views
 
+  ;; https://magit.vc/manual/magit/Action-Confirmation.html
+  (setq magit-no-confirm '(
+                           stage-all-changes
+                           unstage-all-changes
+                           repolist-all             ; Fetch all repos, when none is selected in the magit-list-repositories.
+                           ;; set-and-push      ; When pushing to the upstream or the push-remote and that isn’t actually configured yet, then the user can first set the target.
+                           ))
 
+  (defun ym/magit-repolist-column--date-last-touched (_)
+    (string-trim-right (shell-command-to-string            ; test using '%TY-%Tm-%Td %p\n'
+                        ;; another option is to use -path ./.git, but -name '.git' also works for submodules
+                        "find . -name '.git' -prune -o -type f -printf '%TY-%Tm-%Td\n' | sort -r | head -1"
+                        )))
 
-  (add-to-list 'magit-repository-directories '("~/.emacs.d.old" . 0))
-  (add-to-list 'magit-repository-directories '("~/.setuplets" . 0))
-  (add-to-list 'magit-repository-directories '("~/werk" . 0))
-  (add-to-list 'magit-repository-directories '("~/workspaces" . 1))
-  ;; (setq magit-repository-directories nil)
-  ;; (setq magit-git-debug nil)
+  ;; an example of how it should look like: (setq magit-repository-directories'(("~/werk" . 0) ("~/.setuplets" . 0) ("~/.emacs.d.old" . 0)))
+  (setq magit-repository-directories
+        (let* ((dirs (list
+                      "~/.emacs.d.old"
+                      "~/.setuplets"
+                      "~/werk"
+                      "~/workspaces"
+                      ))
+               (w-subdirs (append
+                           (f-directories "~/workspaces"
+                                         (lambda (dir)
+                                           (not (f-hidden-p dir 'last))))
+                           (f-directories "~/wurkspaces"
+                                         (lambda (dir)
+                                           (not (f-hidden-p dir 'last))))))
+               (w-subdirs-relative-to-home (mapcar
+                                            (lambda (d) (f-short d))    ; I'd like to see the ~/ in front of dirs in the list
+                                            w-subdirs))
+               (my-dirs (append dirs w-subdirs-relative-to-home))
+               )
+          (mapcar (lambda (d)
+                    (cons d 0))       ; magit-repository-directories is a list of cons-cells, where the cdr is depth, 0 means only the dir itself
+                  my-dirs)))
 
   (setq magit-repolist-columns
         '(
-          (" " 10 ym/magit-repolist-column--date-last-touched nil)
-          ("Version" 30 magit-repolist-column-version
-           ((:sort magit-repolist-version<)))
-          ("B<U" 3 magit-repolist-column-unpulled-from-upstream
-           (
-            ;; (:right-align t)
-            (:sort <)))
-          ("B>U" 3 magit-repolist-column-unpushed-to-upstream
-           (
-            ;; (:right-align t)
-            (:sort <)))
-          (" " 3 magit-repolist-column-flag nil)
-          (" " 12 magit-repolist-column-branch ((:right-align t)))
-          ("Path" 300 magit-repolist-column-path nil)
+          ("mtime" 10 ym/magit-repolist-column--date-last-touched)   ; can't figure out how to use (:sort <)
+          ("version" 30 magit-repolist-column-version)           ; (:sort magit-repolist-version<)
+          ("B<U" 3 magit-repolist-column-unpulled-from-upstream)      ; (:sort <)
+          ("B>U" 3 magit-repolist-column-unpushed-to-upstream)        ; (:sort <)
+          ("B<P" 3 magit-repolist-column-unpulled-from-pushremote)
+          ("B>P" 3 magit-repolist-column-unpushed-to-pushremote)
+          ("upstream" 10 magit-repolist-column-upstream)
+          ("#b" 3 magit-repolist-column-branches)
+          ("#s" 3 magit-repolist-column-stashes)
+          (" " 3 magit-repolist-column-flags)   ; N, U, and S mean: uNtracked, Unstaged, Staged
+          ("branch" 30 magit-repolist-column-branch ((:right-align t)))
+          ("path" 300 magit-repolist-column-path)
           ))
-
-  ;; (setq magit-repolist-column-flag-alist )
-
+  ;; M-x tabulated-list-sort
   )
 
 ;; from reddit: "Mine is just the default nil. I don't use any of the packages. But I prefer magit to be fullscreen and to restore back to where I was on quit:"
