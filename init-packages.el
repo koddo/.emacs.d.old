@@ -726,7 +726,7 @@
   (defun ym/magit-repolist-column--date-last-touched (_)
     (string-trim-right (shell-command-to-string            ; test using '%TY-%Tm-%Td %p\n'
                         ;; another option is to use -path ./.git, but -name '.git' also works for submodules
-                        "find . -name '.git' -prune -o -type f -printf '%TY-%Tm-%Td\n' | sort -r | head -1"
+                        "THE_FIND_COMMAND=$(command -v gfind || echo find) && $THE_FIND_COMMAND . -name '.git' -prune -o -type f -printf '%TY-%Tm-%Td\n' | sort -r | head -1"
                         )))
 
   ;; an example of how it should look like: (setq magit-repository-directories'(("~/werk" . 0) ("~/.setuplets" . 0) ("~/.emacs.d.old" . 0)))
