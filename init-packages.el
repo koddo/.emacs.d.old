@@ -755,16 +755,16 @@
 
   (setq magit-repolist-columns
         '(
-          ("mtime" 10 ym/magit-repolist-column--date-last-touched)   ; can't figure out how to use (:sort <)
+          ("mtime" 11 ym/magit-repolist-column--date-last-touched)   ; can't figure out how to use (:sort <)
           ("version" 30 magit-repolist-column-version)           ; (:sort magit-repolist-version<)
-          ("B<U" 3 magit-repolist-column-unpulled-from-upstream)      ; (:sort <)
-          ("B>U" 3 magit-repolist-column-unpushed-to-upstream)        ; (:sort <)
-          ("B<P" 3 magit-repolist-column-unpulled-from-pushremote)
-          ("B>P" 3 magit-repolist-column-unpushed-to-pushremote)
-          ("upstream" 10 magit-repolist-column-upstream)
-          ("#b" 3 magit-repolist-column-branches)
-          ("#s" 3 magit-repolist-column-stashes)
+          ("upstream" 12 magit-repolist-column-upstream)
+          ("B<U" 3 magit-repolist-column-unpulled-from-upstream ((:right-align t)))      ; (:sort <)
+          ("B>U" 3 magit-repolist-column-unpushed-to-upstream ((:right-align t)))        ; (:sort <)
+          ("B<P" 3 magit-repolist-column-unpulled-from-pushremote ((:right-align t)))
+          ("B>P" 3 magit-repolist-column-unpushed-to-pushremote ((:right-align t)))
+          ;; ("#b" 3 magit-repolist-column-branches)
           (" " 3 magit-repolist-column-flags)   ; N, U, and S mean: uNtracked, Unstaged, Staged
+          ("#s" 3 magit-repolist-column-stashes)
           ("branch" 30 magit-repolist-column-branch ((:right-align t)))
           ("path" 300 magit-repolist-column-path)
           ))
