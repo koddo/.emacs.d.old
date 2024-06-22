@@ -175,9 +175,14 @@
   (auto-save-visited-mode 1)   ; it's a built-in mode, I found the super-save-auto-save-when-idle less usable, because it polluted messages
   ;; or, for fine-grained control: https://github.com/ChillarAnand/real-auto-save
   ;; it allows the following: (add-hook 'org-mode-hook 'real-auto-save-mode)
+
+  (progn   ; do not auto-save .gpg
+    (setq auto-save-visited-predicate
+          (lambda ()
+            (not (string-suffix-p ".gpg" (buffer-file-name)))))
+    (setq super-save-exclude '(".gpg")))
     
   (setq super-save-remote-files nil)
-  (setq super-save-exclude '(".gpg"))
   ;; (setq super-save-idle-duration 5)    ; this is default, but it's not used anyway, see auto-save-visited-mode
 
   (setq save-silently t)
