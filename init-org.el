@@ -260,6 +260,33 @@
         ))))
 
 
+(use-package ob-nix
+  :after org
+  )
+
+(use-package isend-mode
+  )
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (python . t)
+   (http . t)
+   (shell . t)
+   (sqlite . t)
+   (clojure . t)
+   (java . t)
+   ;; (nix . t)
+   ;;    (nix-to-stdin . t)
+   ;; (haskell . t)
+   ;; (javascript . t)
+   ;; (lisp . t)
+   ;; (R . t)
+   ;; (sql . t)
+   ;; (typescript . t)     ; (use-package ob-typescript)
+   ;; (mongo . t)     ; (use-package ob-mongo)
+   ;; (jupyter . t)
+   ))
 
 
 ;; -------------------------------------------------------------------
