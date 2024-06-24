@@ -1,15 +1,6 @@
 ;; -*- lexical-binding: t; -*-
 
 
-;; (rainbow-mode)
-
-
-;; taken from stackoverflow
-(defun ym/what-face (pos)
-  (interactive "d")
-  (let ((face (or (get-char-property pos 'read-face-name)
-                  (get-char-property pos 'face))))
-    (if face (message "Face: %s" face) (message "No face at %d" pos))))
 
 
 
@@ -24,49 +15,9 @@
 
 ;; -------------------------------------------------------------------
 
-;; Colorize color names in buffers, like #0000ff or blue
-(use-package rainbow-mode)
 
 ;; -------------------------------------------------------------------
 
-;; http://chriskempson.com/projects/base16/
-;; https://github.com/belak/base16-emacs
-;; https://github.com/belak/base16-emacs/blob/master/base16-theme.el
-(use-package base16-theme
-  :after org
-  :config
-  (deftheme ym-base16-theme)
-
-  (setq ym-base16-colors (list
-			              :base00 "grey99"     ; Default Background
-			              :base01 "grey88"     ; Lighter Background (Used for status bars)
-			              :base02 "#d8d8d8"    ; Selection Background
-			              :base03 "grey70"     ; Comments, Invisibles, Line Highlighting
-			              :base04 "#585858"    ; Dark Foreground (Used for status bars)
-			              :base05 "grey20"     ; Default Foreground, Caret, Delimiters, Operators
-			              :base06 "#282828"    ; Light Foreground (Not often used)
-			              :base07 "#181818"    ; Light Background (Not often used)
-			              :base08 "#ab4642"    ; Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
-			              :base09 "#dc9656"    ; Integers, Boolean, Constants, XML Attributes, Markup Link Url
-			              :base0A "#cca770"    ; Classes, Markup Bold, Search Text Background
-			              :base0B "#a1b56c"    ; Strings, Inherited Class, Markup Code, Diff Inserted
-			              :base0C "#86c1b9"    ; Support, Regular Expressions, Escape Characters, Markup Quotes
-			              :base0D "#7cafc2"    ; Functions, Methods, Attribute IDs, Headings
-			              :base0E "#ba8baf"    ; Keywords, Storage, Selector, Markup Italic, Diff Changed
-			              :base0F "#a16946"    ; Deprecated, Opening/Closing Embedded Language Tags, e.g. <?php ?>
-			              ))
-  (setq ym-base16-colors-darker    ; from :base09 to :base0E
-        (let ((percent-darker 33))
-          (-map-indexed (lambda (ii cc)
-                          (if
-                              (and (> ii 18) (<= ii 30)
-                                   (cl-oddp ii))
-                              (apply 'color-rgb-to-hex `(,@(color-name-to-rgb (color-darken-name cc percent-darker)) 2))
-                            cc))
-                        ym-base16-colors)))
-
-  (base16-theme-define 'ym-base16-theme ym-base16-colors-darker)
-  (enable-theme 'ym-base16-theme)
 
   (progn 
     ;; (print ym-base16-colors-darker)
@@ -78,55 +29,6 @@
     )
 
 
-
-  
-  ;; ;; https://terminal.sexy/
-  ;; (use-package base16-theme
-  ;;   :config
-  ;;   (load-theme 'base16-default-light t)
-  ;;   ;; (load-theme 'base16-grayscale-light t)
-  ;;   )
-
-  (defun ym/toggle-color-of-comments ()
-    (interactive)
-    (let* ((comments-colors-togglable '("grey90" "grey70" "grey30"))
-           (current-comments-color (face-attribute 'font-lock-comment-face :foreground))
-           (next-color-in-list (cadr (member current-comments-color comments-colors-togglable)))
-           (new-comments-color (if next-color-in-list
-                                   next-color-in-list
-                                 (car comments-colors-togglable)))
-           )
-      (set-face-attribute 'font-lock-comment-face nil :foreground new-comments-color)
-      ;; temporarily fixing this: https://github.com/belak/base16-emacs/issues/114
-      ;; font-lock-comment-delimiter-face should be base03, not base02
-      (set-face-attribute 'font-lock-comment-delimiter-face nil :foreground new-comments-color)
-      ))
-
-  )
-
-
-
-(set-face-attribute 'mode-line-buffer-id nil
-                    :foreground "black"
-                    :distant-foreground "white"
-                    ;; :background "grey"
-                    )
-(set-face-attribute 'mode-line nil
-                    :foreground "grey60"
-                    :box (list
-                          :color "grey22"
-                          :line-width '(0 . 2)       ; used to be '(0 . 9)
-                          )
-                    :background "grey22"
-                    )
-(set-face-attribute 'mode-line-inactive nil
-                    :foreground "grey60"
-                    :box (list
-                          :color "grey22"
-                          :line-width '(1 . 2)      ; used to be '(1 . 2)
-                          )
-                    :background "grey90"
-                    )
 
 
 
@@ -143,105 +45,6 @@
 ;;                   ))
 ;;               )
 
-(defun ym/align-mode-line (left right)
-  "Return a string of `window-width' length.
-Containing LEFT, and RIGHT aligned respectively."
-  (let ((available-width
-         (- (window-total-width)
-            (+ (length (format-mode-line left))
-               (length (format-mode-line right))))))
-    (append left
-            (list (format (format "%%%ds" available-width) ""))
-            right)))
-
-(setq-default
- mode-line-format
- (list
-  (propertize "\u200b" 'display '((raise -0.4) (height 1.6)))          ; a zero-width character in mode-line in order to make it wider vertically
-  '(:eval
-    (ym/align-mode-line
-     ;; Left.
-     '("%e" mode-line-front-space mode-line-mule-info mode-line-client mode-line-modified mode-line-remote mode-line-frame-identification mode-line-buffer-identification)
-
-     ;; Right.
-     '("   "
-       "%l:%c"         ; instead of mode-line-position
-       ;; (vc-mode vc-mode)
-       "  " mode-line-modes mode-line-misc-info mode-line-end-spaces)
-     ))))
-
-
-;; tab-bar behaviour and appearance: https://github.com/daviwil/emacs-from-scratch/blob/82f03806d90eb356b815cf514d10b6d863a2cbdc/show-notes/Emacs-Tips-06.org
-;; tab-bar menu, and other arbitrary info in tab-bar: https://karthinks.com/software/a-tab-bar-menu-in-emacs/
-;; https://lambdaland.org/posts/2022-07-20_adding_a_clock_to_emacs/
-
-(set-face-attribute 'tab-bar nil
-                    :foreground "red"
-                    :box nil
-                    ;; :box (list
-                    ;;       :color "grey22"
-                    ;;       :line-width '(0 . 9)
-                    ;;       )
-                    :background "grey80"
-                    )
-
-(set-face-attribute 'tab-bar-tab nil
-                    :foreground "white"
-                    :box (list
-                          :color "grey55"
-                          :line-width '(10 . 8)
-                          )
-                    :background "grey55"                    
-                    )
-
-(set-face-attribute 'tab-bar-tab-inactive nil
-                    :foreground "grey36"
-                    :box (list
-                          :color "grey72"
-                          :line-width '(10 . 0)
-                          )
-                    :background "grey72"                    
-                    )
-;; tab-bar-tab-group-current
-;; tab-bar-tab-group-inactive
-
-;; to customize further, first do M-x describe-text-properties, then the following
-(set-face-attribute 'org-special-keyword nil :foreground (plist-get ym-base16-colors :base03))
-(set-face-attribute 'org-drawer nil :foreground (plist-get ym-base16-colors :base03))
-(set-face-attribute 'org-date   nil :foreground (plist-get ym-base16-colors :base03))
-
-(let ((f "#5c69cc")) ; "#0018ca"
-  (set-face-attribute 'org-level-1 nil :height 5.0 :foreground f)  ; "#ae1200"
-  (set-face-attribute 'org-level-2 nil :height 3.0 :foreground f)
-  (set-face-attribute 'org-level-3 nil :height 1.5 :foreground f)
-  (set-face-attribute 'org-level-4 nil :height 1.0 :foreground "#5c69cc")
-  (set-face-attribute 'org-level-5 nil :height 1.0 :foreground "#9096c5")
-                                        ; (set-face-attribute 'org-level-6 nil :height 1.0 :foreground "#9096c5")
-                                        ; (set-face-attribute 'org-level-7 nil :height 1.0 :foreground "#9096c5")
-                                        ; (set-face-attribute 'org-level-8 nil :height 1.0 :foreground "#9096c5")
-  )
-
-
-
-
-
-(use-package rainbow-delimiters
-  :config
-  ;; (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
-  (setq rainbow-delimiters-max-face-count 6)
-  (custom-set-faces
-   ;; custom-set-faces was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
-   '(rainbow-delimiters-depth-1-face ((t (:foreground "firebrick3"))))
-   '(rainbow-delimiters-depth-2-face ((t (:foreground "dodger blue"))))
-   '(rainbow-delimiters-depth-3-face ((t (:foreground "green3"))))
-   '(rainbow-delimiters-depth-4-face ((t (:foreground "peru"))))
-   '(rainbow-delimiters-depth-5-face ((t (:foreground "grey50"))))
-   '(rainbow-delimiters-depth-6-face ((t (:foreground "black"))))
-   )
-  )
 
 
 
@@ -251,7 +54,16 @@ Containing LEFT, and RIGHT aligned respectively."
 
 
 
-(set-face-attribute 'ido-virtual nil :foreground (plist-get ym-base16-colors :base03))
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -348,81 +160,13 @@ Containing LEFT, and RIGHT aligned respectively."
 
 ;; -------------------------------------------------------------------
 
-;; highlight minibuffer prompt, because large monitor
-
-(set-face-attribute 'minibuffer-prompt nil :background "light green" :foreground "black")
-
-
-;; the foloowing is an attempt to highlight the whole minibuffer, but it failed
-
-;; TODO: this kind of works, but fix this: the face gets reset back to default after auto-save-visited-mode kicks in after 5 seconds
-;; (defun my-minibuffer-setup-hook ()
-;;   (buffer-face-set :background "yellow"))
-;; (add-hook 'minibuffer-setup-hook 'my-minibuffer-setup-hook)
-
-;;; this doesn't work for me for some reason
-;; (dolist (buf (buffer-list))
-;;   (when (string-match-p " \*Minibuf-[0-9]+\*" (buffer-name buf))
-;;     (message (buffer-name buf))
-;;     (with-current-buffer (get-buffer buf)
-;;       (set (make-local-variable 'face-remapping-alist)
-;;          (copy-tree'((default :background "green")))))))
-;; (dolist (buf (buffer-list))
-;;   (when (string-match-p " \*Minibuf-[0-9]+\*" (buffer-name buf))
-;;     (message (buffer-name buf))
-;;     (with-current-buffer (get-buffer buf)
-;;       (buffer-face-set :background "yellow")
-;;       )))
-
-;; -------------------------------------------------------------------
-
-;; Douglas Crockford once suggested syntax highlighting based on scope, this is the closest thing so far
-(use-package prism       ; there's also https://github.com/Fanael/rainbow-delimiters, but it doesn't work for python
-  :config
-  (setq prism-comments nil)
-  (setq prism-parens t)
-  (setq prism-strings t)
-  
-  (prism-set-colors            ; used to be :num 1
-    :desaturations '(30 0 60)                  ; used to be (cl-loop for i from 0 below 16 collect 60)
-    :lightens '(0)
-    :colors (list
-             (color-darken-name "red" 20)
-             (color-darken-name "green" 30)
-             (color-lighten-name "purple" 10)
-             (color-darken-name "blue" 10)
-             
-             )
-    :parens-fn
-    (lambda (color) (color-lighten-name (color-saturate-name color 1000) 10))
-    :strings-fn #'identity
-    )
-  (add-hook 'emacs-lisp-mode-hook 'prism-mode)
-  (add-hook 'python-mode-hook 'prism-whitespace-mode)
-  (add-hook 'clojure-mode-hook 'prism-mode)
-  ;; found a comment in on a forum: nothing prevents you from doing: :hook ((markdown-mode . visual-line-mode) (markdown-mode flyspell-mode)) although I'd do the reverse, as in (use-package flyspell-mode :hook markdown-mode)
-  )
-
-;; (use-package highlight-function-calls
-;;   :config
-;;   (setq highlight-function-calls-macro-calls nil)
-;;   (setq highlight-function-calls-special-forms nil)
-;;   ;; (add-hook 'emacs-lisp-mode-hook 'highlight-function-calls-mode)
-;;   )
-
 
 
 ;; -------------------------------------------------------------------
 
-(setq global-hl-line-sticky-flag nil)   ; only appear in one window
-(global-hl-line-mode)
-(blink-cursor-mode 0)
-(setq-default cursor-type 'box)
-(setq-default cursor-in-non-selected-windows t)   ;;  displays a cursor related to the usual cursor type
-;; cursor color is set by base16, it used to be (set-cursor-color "#000")
 
-(setq ym-hl-line-color-normal-mode-color "#e6eef7")   ; was LightSteelBlue1, e3ecf7
-(set-face-background 'hl-line ym-hl-line-color-normal-mode-color)
+;; -------------------------------------------------------------------
+
 
 ;; -------------------------------------------------------------------
 

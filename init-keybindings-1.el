@@ -1,16 +1,4 @@
-;; https://emacs.stackexchange.com/questions/14755/how-to-remove-bindings-to-the-esc-prefix-key/14759#14759
-;; let the escape key do its thing
-;; yeah, I feel the judgemental stare
-(define-key key-translation-map (kbd "ESC") (kbd "C-g"))   ; = quit
 
-;; -------------------------------------------------------------------
-
-(defun dont-kill-emacs ()   ;; disable C-x C-c
-  (interactive)
-  (message (substitute-command-keys "To exit emacs: \\[save-buffers-kill-emacs]")))
-(global-set-key "\C-x\C-c" 'dont-kill-emacs)
-
-;; -------------------------------------------------------------------
 
 (ym-define-key (kbd "M-<tab>") #'completion-at-point)      ; dabbrev, corfu
 
@@ -29,6 +17,10 @@
 ;;   ("l" text-scale-decrease "out"))
 ;; (global-set-key (kbd "H-z") 'hydra-zoom/body)
 
+(setq text-scale-mode-step 1.1)
+;; (ym-define-key (kbd "s--") #'text-scale-decrease)
+;; (ym-define-key (kbd "s-=") #'text-scale-increase)
+;; (ym-define-key (kbd "s-0") (lambda () (interactive) (text-scale-adjust 0)))
 
 
 ;; (defhydra hydra-smartparens ()
