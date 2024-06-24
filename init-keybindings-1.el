@@ -1,47 +1,5 @@
 
 
-(ym-define-key (kbd "M-<tab>") #'completion-at-point)      ; dabbrev, corfu
-
-
-;; -------------------------------------------------------------------
-
-;; I no longer use cua-mode
-;; (cua-mode t)   ; CUA mode: C-x, C-c, C-v for copying, pasting, C-z for undo
-;; (setq cua-keep-region-after-copy t)   ; Standard Windows behaviour
-
-;; -------------------------------------------------------------------
-
-;; (defhydra hydra-zoom ()
-;;   "zoom"
-;;   ("g" text-scale-increase "in")
-;;   ("l" text-scale-decrease "out"))
-;; (global-set-key (kbd "H-z") 'hydra-zoom/body)
-
-(setq text-scale-mode-step 1.1)
-;; (ym-define-key (kbd "s--") #'text-scale-decrease)
-;; (ym-define-key (kbd "s-=") #'text-scale-increase)
-;; (ym-define-key (kbd "s-0") (lambda () (interactive) (text-scale-adjust 0)))
-
-
-;; (defhydra hydra-smartparens ()
-;;   "smartparens"
-;;   ("g" text-scale-increase "in")
-;;   )
-
-
-(defun ym/highlight-enclosing-pairs ()
-  (interactive)
-  
-;; (define-advice show-paren-function (:around (fn) fix)
-;;   "Highlight enclosing parens."
-;;   (cond ((looking-at-p "\\s(") (funcall fn))      ; \s( and \s) are open and close delimiter character
-;; 	  ((save-match-data (looking-back "\\s)" 1)) (funcall fn))   ; if performance is an issue, replace looking-back with char-before and 
-;; 	  (t (save-excursion
-;; 	       (ignore-errors (backward-up-list))
-;; 	       (funcall fn)))))
-
-
-  )
 
 ;; (pretty-hydra-define hydra-smartparens (
 ;;                                         :title "smartparens"
@@ -517,9 +475,6 @@
 
 ;; -------------------------------------------------------------------
 
-(use-package expand-region)
-(use-package lispy)
-(use-package symex)
 
 (pretty-hydra-define hydra-aaa (:exit nil)
   (

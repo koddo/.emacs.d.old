@@ -108,19 +108,6 @@
 (defface ym/org-double-backslash-newline-highlight '((t :foreground "grey80")) "double backslash at eol")
 ;; (set-face-attribute 'org-double-slash-newline-highlight nil :foreground "grey80")
 
-(dolist (x '(avy-lead-face
-	         avy-lead-face-0
-	         avy-lead-face-1
-	         avy-lead-face-2))
-  (set-face-attribute x nil :foreground "white" :background "#dc9656")
-  ;; (set-face-attribute x nil :foreground "white" :background "#e5b180")
-  ;; (set-face-attribute x nil :foreground "white" :background "#eecbaa")
-  )
-;; (dolist (buf (buffer-list))
-;;    (when (get-buffer-window buf 'visible) (....<STUFF>...))
-
-;; (defface ym/habits-face '((t :family "Monaco" :height 80)) "")
-
 
 
 
@@ -170,61 +157,6 @@
 
 ;; -------------------------------------------------------------------
 
-;; electric-pair-mode is enough most of the time
-;; I don't use strict mode and soft deletion from puni and smartparens
-(electric-pair-mode t)
-
-(use-package puni
-  ;; No configuration here. I just directly use functions from puni, smartparens, lispy, etc
-  )
-
-(use-package smartparens
-  ;; :demand t
-  ;; :diminish smartparens-mode smartparens-global-mode show-smartparens-mode show-smartparens-global-mode
-  :config
-  (require 'smartparens-config)   ; default configuration
-  (setq sp-navigate-reindent-after-up-in-string nil)
-  (setq sp-navigate-reindent-after-up nil)
-
-  ;; I now use electric-pair-mode
-  ;; (smartparens-global-mode 1)     ; used to be (smartparens-global-strict-mode 1), but I don't need it to be that strict
-  ;; (show-smartparens-global-mode 1)
-  
-  ;; customize sp-show-pair-match-content-face if you want to highlight not only parens but also the content of the s-exp
-  ;; '(sp-show-pair-enclosing ((t (:inherit show-paren-match))))  
-  )
-
-
-;; highlight matching parenthesis
-(require 'paren)   ; I prefer stock show-paren-mode over show-smartparen-mode because it's ultra-fast
-;; (setq show-paren-delay 0)
-;; (setq show-paren-delay 0.1)
-(setq show-paren-delay 0.01)
-(show-paren-mode 1)
-;; (show-paren-mode -1)
-(setq show-paren-style 'parenthesis)
-(copy-face 'default 'show-paren-match)
-(set-face-attribute 'show-paren-match nil
-                    :weight 'bold
-                    :foreground "black"
-                    :background "grey"         ; was ym-hl-line-color-normal-mode-color
-                    )    ; inherited by show-paren-match-expression
-
-
-;; (progn (require 'autopair)   ; insert paired parenthesis
-;;      (autopair-global-mode)
-;;      (setq autopair-blink nil)
-;;      (setq autopair-skip-whitespace 'chomp))   ; ) ) => )) when closing
-
-;; here's a modified snippet from https://stackoverflow.com/questions/34846531/show-parentheses-when-inside-them-emacs/34861578#34861578
-;; rename the advice and make it toggleable through hydra
-;; (define-advice show-paren-function (:around (fn) fix)
-;;   "Highlight enclosing parens."
-;;   (cond ((looking-at-p "\\s(") (funcall fn))      ; \s( and \s) are open and close delimiter character
-;; 	  ((save-match-data (looking-back "\\s)" 1)) (funcall fn))   ; if performance is an issue, replace looking-back with char-before and 
-;; 	  (t (save-excursion
-;; 	       (ignore-errors (backward-up-list))
-;; 	       (funcall fn)))))
 
 ;; -------------------------------------------------------------------
 
