@@ -208,16 +208,6 @@
 
 ;; clone in order to prevent reusing buffers
 
-(defun jue-clone-buffer ()
-  "jue clone current buffer. Useful to have multiple help buffers."
-  (interactive)
-  (rename-buffer (generate-new-buffer-name
-                  (concat (buffer-name) " -- "                 ; create name from old name and
-                          (save-excursion                   ; use first word in buffer for new name
-                            (goto-char 0)
-                            (thing-at-point 'symbol t))))
-                 t))                                      ; show cloned buffer now
-
 ;; write the same for occur using occur-rename-buffer
 ;; for rg clone?
 
