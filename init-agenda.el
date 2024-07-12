@@ -75,10 +75,6 @@
 
 ;; -------------------------------------------------------------------
 
-(use-package org-ql
-  :config
-  )
-
 (use-package org-super-agenda
   :config
   (org-super-agenda-mode 1)
