@@ -771,13 +771,6 @@ there's a region, all lines that region covers will be duplicated."
 
 ;; -------------------------------------------------------------------
 
-(setq text-scale-mode-step 1.1)
-;; (ym-define-key (kbd "s--") #'text-scale-decrease)
-;; (ym-define-key (kbd "s-=") #'text-scale-increase)
-;; (ym-define-key (kbd "s-0") (lambda () (interactive) (text-scale-adjust 0)))
-
-;; -------------------------------------------------------------------
-
 ;; (ym-define-key (kbd "s-p") 'projectile-command-map)
 
 ;; -------------------------------------------------------------------
