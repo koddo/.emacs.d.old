@@ -13,11 +13,6 @@
 
 ;; -------------------------------------------------------------------
 
-(setq org-log-into-drawer t      ; log both into :LOGBOOK:
-      org-clock-into-drawer t)
-(setq org-log-repeat nil)   ; disable :LAST_REPEAT:
-(setq org-todo-repeat-to-state t)   ; habit -> done -> habit, not todo
-
 (add-hook 'org-capture-mode-hook
           (lambda ()
             (setq-local org-complete-tags-always-offer-all-agenda-tags t)))  
