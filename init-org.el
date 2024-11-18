@@ -83,21 +83,24 @@
 ;; functions of interest: org-download-screenshot, org-download-image, org-download-edit, org-download-delete
 (use-package org-download
   :after org
-
-  :init
-  (defun org-download-advice (orig-func &rest args)
-    (let ((org-download-image-dir
-           (expand-file-name ".images" (vc-root-dir))))
-     (apply orig-func args)))
-  (advice-add 'org-download-screenshot :around #'org-download-advice)
-  (advice-add 'org-download-image :around #'org-download-advice)
-
   :config
   (setq-default org-download-heading-lvl nil)   ; don't take header text into account, just put everything into the specified folder
   (setq org-download-annotate-function (lambda (link)   ; don't annotate screenshots, but annotate other images
                                          (if (equal link org-download-screenshot-file)   ; see the org-download source code
                                              ""
-                                           (format "#+DOWNLOADED: %s @ %s\n" link (format-time-string "%Y-%m-%d %H:%M:%S"))))))
+                                           (format "#+DOWNLOADED: %s @ %s\n" link (format-time-string "%Y-%m-%d %H:%M:%S")))))
+
+  (defun m/org-screenshot-to-cwd ()
+    (interactive)
+    (let ((org-download-image-dir "."))
+       (org-download-screenshot)))
+  (defun m/org-screenshot-to-repo-dot-images ()
+    (interactive)
+    (let ((org-download-image-dir
+            (expand-file-name ".images" (vc-root-dir))))
+       (org-download-screenshot)))
+
+  )
 
 
 
@@ -260,6 +263,33 @@
         ))))
 
 
+(use-package ob-nix
+  :after org
+  )
+
+(use-package isend-mode
+  )
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (python . t)
+   (http . t)
+   (shell . t)
+   (sqlite . t)
+   (clojure . t)
+   (java . t)
+   ;; (nix . t)
+   ;;    (nix-to-stdin . t)
+   ;; (haskell . t)
+   ;; (javascript . t)
+   ;; (lisp . t)
+   ;; (R . t)
+   ;; (sql . t)
+   ;; (typescript . t)     ; (use-package ob-typescript)
+   ;; (mongo . t)     ; (use-package ob-mongo)
+   ;; (jupyter . t)
+   ))
 
 
 ;; -------------------------------------------------------------------

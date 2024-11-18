@@ -417,6 +417,11 @@
 		 (delete-other-windows)
 		 )
 	   "drilltodo only")
+	  ("o" (lambda () (interactive)
+		     (let ((tt (read-string "drill tag: ")))
+               (org-ql-search (org-agenda-files) `(and (tags "drill") (tags ,tt) (not (tags "english" "spanish" "humor"))) :sort '(date))
+		       (delete-other-windows)))
+	   "drill only")
 
 	  )
 
