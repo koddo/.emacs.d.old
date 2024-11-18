@@ -16,7 +16,6 @@
 (setq org-log-into-drawer t      ; log both into :LOGBOOK:
       org-clock-into-drawer t)
 (setq org-log-repeat nil)   ; disable :LAST_REPEAT:
-(setq org-todo-repeat-to-state t)   ; habit -> done -> habit, not todo
 
 (add-hook 'org-capture-mode-hook
           (lambda ()
@@ -31,25 +30,6 @@
 
 ;; -------------------------------------------------------------------
 
-;; t vs. T
-;; "PAUSED(p!)"
-;; "WORKING(w!)"
-(setq ym-org-todo-keywords-working '("TODAY(T!)" "NOW(n!)"))
-(setq ym-org-todo-keywords-undone
-      `("TODO(t!)" "NEXT(n!)"
-	,@ym-org-todo-keywords-working
-	"POSTPONED(P!)" "WAITING(W!)" "IN PROGRESS(i!)"
-	"HABIT(h/@)" "REGULARLY(r!)" "SOMEDAY(S!)" "MAYBE(M!)"
-	))
-(setq ym-org-todo-keywords-done
-      '("DONE(d!)"
-	"CANCELED(c@)"
-	"HABIT SKIPPED(!)"
-	"REDIRECTED(R@)" "DELEGATED(D@)"
-	"MERGED(m@)" "JIRA(j@)"))
-(setq ym-org-todo-state-string-in-log "State:     (")
-(setq org-todo-keywords
-      `((sequence ,@ym-org-todo-keywords-undone "|" ,@ym-org-todo-keywords-done)))
 
 
 ;; -------------------------------------------------------------------
